@@ -1,5 +1,7 @@
 # Flutter Map Marker Cluster
 
+[![pub package](https://img.shields.io/pub/v/flutter_map_marker_cluster.svg)](https://pub.dartlang.org/packages/flutter_map_marker_cluster) ![travis](https://api.travis-ci.com/lpongetti/flutter_map_marker_cluster.svg?branch=master)
+
 A Dart implementation of Leaflet.markercluster for Flutter apps.
 This is a plugin for [flutter_map](https://github.com/johnpryan/flutter_map) package
 
