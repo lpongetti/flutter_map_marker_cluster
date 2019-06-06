@@ -532,6 +532,8 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
     List<Widget> layers = [];
 
+    if (_polygon != null) layers.add(_polygon);
+
     if (zoom < currentZoom || zoom > currentZoom) {
       previusZoom = currentZoom;
       currentZoom = zoom;
@@ -545,8 +547,6 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     _topClusterLevel.recurvisely(currentZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
-
-    if (_polygon != null) layers.add(_polygon);
 
     return layers;
   }
