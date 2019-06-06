@@ -1,4 +1,4 @@
-# flutter_map_marker_cluster
+# Flutter Map Marker Cluster
 
 A Dart implementation of Leaflet.markercluster for Flutter apps.
 This is a plugin for [flutter_map](https://github.com/johnpryan/flutter_map) package
