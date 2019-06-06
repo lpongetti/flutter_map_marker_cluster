@@ -21,7 +21,8 @@ class QuickHull {
     LatLng maxPt;
     List<LatLng> newPoints = [];
 
-    for (var pt in latLngs) {
+    for (var i = latLngs.length - 1; i >= 0; i--) {
+      var pt = latLngs[i];
       var d = _getDistant(pt, baseLine);
 
       if (d > 0) {
@@ -60,7 +61,9 @@ class QuickHull {
 
     LatLng maxLatPt, minLatPt, maxLngPt, minLngPt, maxPt, minPt;
 
-    for (var pt in latLngs) {
+    for (var i = latLngs.length - 1; i >= 0; i--) {
+      var pt = latLngs[i];
+
       if (maxLat == null || pt.latitude > maxLat) {
         maxLatPt = pt;
         maxLat = pt.latitude;

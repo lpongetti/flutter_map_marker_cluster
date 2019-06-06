@@ -1,13 +1,13 @@
 import 'dart:math';
 
 class DistanceGrid<T> {
-  final int cellSize;
+  final num cellSize;
 
-  double _sqCellSize;
+  num _sqCellSize;
   Map<num, Map<num, List<T>>> _grid = {};
   Map<T, Point> _objectPoint = {};
 
-  DistanceGrid(this.cellSize) : _sqCellSize = (cellSize * cellSize).toDouble();
+  DistanceGrid(this.cellSize) : _sqCellSize = cellSize * cellSize;
 
   addObject(T obj, Point point) {
     var x = _getCoord(point.x), y = _getCoord(point.y);

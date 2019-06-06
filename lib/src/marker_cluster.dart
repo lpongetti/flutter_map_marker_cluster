@@ -5,6 +5,7 @@ import 'package:flutter_map/src/core/center_zoom.dart' show CenterZoom;
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
+import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong/latlong.dart';
@@ -17,8 +18,8 @@ enum _FadeType {
 
 enum _TranslateType {
   None,
-  To,
-  From,
+  FromMyPosToNewPos,
+  FromNewPosToMyPos,
 }
 
 class PolygonOptions {
@@ -50,19 +51,48 @@ typedef ClusterWidgetBuilder = Widget Function(
     BuildContext context, List<Marker> markers);
 
 class MarkerClusterGroupLayerOptions extends LayerOptions {
+  /// Cluster builder
   final ClusterWidgetBuilder builder;
+
+  /// List of markers
   final List<Marker> markers;
+
+  /// Cluster width
   final double width;
+
+  /// Cluster height
   final double height;
+
+  /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
+
+  /// Options for fit bounds
   final FitBoundsOptions fitBoundsOptions;
+
+  /// Zoom buonds with animation on click cluster
   final bool zoomToBoundsOnClick;
+
+  /// Duration for all animations
   final Duration animationDuration;
+
+  /// When click marker, center it with animation
   final bool centerMarkerOnClick;
+
+  /// Increase to increase the distance away that spiderfied markers appear from the center
   final int spiderfyDistanceMultiplier;
+
+  /// Show spiral instead of circle from this marker count upwards.
+  /// 0 -> always spiral; Infinity -> always circle
   final int circleSpiralSwitchover;
+
+  /// Make it possible to provide custom function to calculate spiderfy shape positions
   final List<Point> Function(int, Point) spiderfyShapePositions;
+
+  /// Polygon's options that shown when tap cluster.
   final PolygonOptions polygonOptions;
+
+  /// Setting this to false prevents the removal of any clusters outside of the viewpoint, which is the default behaviour for performance reasons.
+  final bool removeOutsideVisibleBounds;
 
   MarkerClusterGroupLayerOptions({
     @required this.builder,
@@ -79,6 +109,7 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,
     this.polygonOptions = const PolygonOptions(),
+    this.removeOutsideVisibleBounds = true,
   }) : assert(builder != null);
 }
 
@@ -116,21 +147,21 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
   _MarkerClusterGroupLayerState(this.options, this.map, this.stream);
 
-  CustomPoint<num> _getPixelFromPoint(LatLng point) {
+  CustomPoint<num> _getPixelFromNewPosToMyPosPoint(LatLng point) {
     var pos = map.project(point);
     return pos.multiplyBy(map.getZoomScale(map.zoom, map.zoom)) -
         map.getPixelOrigin();
   }
 
-  Point _getPixelFromMarker(MarkerNode marker) {
-    final pos = _getPixelFromPoint(marker.point);
+  Point _getPixelFromNewPosToMyPosMarker(MarkerNode marker) {
+    final pos = _getPixelFromNewPosToMyPosPoint(marker.point);
     final x = (pos.x - (marker.width - marker.anchor.left)).toDouble();
     final y = (pos.y - (marker.height - marker.anchor.top)).toDouble();
     return Point(x, y);
   }
 
-  Point _getPixelFromCluster(MarkerClusterNode cluster) {
-    final pos = _getPixelFromPoint(cluster.point);
+  Point _getPixelFromNewPosToMyPosCluster(MarkerClusterNode cluster) {
+    final pos = _getPixelFromNewPosToMyPosPoint(cluster.point);
     final x = (pos.x - options.width / 2).toDouble();
     final y = (pos.y - options.height / 2).toDouble();
     return Point(x, y);
@@ -207,7 +238,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
         }
         parent.addChild(lastParent);
 
-        _removeFromGridUnclustered(closest, zoom);
+        _removeFromNewPosToMyPosGridUnclustered(closest, zoom);
         return;
       }
 
@@ -226,7 +257,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     _topClusterLevel.recalulateBounds();
   }
 
-  _removeFromGridUnclustered(MarkerNode marker, int zoom) {
+  _removeFromNewPosToMyPosGridUnclustered(MarkerNode marker, int zoom) {
     for (; zoom >= minZoom; zoom--) {
       if (!_gridUnclustered[zoom].removeObject(marker)) {
         break;
@@ -246,12 +277,12 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
   Animation<Point> _translateAnimation(AnimationController controller,
       _TranslateType translate, Point pos, Point newPos) {
-    if (translate == _TranslateType.From)
+    if (translate == _TranslateType.FromNewPosToMyPos)
       return Tween<Point>(
         begin: Point(newPos.x, newPos.y),
         end: Point(pos.x, pos.y),
       ).animate(controller);
-    if (translate == _TranslateType.To)
+    if (translate == _TranslateType.FromMyPosToNewPos)
       return Tween<Point>(
         begin: Point(pos.x, pos.y),
         end: Point(newPos.x, newPos.y),
@@ -267,7 +298,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     assert((translate == _TranslateType.None && newPos == null) ||
         (translate != _TranslateType.None && newPos != null));
 
-    final pos = _getPixelFromMarker(marker);
+    final pos = _getPixelFromNewPosToMyPosMarker(marker);
 
     Animation<double> fadeAnimation = _fadeAnimation(controller, fade);
     Animation<Point> translateAnimation =
@@ -299,7 +330,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   List<Widget> _buildSpiderfyCluster(MarkerClusterNode cluster, int zoom) {
-    final pos = _getPixelFromCluster(cluster);
+    final pos = _getPixelFromNewPosToMyPosCluster(cluster);
 
     final points = _generatePointSpiderfy(cluster.markers.length, pos);
 
@@ -337,7 +368,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       final marker = cluster.markers[i];
 
       results.add(_buildMarker(marker, _spiderfyController, _FadeType.FadeIn,
-          _TranslateType.To, points[i]));
+          _TranslateType.FromMyPosToNewPos, points[i]));
     }
 
     return results;
@@ -350,7 +381,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     assert((translate == _TranslateType.None && newPos == null) ||
         (translate != _TranslateType.None && newPos != null));
 
-    final pos = _getPixelFromCluster(cluster);
+    final pos = _getPixelFromNewPosToMyPosCluster(cluster);
 
     Animation<double> fadeAnimation = _fadeAnimation(_zoomController, fade);
     Animation<Point> translateAnimation =
@@ -415,6 +446,81 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     }
   }
 
+  List<Widget> _buildLayer(layer) {
+    if (options.removeOutsideVisibleBounds) {
+      if (!map.bounds.contains(layer.point)) {
+        return List<Widget>();
+      }
+    }
+
+    List<Widget> layers = [];
+
+    if (layer is MarkerNode) {
+      // fadein if
+      // animating and
+      // zoomin and parent has the previus zoom
+      if (_zoomController.isAnimating &&
+          (currentZoom > previusZoom && layer.parent.zoom == previusZoom)) {
+        // marker
+        layers.add(_buildMarker(
+            layer,
+            _zoomController,
+            _FadeType.FadeIn,
+            _TranslateType.FromNewPosToMyPos,
+            _getPixelFromNewPosToMyPosCluster(layer.parent)));
+        //parent
+        layers.add(_buildCluster(layer.parent, _FadeType.FadeOut));
+      } else {
+        layers.add(_buildMarker(layer, _zoomController));
+      }
+    }
+    if (layer is MarkerClusterNode) {
+      // fadein if
+      // animating and
+      // zoomout and children is more than one or zoomin and father has same point
+      if (_zoomController.isAnimating &&
+          (currentZoom < previusZoom && layer.children.length > 1)) {
+        // cluster
+        layers.add(_buildCluster(layer, _FadeType.FadeIn));
+        // children
+        layer.children.forEach((child) {
+          if (child is MarkerNode) {
+            layers.add(_buildMarker(
+                child,
+                _zoomController,
+                _FadeType.FadeOut,
+                _TranslateType.FromMyPosToNewPos,
+                _getPixelFromNewPosToMyPosCluster(layer)));
+          } else {
+            layers.add(_buildCluster(
+                child,
+                _FadeType.FadeOut,
+                _TranslateType.FromMyPosToNewPos,
+                _getPixelFromNewPosToMyPosCluster(layer)));
+          }
+        });
+      } else if (_zoomController.isAnimating &&
+          (currentZoom > previusZoom && layer.parent.point != layer.point)) {
+        // cluster
+        layers.add(_buildCluster(
+            layer,
+            _FadeType.FadeIn,
+            _TranslateType.FromNewPosToMyPos,
+            _getPixelFromNewPosToMyPosCluster(layer.parent)));
+        //parent
+        layers.add(_buildCluster(layer.parent, _FadeType.FadeOut));
+      } else {
+        if (_isSpiderfyCluster(layer)) {
+          layers.addAll(_buildSpiderfyCluster(layer, currentZoom));
+        } else {
+          layers.add(_buildCluster(layer));
+        }
+      }
+    }
+
+    return layers;
+  }
+
   List<Widget> _buildLayers() {
     if (map.zoom != previusZoomDouble) {
       previusZoomDouble = map.zoom;
@@ -424,8 +530,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
     int zoom = map.zoom.ceil();
 
-    List<Widget> clusters = [];
-    List<Widget> markers = [];
+    List<Widget> layers = [];
 
     if (zoom < currentZoom || zoom > currentZoom) {
       previusZoom = currentZoom;
@@ -438,64 +543,12 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     }
 
     _topClusterLevel.recurvisely(currentZoom, (layer) {
-      if (layer is MarkerNode) {
-        // fadein if
-        // animating and
-        // zoomin and parent has the previus zoom
-        if (_zoomController.isAnimating &&
-            (currentZoom > previusZoom && layer.parent.zoom == previusZoom)) {
-          // marker
-          markers.add(_buildMarker(layer, _zoomController, _FadeType.FadeIn,
-              _TranslateType.From, _getPixelFromCluster(layer.parent)));
-          //parent
-          clusters.add(_buildCluster(layer.parent, _FadeType.FadeOut));
-        } else {
-          markers.add(_buildMarker(layer, _zoomController));
-        }
-      }
-      if (layer is MarkerClusterNode) {
-        // fadein if
-        // animating and
-        // zoomout and children is more than one or zoomin and father has same point
-        if (_zoomController.isAnimating &&
-            (currentZoom < previusZoom && layer.children.length > 1)) {
-          // cluster
-          clusters.add(_buildCluster(layer, _FadeType.FadeIn));
-          // children
-          layer.children.forEach((child) {
-            if (child is MarkerNode) {
-              markers.add(_buildMarker(
-                  child,
-                  _zoomController,
-                  _FadeType.FadeOut,
-                  _TranslateType.To,
-                  _getPixelFromCluster(layer)));
-            } else {
-              clusters.add(_buildCluster(child, _FadeType.FadeOut,
-                  _TranslateType.To, _getPixelFromCluster(layer)));
-            }
-          });
-        } else if (_zoomController.isAnimating &&
-            (currentZoom > previusZoom && layer.parent.point != layer.point)) {
-          // cluster
-          clusters.add(_buildCluster(layer, _FadeType.FadeIn,
-              _TranslateType.From, _getPixelFromCluster(layer.parent)));
-          //parent
-          clusters.add(_buildCluster(layer.parent, _FadeType.FadeOut));
-        } else {
-          if (_isSpiderfyCluster(layer)) {
-            clusters.addAll(_buildSpiderfyCluster(layer, currentZoom));
-          } else {
-            clusters.add(_buildCluster(layer));
-          }
-        }
-      }
+      layers.addAll(_buildLayer(layer));
     });
 
-    List<Widget> result = [];
-    if (_polygon != null) result.add(_polygon);
+    if (_polygon != null) layers.add(_polygon);
 
-    return result..addAll(clusters)..addAll(markers);
+    return layers;
   }
 
   _isSpiderfyCluster(MarkerClusterNode cluster) {
@@ -648,67 +701,11 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       return options.spiderfyShapePositions(count, center);
     }
     if (count >= options.circleSpiralSwitchover) {
-      return _generatePointsSpiral(count, center);
+      return Spiderfy.spiral(options.spiderfyDistanceMultiplier, count, center);
     }
 
-    return _generatePointsCircle(count, center);
-  }
-
-  List<Point> _generatePointsSpiral(int count, Point center) {
-    final pi2 = pi * 2;
-    final spiralFootSeparation = 28; //related to size of spiral (experiment!)
-    final spiralLengthStart = 11;
-    final spiralLengthFactor = 5;
-
-    // var spiderfyDistanceMultiplier = widget.spiderfyDistanceMultiplier,
-    num legLength = options.spiderfyDistanceMultiplier * spiralLengthStart;
-    final separation =
-        options.spiderfyDistanceMultiplier * spiralFootSeparation;
-    final lengthFactor =
-        options.spiderfyDistanceMultiplier * spiralLengthFactor * pi2;
-    num angle = 0;
-
-    final result = List<Point>(count);
-    // Higher index, closer position to cluster center.
-    for (var i = count; i >= 0; i--) {
-      // Skip the first position, so that we are already farther from center and we avoid
-      // being under the default cluster icon (especially important for Circle Markers).
-      if (i < count) {
-        result[i] = CustomPoint<double>(center.x + legLength * cos(angle),
-            center.y + legLength * sin(angle));
-      }
-      angle += separation / legLength + i * 0.0005;
-      legLength += lengthFactor / angle;
-    }
-    return result;
-  }
-
-  List<Point> _generatePointsCircle(int count, Point center) {
-    final pi2 = pi * 2;
-    final circleFootSeparation = 25; //related to circumference of circle
-    final circleStartAngle = 0;
-
-    num circumference =
-        options.spiderfyDistanceMultiplier * circleFootSeparation * (2 + count);
-    double legLength = circumference / pi2; //radius from circumference
-    double angleStep = pi2 / count;
-
-    legLength = max(
-        legLength,
-        max(
-            options.height,
-            options
-                .width)); // Minimum distance to get outside the cluster icon.
-
-    final result = List<Point>(count);
-
-    for (var i = 0; i < count; i++) {
-      double angle = circleStartAngle + i * angleStep;
-
-      result[i] = CustomPoint<double>(center.x + 5 + legLength * cos(angle),
-          center.y + 5 + legLength * sin(angle));
-    }
-    return result;
+    return Spiderfy.circle(max(options.width, options.height),
+        options.spiderfyDistanceMultiplier, count, center);
   }
 
   @override
