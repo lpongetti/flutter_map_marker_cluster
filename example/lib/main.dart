@@ -31,6 +31,13 @@ final markers = [
     point: LatLng(48.8566, 2.3522),
     builder: (ctx) => Icon(Icons.pin_drop),
   ),
+  Marker(
+    anchorPos: AnchorPos.align(AnchorAlign.center),
+    height: 30,
+    width: 30,
+    point: LatLng(49.8566, 3.3522),
+    builder: (ctx) => Icon(Icons.pin_drop),
+  ),
 ];
 
 void main() => runApp(MyApp());
