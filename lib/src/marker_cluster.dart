@@ -88,6 +88,9 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
   /// Make it possible to provide custom function to calculate spiderfy shape positions
   final List<Point> Function(int, Point) spiderfyShapePositions;
 
+  /// If true show polygon then tap on cluster
+  final bool showPolygon;
+
   /// Polygon's options that shown when tap cluster.
   final PolygonOptions polygonOptions;
 
@@ -110,6 +113,7 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
     this.spiderfyShapePositions,
     this.polygonOptions = const PolygonOptions(),
     this.removeOutsideVisibleBounds = true,
+    this.showPolygon = true,
   }) : assert(builder != null);
 }
 
@@ -540,8 +544,9 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
       _zoomController
         ..reset()
-        ..forward().then(
-            (_) => setState(() {})); // for remove previus layer (animation)
+        ..forward().then((_) => setState(() {
+              _hidePolygon();
+            })); // for remove previus layer (animation)
     }
 
     _topClusterLevel.recurvisely(currentZoom, (layer) {
@@ -574,69 +579,65 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
       if (!options.zoomToBoundsOnClick) return null;
 
-      _showPolygon(cluster.children.fold<List<LatLng>>([], (result, child) {
-        if (child is MarkerNode) result.add(child.point);
-        if (child is MarkerClusterNode) result.add(child.point);
-        return result;
-      }));
+      _showPolygon(cluster.markers.fold<List<LatLng>>(
+          [], (result, marker) => result..add(marker.point)));
 
-      Future.delayed(Duration(milliseconds: 500)).then((_) {
-        _hidePolygon();
+      final center = map.center;
+      final dest =
+          _getBoundsCenterZoom(cluster.bounds, options.fitBoundsOptions);
 
-        final center = map.center;
-        final dest =
-            _getBoundsCenterZoom(cluster.bounds, options.fitBoundsOptions);
+      final _latTween =
+          Tween<double>(begin: center.latitude, end: dest.center.latitude);
+      final _lngTween =
+          Tween<double>(begin: center.longitude, end: dest.center.longitude);
+      final _zoomTween =
+          Tween<double>(begin: currentZoom.toDouble(), end: dest.zoom);
 
-        final _latTween =
-            Tween<double>(begin: center.latitude, end: dest.center.latitude);
-        final _lngTween =
-            Tween<double>(begin: center.longitude, end: dest.center.longitude);
-        final _zoomTween =
-            Tween<double>(begin: currentZoom.toDouble(), end: dest.zoom);
+      Animation<double> animation = CurvedAnimation(
+          parent: _fitBoundController, curve: Curves.fastOutSlowIn);
 
-        Animation<double> animation = CurvedAnimation(
-            parent: _fitBoundController, curve: Curves.fastOutSlowIn);
+      final listener = () {
+        map.move(
+          LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)),
+          _zoomTween.evaluate(animation),
+        );
+      };
 
-        final listener = () {
-          map.move(
-            LatLng(
-                _latTween.evaluate(animation), _lngTween.evaluate(animation)),
-            _zoomTween.evaluate(animation),
-          );
-        };
+      _fitBoundController.addListener(listener);
 
-        _fitBoundController.addListener(listener);
-
-        _fitBoundController.forward().then((_) {
-          _fitBoundController
-            ..removeListener(listener)
-            ..reset();
-        });
+      _fitBoundController.forward().then((_) {
+        _fitBoundController
+          ..removeListener(listener)
+          ..reset();
       });
     };
   }
 
   _showPolygon(List<LatLng> points) {
-    setState(() {
-      _polygon = PolygonLayer(
-        PolygonLayerOptions(polygons: [
-          Polygon(
-            points: QuickHull.getConvexHull(points),
-            borderStrokeWidth: options.polygonOptions.borderStrokeWidth,
-            color: options.polygonOptions.color,
-            borderColor: options.polygonOptions.borderColor,
-          ),
-        ]),
-        map,
-        stream,
-      );
-    });
+    if (options.showPolygon) {
+      setState(() {
+        _polygon = PolygonLayer(
+          PolygonLayerOptions(polygons: [
+            Polygon(
+              points: QuickHull.getConvexHull(points),
+              borderStrokeWidth: options.polygonOptions.borderStrokeWidth,
+              color: options.polygonOptions.color,
+              borderColor: options.polygonOptions.borderColor,
+            ),
+          ]),
+          map,
+          stream,
+        );
+      });
+    }
   }
 
   _hidePolygon() {
-    setState(() {
-      _polygon = null;
-    });
+    if (options.showPolygon) {
+      setState(() {
+        _polygon = null;
+      });
+    }
   }
 
   Function _onMarkerTap(MarkerNode marker) {
