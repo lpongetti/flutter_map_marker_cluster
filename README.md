@@ -14,10 +14,11 @@ This is a plugin for [flutter_map](https://github.com/johnpryan/flutter_map) pac
 
 ## Usage
 
-Add flutter_map to your pubspec:
+Add flutter_map and  flutter_map_marker_cluster to your pubspec:
 
 ```yaml
 dependencies:
+  flutter_map: any
   flutter_map_marker_cluster: any # or the latest version on Pub
 ```
 
