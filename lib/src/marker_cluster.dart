@@ -1,8 +1,8 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/src/core/center_zoom.dart' show CenterZoom;
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
 import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
@@ -26,11 +26,13 @@ class PolygonOptions {
   final Color color;
   final double borderStrokeWidth;
   final Color borderColor;
+  final bool isDotted;
 
   const PolygonOptions({
     this.color = const Color(0xFF00FF00),
     this.borderStrokeWidth = 0.0,
     this.borderColor = const Color(0xFFFFFF00),
+    this.isDotted = false,
   });
 }
 
@@ -63,6 +65,8 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
   /// Cluster height
   final double height;
 
+  final Anchor anchor;
+
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
 
@@ -94,14 +98,12 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
   /// Polygon's options that shown when tap cluster.
   final PolygonOptions polygonOptions;
 
-  /// Setting this to false prevents the removal of any clusters outside of the viewpoint, which is the default behaviour for performance reasons.
-  final bool removeOutsideVisibleBounds;
-
   MarkerClusterGroupLayerOptions({
     @required this.builder,
     this.markers = const [],
     this.width = 30,
     this.height = 30,
+    AnchorPos anchorPos,
     this.maxClusterRadius = 80,
     this.animationDuration = const Duration(milliseconds: 500),
     this.fitBoundsOptions =
@@ -112,9 +114,9 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,
     this.polygonOptions = const PolygonOptions(),
-    this.removeOutsideVisibleBounds = true,
     this.showPolygon = true,
-  }) : assert(builder != null);
+  })  : assert(builder != null),
+        anchor = Anchor.forPos(anchorPos, width, height);
 }
 
 class MarkerClusterGroupLayer extends StatefulWidget {
@@ -450,16 +452,36 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     }
   }
 
-  List<Widget> _buildLayer(layer) {
-    if (options.removeOutsideVisibleBounds) {
-      if (!map.bounds.contains(layer.point)) {
-        return List<Widget>();
-      }
-    }
+  bool _boundsContainsMarker(MarkerNode marker) {
+    var pixelPoint = map.project(marker.point);
 
+    final width = marker.width - marker.anchor.left;
+    final height = marker.height - marker.anchor.top;
+
+    var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
+    var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
+    return map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
+  }
+
+  bool _boundsContainsCluster(MarkerClusterNode cluster) {
+    var pixelPoint = map.project(cluster.point);
+
+    final width = options.width - options.anchor.left;
+    final height = options.height - options.anchor.top;
+
+    var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
+    var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
+    return map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
+  }
+
+  List<Widget> _buildLayer(layer) {
     List<Widget> layers = [];
 
     if (layer is MarkerNode) {
+      if (!_boundsContainsMarker(layer)) {
+        return List<Widget>();
+      }
+
       // fadein if
       // animating and
       // zoomin and parent has the previus zoom
@@ -479,6 +501,10 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       }
     }
     if (layer is MarkerClusterNode) {
+      if (!_boundsContainsCluster(layer)) {
+        return List<Widget>();
+      }
+
       // fadein if
       // animating and
       // zoomout and children is more than one or zoomin and father has same point
@@ -584,7 +610,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
       final center = map.center;
       final dest =
-          _getBoundsCenterZoom(cluster.bounds, options.fitBoundsOptions);
+          map.getBoundsCenterZoom(cluster.bounds, options.fitBoundsOptions);
 
       final _latTween =
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
@@ -623,6 +649,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
               borderStrokeWidth: options.polygonOptions.borderStrokeWidth,
               color: options.polygonOptions.color,
               borderColor: options.polygonOptions.borderColor,
+              isDotted: options.polygonOptions.isDotted,
             ),
           ]),
           map,
@@ -673,28 +700,6 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
           ..reset();
       });
     };
-  }
-
-  CenterZoom _getBoundsCenterZoom(
-      LatLngBounds bounds, FitBoundsOptions options) {
-    var paddingTL =
-        CustomPoint<double>(options.padding.left, options.padding.top);
-    var paddingBR =
-        CustomPoint<double>(options.padding.right, options.padding.bottom);
-
-    var paddingTotalXY = paddingTL + paddingBR;
-
-    var zoom = map.getBoundsZoom(bounds, paddingTotalXY, inside: false);
-    zoom = min(options.maxZoom, zoom);
-
-    var paddingOffset = (paddingBR - paddingTL) / 2;
-    var swPoint = map.project(bounds.southWest, zoom);
-    var nePoint = map.project(bounds.northEast, zoom);
-    var center = map.unproject((swPoint + nePoint) / 2 + paddingOffset, zoom);
-    return CenterZoom(
-      center: center,
-      zoom: zoom,
-    );
   }
 
   List<Point> _generatePointSpiderfy(int count, Point center) {

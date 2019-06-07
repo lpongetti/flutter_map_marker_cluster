@@ -20,7 +20,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map: 0.5.3+1
+  flutter_map: 0.5.5+2
   flutter_map_marker_cluster:
     path: ../
 
