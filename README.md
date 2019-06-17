@@ -29,7 +29,7 @@ Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`
     return FlutterMap(
       options: new MapOptions(
         plugins: [
-          MarkerClusterGroupPlugin(),
+          MarkerClusterPlugin(),
         ],
       ),
       layers: [
@@ -37,7 +37,7 @@ Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: ['a', 'b', 'c'],
         ),
-        MarkerClusterGroupLayerOptions(
+        MarkerClusterLayerOptions(
           maxClusterRadius: 120,
           height: 40,
           width: 40,

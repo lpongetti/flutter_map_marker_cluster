@@ -1,26 +1,16 @@
 import 'dart:math';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map/src/core/bounds.dart';
+import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
 import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong/latlong.dart';
-
-enum _FadeType {
-  None,
-  FadeIn,
-  FadeOut,
-}
-
-enum _TranslateType {
-  None,
-  FromMyPosToNewPos,
-  FromNewPosToMyPos,
-}
 
 class PolygonOptions {
   final Color color;
@@ -36,23 +26,23 @@ class PolygonOptions {
   });
 }
 
-class MarkerClusterGroupPlugin extends MapPlugin {
+class MarkerClusterPlugin extends MapPlugin {
   @override
   Widget createLayer(
       LayerOptions options, MapState mapState, Stream<Null> stream) {
-    return MarkerClusterGroupLayer(options, mapState, stream);
+    return MarkerClusterLayer(options, mapState, stream);
   }
 
   @override
   bool supportsLayer(LayerOptions options) {
-    return options is MarkerClusterGroupLayerOptions;
+    return options is MarkerClusterLayerOptions;
   }
 }
 
 typedef ClusterWidgetBuilder = Widget Function(
     BuildContext context, List<Marker> markers);
 
-class MarkerClusterGroupLayerOptions extends LayerOptions {
+class MarkerClusterLayerOptions extends LayerOptions {
   /// Cluster builder
   final ClusterWidgetBuilder builder;
 
@@ -98,7 +88,7 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
   /// Polygon's options that shown when tap cluster.
   final PolygonOptions polygonOptions;
 
-  MarkerClusterGroupLayerOptions({
+  MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
     this.width = 30,
@@ -119,39 +109,40 @@ class MarkerClusterGroupLayerOptions extends LayerOptions {
         anchor = Anchor.forPos(anchorPos, width, height);
 }
 
-class MarkerClusterGroupLayer extends StatefulWidget {
-  final MarkerClusterGroupLayerOptions options;
+class MarkerClusterLayer extends StatefulWidget {
+  final MarkerClusterLayerOptions options;
   final MapState map;
   final Stream<Null> stream;
 
-  MarkerClusterGroupLayer(this.options, this.map, this.stream);
+  MarkerClusterLayer(this.options, this.map, this.stream);
 
   @override
-  _MarkerClusterGroupLayerState createState() =>
-      _MarkerClusterGroupLayerState(this.options, this.map, this.stream);
+  _MarkerClusterLayerState createState() =>
+      _MarkerClusterLayerState(this.options, this.map, this.stream);
 }
 
-class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
+class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     with TickerProviderStateMixin {
-  final MarkerClusterGroupLayerOptions options;
+  final MarkerClusterLayerOptions options;
   final MapState map;
   final Stream<Null> stream;
   Map<int, DistanceGrid<MarkerClusterNode>> _gridClusters = {};
   Map<int, DistanceGrid<MarkerNode>> _gridUnclustered = {};
   MarkerClusterNode _topClusterLevel;
-  int maxZoom;
-  int minZoom;
-  int currentZoom;
-  int previusZoom;
-  double previusZoomDouble;
+  int _maxZoom;
+  int _minZoom;
+  int _currentZoom;
+  int _previusZoom;
+  double _previusZoomDouble;
   AnimationController _zoomController;
   AnimationController _fitBoundController;
   AnimationController _centerMarkerController;
   AnimationController _spiderfyController;
   MarkerClusterNode _spiderfyCluster;
   PolygonLayer _polygon;
+  List<Marker> _markers;
 
-  _MarkerClusterGroupLayerState(this.options, this.map, this.stream);
+  _MarkerClusterLayerState(this.options, this.map, this.stream);
 
   CustomPoint<num> _getPixelFromNewPosToMyPosPoint(LatLng point) {
     var pos = map.project(point);
@@ -197,19 +188,19 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
   _initializeClusters() {
     // set up DistanceGrids for each zoom
-    for (var zoom = maxZoom; zoom >= minZoom; zoom--) {
+    for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
       _gridClusters[zoom] = DistanceGrid(options.maxClusterRadius);
       _gridUnclustered[zoom] = DistanceGrid(options.maxClusterRadius);
     }
 
     _topClusterLevel = MarkerClusterNode(
-      zoom: minZoom - 1,
+      zoom: _minZoom - 1,
       map: map,
     );
   }
 
   _addLayer(MarkerNode marker) {
-    for (var zoom = maxZoom; zoom >= minZoom; zoom--) {
+    for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
       var markerPoint = map.project(marker.point, zoom.toDouble());
       // try find a cluster close by
       var cluster = _gridClusters[zoom].getNearObject(markerPoint);
@@ -256,7 +247,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   _addLayers() {
-    for (var marker in options.markers) {
+    for (var marker in _markers) {
       _addLayer(MarkerNode(marker));
     }
 
@@ -264,7 +255,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   _removeFromNewPosToMyPosGridUnclustered(MarkerNode marker, int zoom) {
-    for (; zoom >= minZoom; zoom--) {
+    for (; zoom >= _minZoom; zoom--) {
       if (!_gridUnclustered[zoom].removeObject(marker)) {
         break;
       }
@@ -272,23 +263,23 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   Animation<double> _fadeAnimation(
-      AnimationController controller, _FadeType fade) {
-    if (fade == _FadeType.FadeIn)
+      AnimationController controller, FadeType fade) {
+    if (fade == FadeType.FadeIn)
       return Tween<double>(begin: 0.0, end: 1.0).animate(controller);
-    if (fade == _FadeType.FadeOut)
+    if (fade == FadeType.FadeOut)
       return Tween<double>(begin: 1.0, end: 0.0).animate(controller);
 
     return null;
   }
 
   Animation<Point> _translateAnimation(AnimationController controller,
-      _TranslateType translate, Point pos, Point newPos) {
-    if (translate == _TranslateType.FromNewPosToMyPos)
+      TranslateType translate, Point pos, Point newPos) {
+    if (translate == TranslateType.FromNewPosToMyPos)
       return Tween<Point>(
         begin: Point(newPos.x, newPos.y),
         end: Point(pos.x, pos.y),
       ).animate(controller);
-    if (translate == _TranslateType.FromMyPosToNewPos)
+    if (translate == TranslateType.FromMyPosToNewPos)
       return Tween<Point>(
         begin: Point(pos.x, pos.y),
         end: Point(newPos.x, newPos.y),
@@ -298,11 +289,11 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   Widget _buildMarker(MarkerNode marker, AnimationController controller,
-      [_FadeType fade = _FadeType.None,
-      _TranslateType translate = _TranslateType.None,
+      [FadeType fade = FadeType.None,
+      TranslateType translate = TranslateType.None,
       Point newPos]) {
-    assert((translate == _TranslateType.None && newPos == null) ||
-        (translate != _TranslateType.None && newPos != null));
+    assert((translate == TranslateType.None && newPos == null) ||
+        (translate != TranslateType.None && newPos != null));
 
     final pos = _getPixelFromNewPosToMyPosMarker(marker);
 
@@ -320,14 +311,14 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
         return Positioned(
           width: marker.width,
           height: marker.height,
-          left: translate == _TranslateType.None
+          left: translate == TranslateType.None
               ? pos.x
               : translateAnimation.value.x,
-          top: translate == _TranslateType.None
+          top: translate == TranslateType.None
               ? pos.y
               : translateAnimation.value.y,
           child: Opacity(
-            opacity: fade == _FadeType.None ? 1 : fadeAnimation.value,
+            opacity: fade == FadeType.None ? 1 : fadeAnimation.value,
             child: child,
           ),
         );
@@ -373,19 +364,19 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     for (var i = 0; i < cluster.markers.length; i++) {
       final marker = cluster.markers[i];
 
-      results.add(_buildMarker(marker, _spiderfyController, _FadeType.FadeIn,
-          _TranslateType.FromMyPosToNewPos, points[i]));
+      results.add(_buildMarker(marker, _spiderfyController, FadeType.FadeIn,
+          TranslateType.FromMyPosToNewPos, points[i]));
     }
 
     return results;
   }
 
   Widget _buildCluster(MarkerClusterNode cluster,
-      [_FadeType fade = _FadeType.None,
-      _TranslateType translate = _TranslateType.None,
+      [FadeType fade = FadeType.None,
+      TranslateType translate = TranslateType.None,
       Point newPos]) {
-    assert((translate == _TranslateType.None && newPos == null) ||
-        (translate != _TranslateType.None && newPos != null));
+    assert((translate == TranslateType.None && newPos == null) ||
+        (translate != TranslateType.None && newPos != null));
 
     final pos = _getPixelFromNewPosToMyPosCluster(cluster);
 
@@ -406,14 +397,14 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
         return Positioned(
           width: options.width,
           height: options.height,
-          left: translate == _TranslateType.None
+          left: translate == TranslateType.None
               ? pos.x
               : translateAnimation.value.x,
-          top: translate == _TranslateType.None
+          top: translate == TranslateType.None
               ? pos.y
               : translateAnimation.value.y,
           child: Opacity(
-            opacity: fade == _FadeType.None ? 1 : fadeAnimation.value,
+            opacity: fade == FadeType.None ? 1 : fadeAnimation.value,
             child: child,
           ),
         );
@@ -486,16 +477,16 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       // animating and
       // zoomin and parent has the previus zoom
       if (_zoomController.isAnimating &&
-          (currentZoom > previusZoom && layer.parent.zoom == previusZoom)) {
+          (_currentZoom > _previusZoom && layer.parent.zoom == _previusZoom)) {
         // marker
         layers.add(_buildMarker(
             layer,
             _zoomController,
-            _FadeType.FadeIn,
-            _TranslateType.FromNewPosToMyPos,
+            FadeType.FadeIn,
+            TranslateType.FromNewPosToMyPos,
             _getPixelFromNewPosToMyPosCluster(layer.parent)));
         //parent
-        layers.add(_buildCluster(layer.parent, _FadeType.FadeOut));
+        layers.add(_buildCluster(layer.parent, FadeType.FadeOut));
       } else {
         layers.add(_buildMarker(layer, _zoomController));
       }
@@ -509,39 +500,39 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       // animating and
       // zoomout and children is more than one or zoomin and father has same point
       if (_zoomController.isAnimating &&
-          (currentZoom < previusZoom && layer.children.length > 1)) {
+          (_currentZoom < _previusZoom && layer.children.length > 1)) {
         // cluster
-        layers.add(_buildCluster(layer, _FadeType.FadeIn));
+        layers.add(_buildCluster(layer, FadeType.FadeIn));
         // children
         layer.children.forEach((child) {
           if (child is MarkerNode) {
             layers.add(_buildMarker(
                 child,
                 _zoomController,
-                _FadeType.FadeOut,
-                _TranslateType.FromMyPosToNewPos,
+                FadeType.FadeOut,
+                TranslateType.FromMyPosToNewPos,
                 _getPixelFromNewPosToMyPosCluster(layer)));
           } else {
             layers.add(_buildCluster(
                 child,
-                _FadeType.FadeOut,
-                _TranslateType.FromMyPosToNewPos,
+                FadeType.FadeOut,
+                TranslateType.FromMyPosToNewPos,
                 _getPixelFromNewPosToMyPosCluster(layer)));
           }
         });
       } else if (_zoomController.isAnimating &&
-          (currentZoom > previusZoom && layer.parent.point != layer.point)) {
+          (_currentZoom > _previusZoom && layer.parent.point != layer.point)) {
         // cluster
         layers.add(_buildCluster(
             layer,
-            _FadeType.FadeIn,
-            _TranslateType.FromNewPosToMyPos,
+            FadeType.FadeIn,
+            TranslateType.FromNewPosToMyPos,
             _getPixelFromNewPosToMyPosCluster(layer.parent)));
         //parent
-        layers.add(_buildCluster(layer.parent, _FadeType.FadeOut));
+        layers.add(_buildCluster(layer.parent, FadeType.FadeOut));
       } else {
         if (_isSpiderfyCluster(layer)) {
-          layers.addAll(_buildSpiderfyCluster(layer, currentZoom));
+          layers.addAll(_buildSpiderfyCluster(layer, _currentZoom));
         } else {
           layers.add(_buildCluster(layer));
         }
@@ -552,8 +543,8 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
   }
 
   List<Widget> _buildLayers() {
-    if (map.zoom != previusZoomDouble) {
-      previusZoomDouble = map.zoom;
+    if (map.zoom != _previusZoomDouble) {
+      _previusZoomDouble = map.zoom;
 
       _unspiderfy();
     }
@@ -564,9 +555,9 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
     if (_polygon != null) layers.add(_polygon);
 
-    if (zoom < currentZoom || zoom > currentZoom) {
-      previusZoom = currentZoom;
-      currentZoom = zoom;
+    if (zoom < _currentZoom || zoom > _currentZoom) {
+      _previusZoom = _currentZoom;
+      _currentZoom = zoom;
 
       _zoomController
         ..reset()
@@ -575,7 +566,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
             })); // for remove previus layer (animation)
     }
 
-    _topClusterLevel.recurvisely(currentZoom, (layer) {
+    _topClusterLevel.recurvisely(_currentZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
 
@@ -596,8 +587,9 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       }
 
       // check if children can uncluster
-      final cannotDivide =
-          cluster.markers.every((marker) => marker.parent.zoom == maxZoom);
+      final cannotDivide = cluster.markers.every((marker) =>
+          marker.parent.zoom == _maxZoom &&
+          marker.parent == cluster.markers[0].parent);
       if (cannotDivide) {
         _spiderfy(cluster);
         return null;
@@ -617,7 +609,7 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
       final _lngTween =
           Tween<double>(begin: center.longitude, end: dest.center.longitude);
       final _zoomTween =
-          Tween<double>(begin: currentZoom.toDouble(), end: dest.zoom);
+          Tween<double>(begin: _currentZoom.toDouble(), end: dest.zoom);
 
       Animation<double> animation = CurvedAnimation(
           parent: _fitBoundController, curve: Curves.fastOutSlowIn);
@@ -716,14 +708,13 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
 
   @override
   void initState() {
-    currentZoom = previusZoom = map.zoom.ceil();
-    minZoom = map.options.minZoom.ceil();
-    maxZoom = map.options.maxZoom.floor();
+    _markers = List.from(options.markers);
+    _currentZoom = _previusZoom = map.zoom.ceil();
+    _minZoom = map.options.minZoom?.ceil() ?? 1;
+    _maxZoom = map.options.maxZoom?.floor() ?? 20;
 
     _initializeAnimationController();
-
     _initializeClusters();
-
     _addLayers();
 
     _zoomController.forward();
@@ -738,6 +729,16 @@ class _MarkerClusterGroupLayerState extends State<MarkerClusterGroupLayer>
     _centerMarkerController.dispose();
     _spiderfyController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(MarkerClusterLayer oldWidget) {
+    if (!listEquals(_markers, options.markers)) {
+      _markers = List.from(options.markers);
+      _initializeClusters();
+      _addLayers();
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   @override

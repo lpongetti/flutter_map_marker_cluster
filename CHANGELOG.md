@@ -1,3 +1,11 @@
+## [0.1.4] - 17/06/2019
+
+- MarkerClusterGroupPlugin to MarkerClusterPlugin
+- MarkerClusterGroupLayerOptions to MarkerClusterLayerOptions
+- maxZoom and minZoom not required ( #2 MapOptions.minZoom required )
+- refresh when change markers ( #4 setState not supported )
+- fix when spiderfy
+
 ## [0.1.3] - 07/06/2019
 
 - flutter_map version 0.5.5+2

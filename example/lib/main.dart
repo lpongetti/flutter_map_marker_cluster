@@ -65,7 +65,7 @@ class MyHomePage extends StatelessWidget {
         minZoom: 2,
         maxZoom: 16,
         plugins: [
-          MarkerClusterGroupPlugin(),
+          MarkerClusterPlugin(),
         ],
       ),
       layers: [
@@ -73,7 +73,7 @@ class MyHomePage extends StatelessWidget {
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: ['a', 'b', 'c'],
         ),
-        MarkerClusterGroupLayerOptions(
+        MarkerClusterLayerOptions(
           maxClusterRadius: 120,
           height: 40,
           width: 40,
