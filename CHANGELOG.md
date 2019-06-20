@@ -1,3 +1,8 @@
+## [0.1.5] - 20/06/2019
+
+- setState issue fixed ( #4 setState not supported )
+- added example with marker that change position
+
 ## [0.1.4] - 17/06/2019
 
 - MarkerClusterGroupPlugin to MarkerClusterPlugin
