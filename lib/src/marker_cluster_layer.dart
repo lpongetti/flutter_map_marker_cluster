@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -8,106 +7,10 @@ import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
 import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
+import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong/latlong.dart';
-
-class PolygonOptions {
-  final Color color;
-  final double borderStrokeWidth;
-  final Color borderColor;
-  final bool isDotted;
-
-  const PolygonOptions({
-    this.color = const Color(0xFF00FF00),
-    this.borderStrokeWidth = 0.0,
-    this.borderColor = const Color(0xFFFFFF00),
-    this.isDotted = false,
-  });
-}
-
-class MarkerClusterPlugin extends MapPlugin {
-  @override
-  Widget createLayer(
-      LayerOptions options, MapState mapState, Stream<Null> stream) {
-    return MarkerClusterLayer(options, mapState, stream);
-  }
-
-  @override
-  bool supportsLayer(LayerOptions options) {
-    return options is MarkerClusterLayerOptions;
-  }
-}
-
-typedef ClusterWidgetBuilder = Widget Function(
-    BuildContext context, List<Marker> markers);
-
-class MarkerClusterLayerOptions extends LayerOptions {
-  /// Cluster builder
-  final ClusterWidgetBuilder builder;
-
-  /// List of markers
-  final List<Marker> markers;
-
-  /// Cluster width
-  final double width;
-
-  /// Cluster height
-  final double height;
-
-  final Anchor anchor;
-
-  /// A cluster will cover at most this many pixels from its center
-  final int maxClusterRadius;
-
-  /// Options for fit bounds
-  final FitBoundsOptions fitBoundsOptions;
-
-  /// Zoom buonds with animation on click cluster
-  final bool zoomToBoundsOnClick;
-
-  /// Duration for all animations
-  final Duration animationDuration;
-
-  /// When click marker, center it with animation
-  final bool centerMarkerOnClick;
-
-  /// Increase to increase the distance away that spiderfied markers appear from the center
-  final int spiderfyDistanceMultiplier;
-
-  /// Show spiral instead of circle from this marker count upwards.
-  /// 0 -> always spiral; Infinity -> always circle
-  final int circleSpiralSwitchover;
-
-  /// Make it possible to provide custom function to calculate spiderfy shape positions
-  final List<Point> Function(int, Point) spiderfyShapePositions;
-
-  /// If true show polygon then tap on cluster
-  final bool showPolygon;
-
-  /// Polygon's options that shown when tap cluster.
-  final PolygonOptions polygonOptions;
-
-  MarkerClusterLayerOptions({
-    @required this.builder,
-    this.markers = const [],
-    this.width = 30,
-    this.height = 30,
-    AnchorPos anchorPos,
-    this.maxClusterRadius = 80,
-    this.animationDuration = const Duration(milliseconds: 500),
-    this.fitBoundsOptions =
-        const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
-    this.zoomToBoundsOnClick = true,
-    this.centerMarkerOnClick = true,
-    this.spiderfyDistanceMultiplier = 1,
-    this.circleSpiralSwitchover = 9,
-    this.spiderfyShapePositions,
-    this.polygonOptions = const PolygonOptions(),
-    this.showPolygon = true,
-  })  : assert(builder != null),
-        anchor = Anchor.forPos(anchorPos, width, height);
-}
 
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
@@ -117,15 +20,11 @@ class MarkerClusterLayer extends StatefulWidget {
   MarkerClusterLayer(this.options, this.map, this.stream);
 
   @override
-  _MarkerClusterLayerState createState() =>
-      _MarkerClusterLayerState(this.options, this.map, this.stream);
+  _MarkerClusterLayerState createState() => _MarkerClusterLayerState();
 }
 
 class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     with TickerProviderStateMixin {
-  final MarkerClusterLayerOptions options;
-  final MapState map;
-  final Stream<Null> stream;
   Map<int, DistanceGrid<MarkerClusterNode>> _gridClusters = {};
   Map<int, DistanceGrid<MarkerNode>> _gridUnclustered = {};
   MarkerClusterNode _topClusterLevel;
@@ -140,14 +39,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   AnimationController _spiderfyController;
   MarkerClusterNode _spiderfyCluster;
   PolygonLayer _polygon;
-  List<Marker> _markers;
 
-  _MarkerClusterLayerState(this.options, this.map, this.stream);
+  _MarkerClusterLayerState();
 
   CustomPoint<num> _getPixelFromNewPosToMyPosPoint(LatLng point) {
-    var pos = map.project(point);
-    return pos.multiplyBy(map.getZoomScale(map.zoom, map.zoom)) -
-        map.getPixelOrigin();
+    var pos = widget.map.project(point);
+    return pos.multiplyBy(
+            widget.map.getZoomScale(widget.map.zoom, widget.map.zoom)) -
+        widget.map.getPixelOrigin();
   }
 
   Point _getPixelFromNewPosToMyPosMarker(MarkerNode marker) {
@@ -159,49 +58,49 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   Point _getPixelFromNewPosToMyPosCluster(MarkerClusterNode cluster) {
     final pos = _getPixelFromNewPosToMyPosPoint(cluster.point);
-    final x = (pos.x - options.width / 2).toDouble();
-    final y = (pos.y - options.height / 2).toDouble();
+    final x = (pos.x - widget.options.width / 2).toDouble();
+    final y = (pos.y - widget.options.height / 2).toDouble();
     return Point(x, y);
   }
 
   _initializeAnimationController() {
     _zoomController = AnimationController(
       vsync: this,
-      duration: options.animationDuration,
+      duration: widget.options.animationDuration,
     );
 
     _fitBoundController = AnimationController(
       vsync: this,
-      duration: options.animationDuration,
+      duration: widget.options.animationDuration,
     );
 
     _centerMarkerController = AnimationController(
       vsync: this,
-      duration: options.animationDuration,
+      duration: widget.options.animationDuration,
     );
 
     _spiderfyController = AnimationController(
       vsync: this,
-      duration: options.animationDuration,
+      duration: widget.options.animationDuration,
     );
   }
 
   _initializeClusters() {
     // set up DistanceGrids for each zoom
     for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
-      _gridClusters[zoom] = DistanceGrid(options.maxClusterRadius);
-      _gridUnclustered[zoom] = DistanceGrid(options.maxClusterRadius);
+      _gridClusters[zoom] = DistanceGrid(widget.options.maxClusterRadius);
+      _gridUnclustered[zoom] = DistanceGrid(widget.options.maxClusterRadius);
     }
 
     _topClusterLevel = MarkerClusterNode(
       zoom: _minZoom - 1,
-      map: map,
+      map: widget.map,
     );
   }
 
   _addLayer(MarkerNode marker) {
     for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
-      var markerPoint = map.project(marker.point, zoom.toDouble());
+      var markerPoint = widget.map.project(marker.point, zoom.toDouble());
       // try find a cluster close by
       var cluster = _gridClusters[zoom].getNearObject(markerPoint);
       if (cluster != null) {
@@ -214,24 +113,24 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         var parent = closest.parent;
         parent.removeChild(closest);
 
-        var newCluster = MarkerClusterNode(zoom: zoom, map: map)
+        var newCluster = MarkerClusterNode(zoom: zoom, map: widget.map)
           ..addChild(closest)
           ..addChild(marker);
 
         _gridClusters[zoom].addObject(
-            newCluster, map.project(newCluster.point, zoom.toDouble()));
+            newCluster, widget.map.project(newCluster.point, zoom.toDouble()));
 
         //First create any new intermediate parent clusters that don't exist
         var lastParent = newCluster;
         for (var z = zoom - 1; z > parent.zoom; z--) {
           var newParent = MarkerClusterNode(
             zoom: z,
-            map: map,
+            map: widget.map,
           );
           newParent.addChild(lastParent);
           lastParent = newParent;
-          _gridClusters[z]
-              .addObject(lastParent, map.project(closest.point, z.toDouble()));
+          _gridClusters[z].addObject(
+              lastParent, widget.map.project(closest.point, z.toDouble()));
         }
         parent.addChild(lastParent);
 
@@ -247,7 +146,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   _addLayers() {
-    for (var marker in _markers) {
+    for (var marker in widget.options.markers) {
       _addLayer(MarkerNode(marker));
     }
 
@@ -341,15 +240,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         animation: _spiderfyController,
         child: GestureDetector(
           onTap: _onClusterTap(cluster),
-          child: options.builder(
+          child: widget.options.builder(
             context,
             cluster.markers.map((node) => node.marker).toList(),
           ),
         ),
         builder: (BuildContext context, Widget child) {
           return Positioned(
-            width: options.width,
-            height: options.height,
+            width: widget.options.width,
+            height: widget.options.height,
             left: pos.x,
             top: pos.y,
             child: Opacity(
@@ -388,15 +287,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       animation: _zoomController,
       child: GestureDetector(
         onTap: _onClusterTap(cluster),
-        child: options.builder(
+        child: widget.options.builder(
           context,
           cluster.markers.map((node) => node.marker).toList(),
         ),
       ),
       builder: (BuildContext context, Widget child) {
         return Positioned(
-          width: options.width,
-          height: options.height,
+          width: widget.options.width,
+          height: widget.options.height,
           left: translate == TranslateType.None
               ? pos.x
               : translateAnimation.value.x,
@@ -444,25 +343,25 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   bool _boundsContainsMarker(MarkerNode marker) {
-    var pixelPoint = map.project(marker.point);
+    var pixelPoint = widget.map.project(marker.point);
 
     final width = marker.width - marker.anchor.left;
     final height = marker.height - marker.anchor.top;
 
     var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
     var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
-    return map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
+    return widget.map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
   }
 
   bool _boundsContainsCluster(MarkerClusterNode cluster) {
-    var pixelPoint = map.project(cluster.point);
+    var pixelPoint = widget.map.project(cluster.point);
 
-    final width = options.width - options.anchor.left;
-    final height = options.height - options.anchor.top;
+    final width = widget.options.width - widget.options.anchor.left;
+    final height = widget.options.height - widget.options.anchor.top;
 
     var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
     var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
-    return map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
+    return widget.map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
   }
 
   List<Widget> _buildLayer(layer) {
@@ -543,13 +442,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Widget> _buildLayers() {
-    if (map.zoom != _previusZoomDouble) {
-      _previusZoomDouble = map.zoom;
+    if (widget.map.zoom != _previusZoomDouble) {
+      _previusZoomDouble = widget.map.zoom;
 
       _unspiderfy();
     }
 
-    int zoom = map.zoom.ceil();
+    int zoom = widget.map.zoom.ceil();
 
     List<Widget> layers = [];
 
@@ -595,14 +494,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return null;
       }
 
-      if (!options.zoomToBoundsOnClick) return null;
+      if (!widget.options.zoomToBoundsOnClick) return null;
 
       _showPolygon(cluster.markers.fold<List<LatLng>>(
           [], (result, marker) => result..add(marker.point)));
 
-      final center = map.center;
-      final dest =
-          map.getBoundsCenterZoom(cluster.bounds, options.fitBoundsOptions);
+      final center = widget.map.center;
+      final dest = widget.map
+          .getBoundsCenterZoom(cluster.bounds, widget.options.fitBoundsOptions);
 
       final _latTween =
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
@@ -615,7 +514,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           parent: _fitBoundController, curve: Curves.fastOutSlowIn);
 
       final listener = () {
-        map.move(
+        widget.map.move(
           LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)),
           _zoomTween.evaluate(animation),
         );
@@ -632,27 +531,28 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   _showPolygon(List<LatLng> points) {
-    if (options.showPolygon) {
+    if (widget.options.showPolygon) {
       setState(() {
         _polygon = PolygonLayer(
           PolygonLayerOptions(polygons: [
             Polygon(
               points: QuickHull.getConvexHull(points),
-              borderStrokeWidth: options.polygonOptions.borderStrokeWidth,
-              color: options.polygonOptions.color,
-              borderColor: options.polygonOptions.borderColor,
-              isDotted: options.polygonOptions.isDotted,
+              borderStrokeWidth:
+                  widget.options.polygonOptions.borderStrokeWidth,
+              color: widget.options.polygonOptions.color,
+              borderColor: widget.options.polygonOptions.borderColor,
+              isDotted: widget.options.polygonOptions.isDotted,
             ),
           ]),
-          map,
-          stream,
+          widget.map,
+          widget.stream,
         );
       });
     }
   }
 
   _hidePolygon() {
-    if (options.showPolygon) {
+    if (widget.options.showPolygon) {
       setState(() {
         _polygon = null;
       });
@@ -665,9 +565,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _centerMarkerController.isAnimating ||
           _fitBoundController.isAnimating) return null;
 
-      if (!options.centerMarkerOnClick) return null;
+      if (!widget.options.centerMarkerOnClick) return null;
 
-      final center = map.center;
+      final center = widget.map.center;
 
       final _latTween =
           Tween<double>(begin: center.latitude, end: marker.point.latitude);
@@ -678,9 +578,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           parent: _centerMarkerController, curve: Curves.fastOutSlowIn);
 
       final listener = () {
-        map.move(
+        widget.map.move(
           LatLng(_latTween.evaluate(animation), _lngTween.evaluate(animation)),
-          map.zoom,
+          widget.map.zoom,
         );
       };
 
@@ -695,23 +595,23 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Point> _generatePointSpiderfy(int count, Point center) {
-    if (options.spiderfyShapePositions != null) {
-      return options.spiderfyShapePositions(count, center);
+    if (widget.options.spiderfyShapePositions != null) {
+      return widget.options.spiderfyShapePositions(count, center);
     }
-    if (count >= options.circleSpiralSwitchover) {
-      return Spiderfy.spiral(options.spiderfyDistanceMultiplier, count, center);
+    if (count >= widget.options.circleSpiralSwitchover) {
+      return Spiderfy.spiral(
+          widget.options.spiderfyDistanceMultiplier, count, center);
     }
 
-    return Spiderfy.circle(max(options.width, options.height),
-        options.spiderfyDistanceMultiplier, count, center);
+    return Spiderfy.circle(max(widget.options.width, widget.options.height),
+        widget.options.spiderfyDistanceMultiplier, count, center);
   }
 
   @override
   void initState() {
-    _markers = List.from(options.markers);
-    _currentZoom = _previusZoom = map.zoom.ceil();
-    _minZoom = map.options.minZoom?.ceil() ?? 1;
-    _maxZoom = map.options.maxZoom?.floor() ?? 20;
+    _currentZoom = _previusZoom = widget.map.zoom.ceil();
+    _minZoom = widget.map.options.minZoom?.ceil() ?? 1;
+    _maxZoom = widget.map.options.maxZoom?.floor() ?? 20;
 
     _initializeAnimationController();
     _initializeClusters();
@@ -733,8 +633,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void didUpdateWidget(MarkerClusterLayer oldWidget) {
-    if (!listEquals(_markers, options.markers)) {
-      _markers = List.from(options.markers);
+    if (oldWidget.options.markers != widget.options.markers) {
       _initializeClusters();
       _addLayers();
     }
@@ -744,7 +643,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<int>(
-      stream: stream, // a Stream<int> or null
+      stream: widget.stream, // a Stream<int> or null
       builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
         return Container(
           child: Stack(
