@@ -9,7 +9,6 @@ class Spiderfy {
   static const spiralLengthStart = 11;
   static const spiralLengthFactor = 5;
 
-  static const circleFootSeparation = 25; //related to circumference of circle
   static const circleStartAngle = 0;
 
   static List<Point> spiral(int distanceMultiplier, int count, Point center) {
@@ -33,22 +32,15 @@ class Spiderfy {
     return result;
   }
 
-  static List<Point> circle(
-      double minLegLenght, int distanceMultiplier, int count, Point center) {
-    num circumference = distanceMultiplier * circleFootSeparation * (2 + count);
-    double legLength = circumference / pi2; //radius from circumference
+  static List<Point> circle(int radius, int count, Point center) {
     double angleStep = pi2 / count;
-
-    legLength = max(legLength,
-        minLegLenght); // Minimum distance to get outside the cluster icon.
-
     final result = List<Point>(count);
 
     for (var i = 0; i < count; i++) {
       double angle = circleStartAngle + i * angleStep;
 
       result[i] = CustomPoint<double>(
-          center.x + legLength * cos(angle), center.y + legLength * sin(angle));
+          center.x + radius * cos(angle), center.y + radius * sin(angle));
     }
     return result;
   }

@@ -52,7 +52,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
   final bool centerMarkerOnClick;
 
   /// Increase to increase the distance away that circle spiderfied markers appear from the center
-  final int spiderfyCircleDistanceMultiplier;
+  final int spiderfyCircleRadius;
 
   /// Increase to increase the distance away that spiral spiderfied markers appear from the center
   final int spiderfySpiralDistanceMultiplier;
@@ -82,7 +82,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
         const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
     this.zoomToBoundsOnClick = true,
     this.centerMarkerOnClick = true,
-    this.spiderfyCircleDistanceMultiplier = 1,
+    this.spiderfyCircleRadius = 40,
     this.spiderfySpiralDistanceMultiplier = 1,
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,

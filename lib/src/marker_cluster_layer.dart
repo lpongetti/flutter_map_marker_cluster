@@ -42,24 +42,27 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   _MarkerClusterLayerState();
 
-  CustomPoint<num> _getPixelFromNewPosToMyPosPoint(LatLng point) {
+  CustomPoint<num> _getPixelFromPoint(LatLng point) {
     var pos = widget.map.project(point);
     return pos.multiplyBy(
             widget.map.getZoomScale(widget.map.zoom, widget.map.zoom)) -
         widget.map.getPixelOrigin();
   }
 
-  Point _getPixelFromNewPosToMyPosMarker(MarkerNode marker) {
-    final pos = _getPixelFromNewPosToMyPosPoint(marker.point);
-    final x = (pos.x - (marker.width - marker.anchor.left)).toDouble();
-    final y = (pos.y - (marker.height - marker.anchor.top)).toDouble();
-    return Point(x, y);
+  Point _getPixelFromMarker(MarkerNode marker, [LatLng customPoint]) {
+    final pos = _getPixelFromPoint(customPoint ?? marker.point);
+    return _removeAnchor(pos, marker.width, marker.height, marker.anchor);
   }
 
-  Point _getPixelFromNewPosToMyPosCluster(MarkerClusterNode cluster) {
-    final pos = _getPixelFromNewPosToMyPosPoint(cluster.point);
-    final x = (pos.x - widget.options.width / 2).toDouble();
-    final y = (pos.y - widget.options.height / 2).toDouble();
+  Point _getPixelFromCluster(MarkerClusterNode cluster, [LatLng customPoint]) {
+    final pos = _getPixelFromPoint(customPoint ?? cluster.point);
+    return _removeAnchor(pos, widget.options.width, widget.options.height,
+        widget.options.anchor);
+  }
+
+  Point _removeAnchor(Point pos, double width, double height, Anchor anchor) {
+    final x = (pos.x - (width - anchor.left)).toDouble();
+    final y = (pos.y - (height - anchor.top)).toDouble();
     return Point(x, y);
   }
 
@@ -195,7 +198,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     assert((translate == TranslateType.None && newPos == null) ||
         (translate != TranslateType.None && newPos != null));
 
-    final pos = myPos ?? _getPixelFromNewPosToMyPosMarker(marker);
+    final pos = myPos ?? _getPixelFromMarker(marker);
 
     Animation<double> fadeAnimation = _fadeAnimation(controller, fade);
     Animation<Point> translateAnimation =
@@ -228,9 +231,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Widget> _buildSpiderfyCluster(MarkerClusterNode cluster, int zoom) {
-    final pos = _getPixelFromNewPosToMyPosCluster(cluster);
+    final pos = _getPixelFromCluster(cluster);
 
-    final points = _generatePointSpiderfy(cluster.markers.length, pos);
+    final points = _generatePointSpiderfy(
+        cluster.markers.length, _getPixelFromPoint(cluster.point));
 
     final fadeAnimation =
         Tween<double>(begin: 1.0, end: 0.3).animate(_spiderfyController);
@@ -266,8 +270,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     for (var i = 0; i < cluster.markers.length; i++) {
       final marker = cluster.markers[i];
 
-      results.add(_buildMarker(marker, _spiderfyController, FadeType.FadeIn,
-          TranslateType.FromMyPosToNewPos, points[i], pos));
+      results.add(_buildMarker(
+          marker,
+          _spiderfyController,
+          FadeType.FadeIn,
+          TranslateType.FromMyPosToNewPos,
+          _removeAnchor(points[i], marker.width, marker.height, marker.anchor),
+          _getPixelFromMarker(marker, cluster.point)));
     }
 
     return results;
@@ -280,7 +289,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     assert((translate == TranslateType.None && newPos == null) ||
         (translate != TranslateType.None && newPos != null));
 
-    final pos = _getPixelFromNewPosToMyPosCluster(cluster);
+    final pos = _getPixelFromCluster(cluster);
 
     Animation<double> fadeAnimation = _fadeAnimation(_zoomController, fade);
     Animation<Point> translateAnimation =
@@ -387,7 +396,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             _zoomController,
             FadeType.FadeIn,
             TranslateType.FromNewPosToMyPos,
-            _getPixelFromNewPosToMyPosCluster(layer.parent)));
+            _getPixelFromMarker(layer, layer.parent.point)));
         //parent
         layers.add(_buildCluster(layer.parent, FadeType.FadeOut));
       } else {
@@ -414,13 +423,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 _zoomController,
                 FadeType.FadeOut,
                 TranslateType.FromMyPosToNewPos,
-                _getPixelFromNewPosToMyPosCluster(layer)));
+                _getPixelFromMarker(child, layer.point)));
           } else {
             layers.add(_buildCluster(
                 child,
                 FadeType.FadeOut,
                 TranslateType.FromMyPosToNewPos,
-                _getPixelFromNewPosToMyPosCluster(layer)));
+                _getPixelFromCluster(child, layer.point)));
           }
         });
       } else if (_zoomController.isAnimating &&
@@ -430,7 +439,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             layer,
             FadeType.FadeIn,
             TranslateType.FromNewPosToMyPos,
-            _getPixelFromNewPosToMyPosCluster(layer.parent)));
+            _getPixelFromCluster(layer, layer.parent.point)));
         //parent
         layers.add(_buildCluster(layer.parent, FadeType.FadeOut));
       } else {
@@ -607,8 +616,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           widget.options.spiderfySpiralDistanceMultiplier, count, center);
     }
 
-    return Spiderfy.circle(max(widget.options.width, widget.options.height),
-        widget.options.spiderfyCircleDistanceMultiplier, count, center);
+    return Spiderfy.circle(widget.options.spiderfyCircleRadius, count, center);
   }
 
   @override

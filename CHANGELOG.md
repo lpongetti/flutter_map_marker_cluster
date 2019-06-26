@@ -1,3 +1,8 @@
+## [0.2.0] - 26/06/2019
+
+- fix positions
+- spiderfyCircleDistanceMultiplier to spiderfyCircleRadius
+
 ## [0.1.6] - 26/06/2019
 
 - fix circle spiferfy
