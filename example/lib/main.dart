@@ -126,6 +126,7 @@ class _HomePageState extends State<HomePage> {
             maxClusterRadius: 120,
             height: 40,
             width: 40,
+            anchorPos: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(
               padding: EdgeInsets.all(50),
             ),

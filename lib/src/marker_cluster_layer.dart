@@ -190,11 +190,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   Widget _buildMarker(MarkerNode marker, AnimationController controller,
       [FadeType fade = FadeType.None,
       TranslateType translate = TranslateType.None,
-      Point newPos]) {
+      Point newPos,
+      Point myPos]) {
     assert((translate == TranslateType.None && newPos == null) ||
         (translate != TranslateType.None && newPos != null));
 
-    final pos = _getPixelFromNewPosToMyPosMarker(marker);
+    final pos = myPos ?? _getPixelFromNewPosToMyPosMarker(marker);
 
     Animation<double> fadeAnimation = _fadeAnimation(controller, fade);
     Animation<Point> translateAnimation =
@@ -203,6 +204,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     return AnimatedBuilder(
       animation: controller,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: _onMarkerTap(marker),
         child: marker.builder(context),
       ),
@@ -239,6 +241,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       AnimatedBuilder(
         animation: _spiderfyController,
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: _onClusterTap(cluster),
           child: widget.options.builder(
             context,
@@ -264,7 +267,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       final marker = cluster.markers[i];
 
       results.add(_buildMarker(marker, _spiderfyController, FadeType.FadeIn,
-          TranslateType.FromMyPosToNewPos, points[i]));
+          TranslateType.FromMyPosToNewPos, points[i], pos));
     }
 
     return results;
@@ -286,6 +289,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     return AnimatedBuilder(
       animation: _zoomController,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTap: _onClusterTap(cluster),
         child: widget.options.builder(
           context,
@@ -600,11 +604,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
     if (count >= widget.options.circleSpiralSwitchover) {
       return Spiderfy.spiral(
-          widget.options.spiderfyDistanceMultiplier, count, center);
+          widget.options.spiderfySpiralDistanceMultiplier, count, center);
     }
 
     return Spiderfy.circle(max(widget.options.width, widget.options.height),
-        widget.options.spiderfyDistanceMultiplier, count, center);
+        widget.options.spiderfyCircleDistanceMultiplier, count, center);
   }
 
   @override

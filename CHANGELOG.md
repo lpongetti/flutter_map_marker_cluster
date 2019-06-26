@@ -1,3 +1,11 @@
+## [0.1.6] - 26/06/2019
+
+- fix circle spiferfy
+- splitted spiderfyDistanceMultiplier to spiderfyCircleDistanceMultiplier and spiderfySpiralDistanceMultiplier
+- added to gesturedetector behavior opaque
+- spiderfy marker animation starts to cluster point
+- added anchorpos to cluster in example
+
 ## [0.1.5] - 20/06/2019
 
 - setState issue fixed ( #4 setState not supported )

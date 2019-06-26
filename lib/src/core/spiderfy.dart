@@ -47,8 +47,8 @@ class Spiderfy {
     for (var i = 0; i < count; i++) {
       double angle = circleStartAngle + i * angleStep;
 
-      result[i] = CustomPoint<double>(center.x + 5 + legLength * cos(angle),
-          center.y + 5 + legLength * sin(angle));
+      result[i] = CustomPoint<double>(
+          center.x + legLength * cos(angle), center.y + legLength * sin(angle));
     }
     return result;
   }
