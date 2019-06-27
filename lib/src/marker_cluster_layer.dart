@@ -15,7 +15,7 @@ import 'package:latlong/latlong.dart';
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapState map;
-  final Stream<Null> stream;
+  final Stream<void> stream;
 
   MarkerClusterLayer(this.options, this.map, this.stream);
 
@@ -654,9 +654,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: widget.stream, // a Stream<int> or null
-      builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+    return StreamBuilder<void>(
+      stream: widget.stream, // a Stream<void> or null
+      builder: (BuildContext context, _) {
         return Container(
           child: Stack(
             children: _buildLayers(),

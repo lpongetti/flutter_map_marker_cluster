@@ -20,7 +20,10 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map: 0.5.5+2
+  flutter_map:
+    git:
+      url: https://github.com/johnpryan/flutter_map.git
+      ref: dev
   flutter_map_marker_cluster:
     path: ../
 
