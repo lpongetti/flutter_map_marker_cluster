@@ -2,7 +2,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map/src/core/bounds.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
