@@ -28,13 +28,14 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// List of markers
   final List<Marker> markers;
 
-  /// Cluster width
-  final double width;
+  /// Cluster size
+  final Size size;
 
-  /// Cluster height
-  final double height;
+  /// Cluster compute size
+  final Size Function(List<Marker>) computeSize;
 
-  final Anchor anchor;
+  /// Cluster anchor
+  final AnchorPos anchor;
 
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
@@ -73,9 +74,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
-    this.width = 30,
-    this.height = 30,
-    AnchorPos anchorPos,
+    this.size = const Size(30, 30),
+    this.computeSize,
+    this.anchor,
     this.maxClusterRadius = 80,
     this.animationDuration = const Duration(milliseconds: 500),
     this.fitBoundsOptions =
@@ -88,6 +89,5 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.spiderfyShapePositions,
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
-  })  : assert(builder != null),
-        anchor = Anchor.forPos(anchorPos, width, height);
+  }) : assert(builder != null);
 }

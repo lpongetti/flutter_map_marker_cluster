@@ -124,9 +124,8 @@ class _HomePageState extends State<HomePage> {
           ),
           MarkerClusterLayerOptions(
             maxClusterRadius: 120,
-            height: 40,
-            width: 40,
-            anchorPos: AnchorPos.align(AnchorAlign.center),
+            size: Size(40, 40),
+            anchor: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(
               padding: EdgeInsets.all(50),
             ),
