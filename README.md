@@ -39,8 +39,7 @@ Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`
         ),
         MarkerClusterLayerOptions(
           maxClusterRadius: 120,
-          height: 40,
-          width: 40,
+          size: Size(40, 40),
           fitBoundsOptions: FitBoundsOptions(
             padding: EdgeInsets.all(50),
           ),
