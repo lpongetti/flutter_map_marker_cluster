@@ -42,7 +42,7 @@ class DistanceGrid<T> {
         if (len == 1) {
           row.remove(x);
 
-          if (_grid[y].length == 0) {
+          if (_grid[y].isEmpty) {
             _grid.remove(y);
           }
         }

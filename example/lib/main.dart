@@ -110,7 +110,7 @@ class _HomePageState extends State<HomePage> {
         },
       ),
       body: FlutterMap(
-        options: new MapOptions(
+        options: MapOptions(
           center: points[0],
           zoom: 5,
           plugins: [

@@ -1,3 +1,8 @@
+## [0.2.4] - 18/11/2019
+
+- added analysis_options.yaml
+- fix warnings
+
 ## [0.2.0] - 26/06/2019
 
 - fix positions

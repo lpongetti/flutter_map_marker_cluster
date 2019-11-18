@@ -6,7 +6,7 @@ import 'package:latlong/latlong.dart';
 
 void main() {
   test('addObject', () {
-    var grid = new DistanceGrid(100),
+    var grid = DistanceGrid(100),
         obj = Marker(
       point: LatLng(1, 2),
     );
@@ -16,7 +16,7 @@ void main() {
   });
 
   test('eachObject', () {
-    var grid = new DistanceGrid(100),
+    var grid = DistanceGrid(100),
         obj = Marker(
       point: LatLng(1, 2),
     );
@@ -29,7 +29,7 @@ void main() {
   });
 
   test('getNearObject', () {
-    var grid = new DistanceGrid(100),
+    var grid = DistanceGrid(100),
         obj = Marker(
       point: LatLng(1, 2),
     );
@@ -41,7 +41,7 @@ void main() {
   });
 
   test('getNearObject double', () {
-    var grid = new DistanceGrid(100),
+    var grid = DistanceGrid(100),
         obj = Marker(
       point: LatLng(1, 2),
     );
@@ -54,7 +54,7 @@ void main() {
   });
 
   test('getNearObject with cellSize 0', () {
-    var grid = new DistanceGrid(0),
+    var grid = DistanceGrid(0),
         obj1 = Marker(
       point: LatLng(1, 2),
     ),
@@ -70,7 +70,7 @@ void main() {
   });
 
   test('getNearObject with cellSize 0 double', () {
-    var grid = new DistanceGrid(0),
+    var grid = DistanceGrid(0),
         obj1 = Marker(
       point: LatLng(1, 2),
     ),
