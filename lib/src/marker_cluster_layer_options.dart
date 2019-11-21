@@ -71,6 +71,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Polygon's options that shown when tap cluster.
   final PolygonOptions polygonOptions;
 
+  /// Function to call when a Marker is tapped
+  final void Function(Marker) onMarkerTap;
+
   MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
@@ -89,5 +92,6 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.spiderfyShapePositions,
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
+    this.onMarkerTap,
   }) : assert(builder != null);
 }
