@@ -597,6 +597,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _centerMarkerController.isAnimating ||
           _fitBoundController.isAnimating) return null;
 
+      // This is handled as an optional callback rather than leaving the package
+      // user to wrap their Marker child Widget in a GestureDetector as only one
+      // GestureDetector gets triggered per gesture (usually the child one) and
+      // therefore this _onMarkerTap function never gets called.
+      if (widget.options.onMarkerTap != null) {
+        widget.options.onMarkerTap(marker.marker);
+      }
+
       if (!widget.options.centerMarkerOnClick) return null;
 
       final center = widget.map.center;
