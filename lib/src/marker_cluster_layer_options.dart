@@ -18,6 +18,24 @@ class PolygonOptions {
   });
 }
 
+class AnimationsOptions {
+  final Duration zoom;
+  final Duration fitBound;
+  final Curve fitBoundCurves;
+  final Duration centerMarker;
+  final Curve centerMarkerCurves;
+  final Duration spiderfy;
+
+  const AnimationsOptions({
+    this.zoom = const Duration(milliseconds: 500),
+    this.fitBound = const Duration(milliseconds: 500),
+    this.centerMarker = const Duration(milliseconds: 500),
+    this.spiderfy = const Duration(milliseconds: 500),
+    this.fitBoundCurves = Curves.fastOutSlowIn,
+    this.centerMarkerCurves = Curves.fastOutSlowIn,
+  });
+}
+
 typedef ClusterWidgetBuilder = Widget Function(
     BuildContext context, List<Marker> markers);
 
@@ -46,8 +64,8 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Zoom buonds with animation on click cluster
   final bool zoomToBoundsOnClick;
 
-  /// Duration for all animations
-  final Duration animationDuration;
+  /// animations options
+  final AnimationsOptions animationsOptions;
 
   /// When click marker, center it with animation
   final bool centerMarkerOnClick;
@@ -81,7 +99,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.computeSize,
     this.anchor,
     this.maxClusterRadius = 80,
-    this.animationDuration = const Duration(milliseconds: 500),
+    this.animationsOptions = const AnimationsOptions(),
     this.fitBoundsOptions =
         const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
     this.zoomToBoundsOnClick = true,

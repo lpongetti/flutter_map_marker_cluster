@@ -72,22 +72,22 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   _initializeAnimationController() {
     _zoomController = AnimationController(
       vsync: this,
-      duration: widget.options.animationDuration,
+      duration: widget.options.animationsOptions.zoom,
     );
 
     _fitBoundController = AnimationController(
       vsync: this,
-      duration: widget.options.animationDuration,
+      duration: widget.options.animationsOptions.fitBound,
     );
 
     _centerMarkerController = AnimationController(
       vsync: this,
-      duration: widget.options.animationDuration,
+      duration: widget.options.animationsOptions.centerMarker,
     );
 
     _spiderfyController = AnimationController(
       vsync: this,
-      duration: widget.options.animationDuration,
+      duration: widget.options.animationsOptions.spiderfy,
     );
   }
 
@@ -543,7 +543,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           Tween<double>(begin: _currentZoom.toDouble(), end: dest.zoom);
 
       Animation<double> animation = CurvedAnimation(
-          parent: _fitBoundController, curve: Curves.fastOutSlowIn);
+          parent: _fitBoundController,
+          curve: widget.options.animationsOptions.fitBoundCurves);
 
       final listener = () {
         widget.map.move(
@@ -615,7 +616,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           Tween<double>(begin: center.longitude, end: marker.point.longitude);
 
       Animation<double> animation = CurvedAnimation(
-          parent: _centerMarkerController, curve: Curves.fastOutSlowIn);
+          parent: _centerMarkerController,
+          curve: widget.options.animationsOptions.centerMarkerCurves);
 
       final listener = () {
         widget.map.move(

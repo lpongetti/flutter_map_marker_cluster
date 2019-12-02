@@ -1,3 +1,8 @@
+## [0.2.5] - 18/11/2019
+
+- added animationsoptions
+- #24 Add optional onTap callback for Markers
+
 ## [0.2.4] - 18/11/2019
 
 - added analysis_options.yaml
