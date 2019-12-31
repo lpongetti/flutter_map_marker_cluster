@@ -14,7 +14,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map: ^0.7.3
+  flutter_map: ^0.8.0
   latlong: ^0.6.1
 
 dev_dependencies:
