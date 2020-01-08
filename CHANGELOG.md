@@ -1,3 +1,7 @@
+## [0.2.7] - 08/02/2019
+
+- Update support for latest flutter_map and add support for AndroidX #27
+
 ## [0.2.6] - 08/02/2019
 
 - updated flutter_map
