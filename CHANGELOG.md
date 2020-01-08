@@ -1,3 +1,7 @@
+## [0.2.6] - 08/02/2019
+
+- updated flutter_map
+
 ## [0.2.5] - 18/11/2019
 
 - added animationsoptions
