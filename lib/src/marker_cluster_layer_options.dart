@@ -111,5 +111,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
-  }) : assert(builder != null);
+    rebuild,
+  })  : assert(builder != null),
+        super(rebuild: rebuild);
 }
