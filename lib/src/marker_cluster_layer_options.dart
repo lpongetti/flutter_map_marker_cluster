@@ -92,6 +92,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker) onMarkerTap;
 
+  /// Function to call when markers are clustered
+  final void Function(List<Marker>) onMarkersClustered;
+
   MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
@@ -111,5 +114,6 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkersClustered,
   }) : assert(builder != null);
 }

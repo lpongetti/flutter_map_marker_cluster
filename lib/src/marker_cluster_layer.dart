@@ -354,16 +354,32 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
+        List<Marker> markersGettingClustered = _spiderfyCluster.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
+
         _spiderfyController.reverse().then((_) => setState(() {
               _spiderfyCluster = null;
             }));
+
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
         break;
       case AnimationStatus.forward:
+        List<Marker> markersGettingClustered = _spiderfyCluster.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
+
         _spiderfyController
           ..stop()
           ..reverse().then((_) => setState(() {
                 _spiderfyCluster = null;
               }));
+
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
         break;
       default:
         break;
@@ -435,8 +451,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         // cluster
         layers.add(_buildCluster(layer, FadeType.FadeIn));
         // children
+        List<Marker> markersGettingClustered = List<Marker>();
         layer.children.forEach((child) {
           if (child is MarkerNode) {
+            markersGettingClustered.add(child.marker);
+
             layers.add(_buildMarker(
                 child,
                 _zoomController,
@@ -451,6 +470,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 _getPixelFromCluster(child, layer.point)));
           }
         });
+
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
       } else if (_zoomController.isAnimating &&
           (_currentZoom > _previusZoom && layer.parent.point != layer.point)) {
         // cluster
