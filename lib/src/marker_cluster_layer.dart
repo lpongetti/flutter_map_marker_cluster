@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -517,6 +518,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return null;
       }
 
+      // This is handled as an optional callback rather than leaving the package
+      // user to wrap their cluster Marker child Widget in a GestureDetector as only one
+      // GestureDetector gets triggered per gesture (usually the child one) and
+      // therefore this _onClusterTap() function never gets called.
+      if (widget.options.onClusterTap != null) {
+        widget.options.onClusterTap(cluster);
+      }
+
       // check if children can uncluster
       final cannotDivide = cluster.markers.every((marker) =>
           marker.parent.zoom == _maxZoom &&
@@ -594,6 +603,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   Function _onMarkerTap(MarkerNode marker) {
     return () {
+      print('tapped!!');
+
       if (_zoomController.isAnimating ||
           _centerMarkerController.isAnimating ||
           _fitBoundController.isAnimating) return null;

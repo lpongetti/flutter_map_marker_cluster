@@ -1,8 +1,10 @@
 import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 
 class PolygonOptions {
   final Color color;
@@ -92,6 +94,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker) onMarkerTap;
 
+  /// Function to call when a cluster Marker is tapped
+  final void Function(MarkerClusterNode) onClusterTap;
+
   MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
@@ -111,5 +116,6 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onClusterTap,
   }) : assert(builder != null);
 }
