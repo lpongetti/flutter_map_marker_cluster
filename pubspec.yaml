@@ -15,6 +15,7 @@ dependencies:
 
   flutter_map: ^0.8.2
   latlong: ^0.6.1
+  flutter_map_marker_popup: ^0.1.4
 
 dev_dependencies:
   flutter_test:
