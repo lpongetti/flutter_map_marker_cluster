@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_popup/extension_api.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
@@ -362,6 +363,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               _spiderfyCluster = null;
             }));
 
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
         }
@@ -377,6 +381,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 _spiderfyCluster = null;
               }));
 
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
         }
@@ -471,6 +478,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           }
         });
 
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
         }
@@ -523,6 +533,18 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     _topClusterLevel.recursively(_currentZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
+
+    final PopupOptions popupOptions = widget.options.popupOptions;
+    if (popupOptions != null) {
+      layers.add(
+        MarkerPopup(
+          mapState: widget.map,
+          popupController: popupOptions.popupController,
+          snap: popupOptions.popupSnap,
+          popupBuilder: popupOptions.popupBuilder,
+        ),
+      );
+    }
 
     return layers;
   }
@@ -620,6 +642,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       if (_zoomController.isAnimating ||
           _centerMarkerController.isAnimating ||
           _fitBoundController.isAnimating) return null;
+
+      if (widget.options.popupOptions != null) {
+        widget.options.popupOptions.popupController.togglePopup(marker.marker);
+      }
 
       // This is handled as an optional callback rather than leaving the package
       // user to wrap their Marker child Widget in a GestureDetector as only one
