@@ -364,7 +364,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+          widget.options.popupOptions.popupController
+              .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
@@ -382,7 +383,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+          widget.options.popupOptions.popupController
+              .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
@@ -431,7 +433,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       // animating and
       // zoom in and parent has the previous zoom
       if (_zoomController.isAnimating &&
-          (_currentZoom > _previousZoom && layer.parent.zoom == _previousZoom)) {
+          (_currentZoom > _previousZoom &&
+              layer.parent.zoom == _previousZoom)) {
         // marker
         layers.add(_buildMarker(
             layer,
@@ -479,7 +482,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         });
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+          widget.options.popupOptions.popupController
+              .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered(markersGettingClustered);
@@ -560,6 +564,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _fitBoundController.isAnimating ||
           _spiderfyController.isAnimating) {
         return null;
+      }
+
+      // This is handled as an optional callback rather than leaving the package
+      // user to wrap their cluster Marker child Widget in a GestureDetector as only one
+      // GestureDetector gets triggered per gesture (usually the child one) and
+      // therefore this _onClusterTap() function never gets called.
+      if (widget.options.onClusterTap != null) {
+        widget.options.onClusterTap(cluster);
       }
 
       // check if children can un-cluster

@@ -1,3 +1,9 @@
+## [0.2.8] - 29/04/2019
+
+- Added marker popup
+- Added marker onClusterTap option
+- Upgraded flutter_map to 0.9.0
+
 ## [0.2.7] - 08/02/2019
 
 - Update support for latest flutter_map and add support for AndroidX #27
