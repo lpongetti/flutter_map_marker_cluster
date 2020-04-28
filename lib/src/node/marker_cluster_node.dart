@@ -48,10 +48,10 @@ class MarkerClusterNode {
 
   removeChild(dynamic child) {
     children.remove(child);
-    recalulateBounds();
+    recalculateBounds();
   }
 
-  recalulateBounds() {
+  recalculateBounds() {
     bounds = LatLngBounds();
 
     markers.forEach((marker) {
@@ -60,12 +60,12 @@ class MarkerClusterNode {
 
     children.forEach((child) {
       if (child is MarkerClusterNode) {
-        child.recalulateBounds();
+        child.recalculateBounds();
       }
     });
   }
 
-  recurvisely(int zoomLevel, Function(dynamic) fn) {
+  recursively(int zoomLevel, Function(dynamic) fn) {
     if (zoom == zoomLevel) {
       fn(this);
       return;
@@ -76,7 +76,7 @@ class MarkerClusterNode {
         fn(child);
       }
       if (child is MarkerClusterNode) {
-        child.recurvisely(zoomLevel, fn);
+        child.recursively(zoomLevel, fn);
       }
     });
   }

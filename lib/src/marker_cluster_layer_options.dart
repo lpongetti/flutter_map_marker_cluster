@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_popup/extension_api.dart';
 
 class PolygonOptions {
   final Color color;
@@ -33,6 +34,18 @@ class AnimationsOptions {
     this.spiderfy = const Duration(milliseconds: 500),
     this.fitBoundCurves = Curves.fastOutSlowIn,
     this.centerMarkerCurves = Curves.fastOutSlowIn,
+  });
+}
+
+class PopupOptions {
+  final PopupBuilder popupBuilder;
+  final PopupController popupController;
+  final PopupSnap popupSnap;
+
+  const PopupOptions({
+    this.popupBuilder,
+    this.popupSnap = PopupSnap.top,
+    this.popupController,
   });
 }
 
@@ -92,6 +105,12 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker) onMarkerTap;
 
+  /// Function to call when markers are clustered
+  final void Function(List<Marker>) onMarkersClustered;
+
+  /// Popup's options that show when tapping markers or via the PopupController.
+  final PopupOptions popupOptions;
+
   MarkerClusterLayerOptions({
     @required this.builder,
     this.markers = const [],
@@ -111,5 +130,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkersClustered,
+    this.popupOptions,
   }) : assert(builder != null);
 }

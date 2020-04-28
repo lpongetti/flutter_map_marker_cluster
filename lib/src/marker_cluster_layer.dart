@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_popup/extension_api.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
@@ -30,8 +31,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   int _maxZoom;
   int _minZoom;
   int _currentZoom;
-  int _previusZoom;
-  double _previusZoomDouble;
+  int _previousZoom;
+  double _previousZoomDouble;
   AnimationController _zoomController;
   AnimationController _fitBoundController;
   AnimationController _centerMarkerController;
@@ -156,7 +157,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _addLayer(MarkerNode(marker));
     }
 
-    _topClusterLevel.recalulateBounds();
+    _topClusterLevel.recalculateBounds();
   }
 
   _removeFromNewPosToMyPosGridUnclustered(MarkerNode marker, int zoom) {
@@ -354,16 +355,38 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
+        List<Marker> markersGettingClustered = _spiderfyCluster.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
+
         _spiderfyController.reverse().then((_) => setState(() {
               _spiderfyCluster = null;
             }));
+
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
         break;
       case AnimationStatus.forward:
+        List<Marker> markersGettingClustered = _spiderfyCluster.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
+
         _spiderfyController
           ..stop()
           ..reverse().then((_) => setState(() {
                 _spiderfyCluster = null;
               }));
+
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
         break;
       default:
         break;
@@ -404,11 +427,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return List<Widget>();
       }
 
-      // fadein if
+      // fade in if
       // animating and
-      // zoomin and parent has the previus zoom
+      // zoom in and parent has the previous zoom
       if (_zoomController.isAnimating &&
-          (_currentZoom > _previusZoom && layer.parent.zoom == _previusZoom)) {
+          (_currentZoom > _previousZoom && layer.parent.zoom == _previousZoom)) {
         // marker
         layers.add(_buildMarker(
             layer,
@@ -427,16 +450,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return List<Widget>();
       }
 
-      // fadein if
+      // fade in if
       // animating and
-      // zoomout and children is more than one or zoomin and father has same point
+      // zoom out and children is more than one or zoom in and father has same point
       if (_zoomController.isAnimating &&
-          (_currentZoom < _previusZoom && layer.children.length > 1)) {
+          (_currentZoom < _previousZoom && layer.children.length > 1)) {
         // cluster
         layers.add(_buildCluster(layer, FadeType.FadeIn));
         // children
+        List<Marker> markersGettingClustered = List<Marker>();
         layer.children.forEach((child) {
           if (child is MarkerNode) {
+            markersGettingClustered.add(child.marker);
+
             layers.add(_buildMarker(
                 child,
                 _zoomController,
@@ -451,8 +477,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 _getPixelFromCluster(child, layer.point)));
           }
         });
+
+        if (widget.options.popupOptions != null) {
+          widget.options.popupOptions.popupController.hidePopupIfShowingFor(markersGettingClustered);
+        }
+        if (widget.options.onMarkersClustered != null) {
+          widget.options.onMarkersClustered(markersGettingClustered);
+        }
       } else if (_zoomController.isAnimating &&
-          (_currentZoom > _previusZoom && layer.parent.point != layer.point)) {
+          (_currentZoom > _previousZoom && layer.parent.point != layer.point)) {
         // cluster
         layers.add(_buildCluster(
             layer,
@@ -474,8 +507,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Widget> _buildLayers() {
-    if (widget.map.zoom != _previusZoomDouble) {
-      _previusZoomDouble = widget.map.zoom;
+    if (widget.map.zoom != _previousZoomDouble) {
+      _previousZoomDouble = widget.map.zoom;
 
       _unspiderfy();
     }
@@ -487,19 +520,31 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     if (_polygon != null) layers.add(_polygon);
 
     if (zoom < _currentZoom || zoom > _currentZoom) {
-      _previusZoom = _currentZoom;
+      _previousZoom = _currentZoom;
       _currentZoom = zoom;
 
       _zoomController
         ..reset()
         ..forward().then((_) => setState(() {
               _hidePolygon();
-            })); // for remove previus layer (animation)
+            })); // for remove previous layer (animation)
     }
 
-    _topClusterLevel.recurvisely(_currentZoom, (layer) {
+    _topClusterLevel.recursively(_currentZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
+
+    final PopupOptions popupOptions = widget.options.popupOptions;
+    if (popupOptions != null) {
+      layers.add(
+        MarkerPopup(
+          mapState: widget.map,
+          popupController: popupOptions.popupController,
+          snap: popupOptions.popupSnap,
+          popupBuilder: popupOptions.popupBuilder,
+        ),
+      );
+    }
 
     return layers;
   }
@@ -517,7 +562,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return null;
       }
 
-      // check if children can uncluster
+      // check if children can un-cluster
       final cannotDivide = cluster.markers.every((marker) =>
           marker.parent.zoom == _maxZoom &&
           marker.parent == cluster.markers[0].parent);
@@ -598,6 +643,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _centerMarkerController.isAnimating ||
           _fitBoundController.isAnimating) return null;
 
+      if (widget.options.popupOptions != null) {
+        widget.options.popupOptions.popupController.togglePopup(marker.marker);
+      }
+
       // This is handled as an optional callback rather than leaving the package
       // user to wrap their Marker child Widget in a GestureDetector as only one
       // GestureDetector gets triggered per gesture (usually the child one) and
@@ -650,7 +699,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void initState() {
-    _currentZoom = _previusZoom = widget.map.zoom.ceil();
+    _currentZoom = _previousZoom = widget.map.zoom.ceil();
     _minZoom = widget.map.options.minZoom?.ceil() ?? 1;
     _maxZoom = widget.map.options.maxZoom?.floor() ?? 20;
 
