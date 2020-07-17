@@ -13,7 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
 
-  flutter_map: ^0.9.0
+  flutter_map: ^0.10.1
   latlong: ^0.6.1
   flutter_map_marker_popup: ^0.1.4
 
