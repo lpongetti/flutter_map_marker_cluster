@@ -1,6 +1,10 @@
+## [0.3.0] - 25/08/2020
+
+- Added extras property to marker
+
 ## [0.2.9] - 25/08/2020
 
-- Upgraded flutter_map to 0.9.0
+- Upgraded flutter_map to 0.10.1+1
 
 ## [0.2.8] - 29/04/2019
 
