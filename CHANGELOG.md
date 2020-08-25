@@ -1,3 +1,7 @@
+## [0.2.9] - 25/08/2020
+
+- Upgraded flutter_map to 0.9.0
+
 ## [0.2.8] - 29/04/2019
 
 - Added marker popup
