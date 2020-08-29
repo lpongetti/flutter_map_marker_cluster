@@ -105,44 +105,46 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     );
   }
 
-  _addLayer(MarkerNode marker) {
+  _addLayer(MarkerNode marker, int disableClusteringAtZoom) {
     for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
       var markerPoint = widget.map.project(marker.point, zoom.toDouble());
-      // try find a cluster close by
-      var cluster = _gridClusters[zoom].getNearObject(markerPoint);
-      if (cluster != null) {
-        cluster.addChild(marker);
-        return;
-      }
-
-      var closest = _gridUnclustered[zoom].getNearObject(markerPoint);
-      if (closest != null) {
-        var parent = closest.parent;
-        parent.removeChild(closest);
-
-        var newCluster = MarkerClusterNode(zoom: zoom, map: widget.map)
-          ..addChild(closest)
-          ..addChild(marker);
-
-        _gridClusters[zoom].addObject(
-            newCluster, widget.map.project(newCluster.point, zoom.toDouble()));
-
-        //First create any new intermediate parent clusters that don't exist
-        var lastParent = newCluster;
-        for (var z = zoom - 1; z > parent.zoom; z--) {
-          var newParent = MarkerClusterNode(
-            zoom: z,
-            map: widget.map,
-          );
-          newParent.addChild(lastParent);
-          lastParent = newParent;
-          _gridClusters[z].addObject(
-              lastParent, widget.map.project(closest.point, z.toDouble()));
+      if (zoom <= disableClusteringAtZoom) {
+        // try find a cluster close by
+        var cluster = _gridClusters[zoom].getNearObject(markerPoint);
+        if (cluster != null) {
+          cluster.addChild(marker);
+          return;
         }
-        parent.addChild(lastParent);
 
-        _removeFromNewPosToMyPosGridUnclustered(closest, zoom);
-        return;
+        var closest = _gridUnclustered[zoom].getNearObject(markerPoint);
+        if (closest != null) {
+          var parent = closest.parent;
+          parent.removeChild(closest);
+
+          var newCluster = MarkerClusterNode(zoom: zoom, map: widget.map)
+            ..addChild(closest)
+            ..addChild(marker);
+
+          _gridClusters[zoom].addObject(newCluster,
+              widget.map.project(newCluster.point, zoom.toDouble()));
+
+          //First create any new intermediate parent clusters that don't exist
+          var lastParent = newCluster;
+          for (var z = zoom - 1; z > parent.zoom; z--) {
+            var newParent = MarkerClusterNode(
+              zoom: z,
+              map: widget.map,
+            );
+            newParent.addChild(lastParent);
+            lastParent = newParent;
+            _gridClusters[z].addObject(
+                lastParent, widget.map.project(closest.point, z.toDouble()));
+          }
+          parent.addChild(lastParent);
+
+          _removeFromNewPosToMyPosGridUnclustered(closest, zoom);
+          return;
+        }
       }
 
       _gridUnclustered[zoom].addObject(marker, markerPoint);
@@ -154,7 +156,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   _addLayers() {
     for (var marker in widget.options.markers) {
-      _addLayer(MarkerNode(marker));
+      _addLayer(MarkerNode(marker), widget.options.disableClusteringAtZoom);
     }
 
     _topClusterLevel.recalculateBounds();
@@ -534,7 +536,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             })); // for remove previous layer (animation)
     }
 
-    _topClusterLevel.recursively(_currentZoom, (layer) {
+    _topClusterLevel.recursively(
+        _currentZoom, widget.options.disableClusteringAtZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
 
