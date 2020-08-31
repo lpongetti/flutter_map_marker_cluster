@@ -65,8 +65,8 @@ class MarkerClusterNode {
     });
   }
 
-  recursively(int zoomLevel, Function(dynamic) fn) {
-    if (zoom == zoomLevel) {
+  recursively(int zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) {
+    if (zoom == zoomLevel && zoomLevel <= disableClusteringAtZoom) {
       fn(this);
       return;
     }
@@ -76,7 +76,7 @@ class MarkerClusterNode {
         fn(child);
       }
       if (child is MarkerClusterNode) {
-        child.recursively(zoomLevel, fn);
+        child.recursively(zoomLevel, disableClusteringAtZoom, fn);
       }
     });
   }

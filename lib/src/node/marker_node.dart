@@ -23,6 +23,6 @@ class MarkerNode implements Marker {
   @override
   double get width => marker.width;
 
-  @override
-  Map<String, dynamic> get extras => marker.extras;
+  // @override
+  // Map<String, dynamic> get extras => marker.extras;
 }
