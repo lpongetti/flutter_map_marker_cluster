@@ -128,6 +128,7 @@ class _HomePageState extends State<HomePage> {
           ),
           MarkerClusterLayerOptions(
             maxClusterRadius: 120,
+            disableClusteringAtZoom: 6,
             size: Size(40, 40),
             anchor: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(

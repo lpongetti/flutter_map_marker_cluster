@@ -1,3 +1,8 @@
+## [0.3.1] - 31/08/2020
+
+- Removed extras property to marker
+- Added disableClusteringAtZoom property to MarkerClusterLayerOptions
+
 ## [0.3.0] - 25/08/2020
 
 - Added extras property to marker
