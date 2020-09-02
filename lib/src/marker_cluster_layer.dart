@@ -1,8 +1,8 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map_marker_popup/extension_api.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
@@ -10,6 +10,7 @@ import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
+import 'package:flutter_map_marker_popup/extension_api.dart';
 import 'package:latlong/latlong.dart';
 
 class MarkerClusterLayer extends StatefulWidget {
@@ -593,9 +594,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           [], (result, marker) => result..add(marker.point)));
 
       final center = widget.map.center;
-      final dest = widget.map
+      var dest = widget.map
           .getBoundsCenterZoom(cluster.bounds, widget.options.fitBoundsOptions);
 
+      // Force a jump to the next zoom level if that wouldn't otherwise occur.
+      if (dest.zoom < cluster.zoom) {
+        dest = CenterZoom(
+          center: dest.center,
+          zoom: cluster.zoom.toDouble() + 0.0000000001,
+        );
+      }
       final _latTween =
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
       final _lngTween =
