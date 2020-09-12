@@ -90,6 +90,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// If set, at this zoom level and below, markers will not be clustered. This defaults to 20 (max zoom)
   final int disableClusteringAtZoom;
 
+  /// Display markers only in the visible area. Default to true.
+  final bool displayInVisibleArea;
+
   /// Increase to increase the distance away that spiral spiderfied markers appear from the center
   final int spiderfySpiralDistanceMultiplier;
 
@@ -126,6 +129,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.anchor,
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
+    this.displayInVisibleArea = true,
     this.animationsOptions = const AnimationsOptions(),
     this.fitBoundsOptions =
         const FitBoundsOptions(padding: EdgeInsets.all(12.0)),

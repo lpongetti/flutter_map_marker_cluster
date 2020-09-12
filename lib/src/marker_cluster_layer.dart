@@ -536,9 +536,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             })); // for remove previous layer (animation)
     }
 
-    _topClusterLevel.recursively(
-        _currentZoom, widget.options.disableClusteringAtZoom, (layer) {
-      layers.addAll(_buildLayer(layer));
+    LatLngBounds bounds;
+    bounds = widget.map.getBounds();
+
+    _topClusterLevel.recursively( _currentZoom, widget.options.disableClusteringAtZoom, (layer) {
+      if (widget.options.displayInVisibleArea && bounds.contains(layer.point)) {
+        layers.addAll(_buildLayer(layer));
+      } else {
+        layers.addAll(_buildLayer(layer));
+      }
     });
 
     final PopupOptions popupOptions = widget.options.popupOptions;
