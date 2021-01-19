@@ -211,6 +211,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _translateAnimation(controller, translate, pos, newPos);
 
     return AnimatedBuilder(
+      key: Key('marker-${marker.hashCode}'),
       animation: controller,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
