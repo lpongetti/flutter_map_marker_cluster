@@ -1,3 +1,7 @@
+## [0.3.2] - 25/01/2021
+
+- Added key so that states are preserved when map moves
+
 ## [0.3.1] - 31/08/2020
 
 - Removed extras property to marker
