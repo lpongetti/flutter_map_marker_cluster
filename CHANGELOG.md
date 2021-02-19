@@ -1,3 +1,7 @@
+## [0.3.3] - 25/01/2021
+
+- Upgraded flutter_map
+
 ## [0.3.2] - 25/01/2021
 
 - Added key so that states are preserved when map moves
