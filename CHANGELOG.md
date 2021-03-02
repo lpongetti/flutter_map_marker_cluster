@@ -1,3 +1,8 @@
+## [0.3.4] - 02/03/2021
+
+- #65 Ensure cluster is split when tapping it
+- Upgrade flutter_map_marker_popup
+
 ## [0.3.3] - 25/01/2021
 
 - Upgraded flutter_map

@@ -45,7 +45,7 @@ class PopupOptions {
 
   const PopupOptions({
     this.popupBuilder,
-    this.popupSnap = PopupSnap.top,
+    this.popupSnap = PopupSnap.markerTop,
     this.popupController,
   });
 }
