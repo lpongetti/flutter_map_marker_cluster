@@ -1,10 +1,10 @@
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class MarkerNode implements Marker {
   final Marker marker;
-  MarkerClusterNode parent;
+  MarkerClusterNode? parent;
 
   MarkerNode(this.marker);
 

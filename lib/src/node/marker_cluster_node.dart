@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class MarkerClusterNode {
   final int zoom;
   final MapState map;
   final List<dynamic> children;
   LatLngBounds bounds;
-  MarkerClusterNode parent;
-  int addCount;
-  int removeCount;
+  MarkerClusterNode? parent;
+  int? addCount;
+  int? removeCount;
 
   List<MarkerNode> get markers {
     List<MarkerNode> markers = [];
@@ -27,15 +26,16 @@ class MarkerClusterNode {
   }
 
   MarkerClusterNode({
-    @required this.zoom,
-    @required this.map,
-  })  : bounds = LatLngBounds(),
+    required this.zoom,
+    required this.map,
+  })   : bounds = LatLngBounds(),
         children = [],
         parent = null;
 
   LatLng get point {
-    var swPoint = map.project(bounds.southWest);
-    var nePoint = map.project(bounds.northEast);
+    // Not sure if this is ideal to do ?? LatLng(0, 0)
+    var swPoint = map.project(bounds.southWest ?? LatLng(0, 0));
+    var nePoint = map.project(bounds.northEast ?? LatLng(0, 0));
     return map.unproject((swPoint + nePoint) / 2);
   }
 
@@ -65,8 +65,9 @@ class MarkerClusterNode {
     });
   }
 
-  recursively(int zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) {
-    if (zoom == zoomLevel && zoomLevel <= disableClusteringAtZoom) {
+  recursively(
+      int? zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) {
+    if (zoom == zoomLevel && zoomLevel! <= disableClusteringAtZoom) {
       fn(this);
       return;
     }

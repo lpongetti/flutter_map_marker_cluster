@@ -42,7 +42,7 @@ class DistanceGrid<T> {
         if (len == 1) {
           row.remove(x);
 
-          if (_grid[y].isEmpty) {
+          if (_grid[y]!.isEmpty) {
             _grid.remove(y);
           }
         }
@@ -55,10 +55,10 @@ class DistanceGrid<T> {
 
   eachObject(Function(T) fn) {
     for (var i in _grid.keys) {
-      var row = _grid[i];
+      var row = _grid[i]!;
 
       for (var j in row.keys) {
-        var cell = row[j];
+        var cell = row[j]!;
 
         for (var k = 0, len = cell.length; k < len; k++) {
           fn(cell[k]);
@@ -67,21 +67,21 @@ class DistanceGrid<T> {
     }
   }
 
-  T getNearObject(Point point) {
+  T? getNearObject(Point point) {
     var x = _getCoord(point.x),
         y = _getCoord(point.y),
         closestDistSq = _sqCellSize;
-    T closest;
+    T? closest;
 
     for (var i = y - 1; i <= y + 1; i++) {
-      var row = this._grid[i];
+      Map<num, List<T>>? row = this._grid[i];
       if (row != null) {
         for (var j = x - 1; j <= x + 1; j++) {
           var cell = row[j];
           if (cell != null) {
             for (var k = 0, len = cell.length; k < len; k++) {
               var obj = cell[k];
-              var dist = _sqDist(_objectPoint[obj], point);
+              var dist = _sqDist(_objectPoint[obj]!, point);
 
               if (dist < closestDistSq ||
                   dist <= closestDistSq && closest == null) {
