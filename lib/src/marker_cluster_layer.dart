@@ -415,7 +415,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     Size size = getClusterSize(cluster);
     Anchor anchor =
-        Anchor.forPos(widget.options.anchor!, size.width, size.height);
+        Anchor.forPos(widget.options.anchor, size.width, size.height);
 
     final width = size.width - anchor.left;
     final height = size.height - anchor.top;
@@ -640,7 +640,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _polygon = PolygonLayer(
           PolygonLayerOptions(polygons: [
             Polygon(
-              points: QuickHull.getConvexHull(points) as List<LatLng>,
+              points: QuickHull.getConvexHull(points),
               borderStrokeWidth:
                   widget.options.polygonOptions.borderStrokeWidth,
               color: widget.options.polygonOptions.color,
