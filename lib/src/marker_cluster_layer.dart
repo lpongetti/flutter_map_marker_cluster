@@ -453,7 +453,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
     }
     if (layer is MarkerClusterNode) {
-      if (!_boundsContainsCluster(layer)) {
+      if (_boundsContainsCluster(layer)) {
         return <Widget>[];
       }
 
