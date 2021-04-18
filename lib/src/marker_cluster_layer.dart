@@ -515,7 +515,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     return layers;
   }
 
-  List<Widget?> _buildLayers() {
+  List<Widget> _buildLayers() {
     if (widget.map.zoom != _previousZoomDouble) {
       _previousZoomDouble = widget.map.zoom;
 
@@ -524,9 +524,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     int zoom = widget.map.zoom.ceil();
 
-    List<Widget?> layers = [];
+    List<Widget> layers = [];
 
-    if (_polygon != null) layers.add(_polygon);
+    if (_polygon != null) layers.add(_polygon!);
 
     if (zoom < _currentZoom! || zoom > _currentZoom!) {
       _previousZoom = _currentZoom;
