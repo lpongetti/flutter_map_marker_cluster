@@ -27,14 +27,11 @@ class MarkerNode implements Marker {
   double get width => marker.width;
 
   @override
-  // TODO: implement rotate
-  bool? get rotate => throw UnimplementedError();
+  bool? get rotate => marker.rotate;
 
   @override
-  // TODO: implement rotateAlignment
-  AlignmentGeometry? get rotateAlignment => throw UnimplementedError();
+  AlignmentGeometry? get rotateAlignment => marker.rotateAlignment;
 
   @override
-  // TODO: implement rotateOrigin
-  Offset? get rotateOrigin => throw UnimplementedError();
+  Offset? get rotateOrigin => marker.rotateOrigin;
 }
