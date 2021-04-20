@@ -60,7 +60,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     Size size = getClusterSize(cluster);
     Anchor anchor =
-        Anchor.forPos(widget.options.anchor!, size.width, size.height);
+        Anchor.forPos(widget.options.anchor, size.width, size.height);
 
     return _removeAnchor(pos, size.width, size.height, anchor);
   }
