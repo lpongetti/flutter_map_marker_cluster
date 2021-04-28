@@ -211,13 +211,26 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     Animation<Point> translateAnimation =
         _translateAnimation(controller, translate, pos, newPos);
 
+    Widget child;
+    if (widget.options.rotate) {
+      // Counter rotated marker to the map rotation
+      child = Transform.rotate(
+        angle: -widget.map.rotationRad,
+        origin: widget.options.rotateOrigin,
+        alignment: widget.options.rotateAlignment,
+        child: marker.builder(context),
+      );
+    } else {
+      child = marker.builder(context);
+    }
+
     return AnimatedBuilder(
       key: Key('marker-${marker.hashCode}'),
       animation: controller,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: _onMarkerTap(marker),
-        child: marker.builder(context),
+        child: child,
       ),
       builder: (BuildContext context, Widget child) {
         return Positioned(
@@ -263,6 +276,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ),
         ),
         builder: (BuildContext context, Widget child) {
+          if (widget.options.rotate) {
+            // Counter rotated marker to the map rotation
+            child = Transform.rotate(
+              angle: -widget.map.rotationRad,
+              origin: widget.options.rotateOrigin,
+              alignment: widget.options.rotateAlignment,
+              child: child,
+            );
+          }
+
           return Positioned(
             width: size.width,
             height: size.height,
@@ -326,6 +349,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         ),
       ),
       builder: (BuildContext context, Widget child) {
+        if (widget.options.rotate) {
+          // Counter rotated marker to the map rotation
+          child = Transform.rotate(
+            angle: -widget.map.rotationRad,
+            origin: widget.options.rotateOrigin,
+            alignment: widget.options.rotateAlignment,
+            child: child,
+          );
+        }
+
         return Positioned(
           width: size.width,
           height: size.height,
@@ -545,17 +578,69 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     final PopupOptions popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
-      layers.add(
-        MarkerPopup(
+      Widget markerPopup;
+
+      if (widget.options.rotate) {
+        // Counter rotated marker to the map rotation
+        markerPopup = MarkerPopup(
+          mapState: widget.map,
+          popupController: popupOptions.popupController,
+          snap: popupOptions.popupSnap,
+          rotate: widget.options.rotate,
+          popupBuilder: (BuildContext context, Marker marker) {
+            return Transform.rotate(
+              angle: -widget.map.rotationRad,
+              origin: widget.options.rotateOrigin,
+              alignment: _popupAlignment,
+              child: popupOptions.popupBuilder(context, marker),
+            );
+          },
+        );
+      } else {
+        markerPopup = MarkerPopup(
           mapState: widget.map,
           popupController: popupOptions.popupController,
           snap: popupOptions.popupSnap,
           popupBuilder: popupOptions.popupBuilder,
-        ),
-      );
+        );
+      }
+
+      layers.add(markerPopup);
     }
 
     return layers;
+  }
+
+  get _popupAlignment {
+    switch (widget.options.popupOptions?.popupSnap) {
+      // ignore: deprecated_member_use
+      case PopupSnap.left:
+      case PopupSnap.markerLeft:
+      case PopupSnap.mapLeft:
+        return Alignment.centerRight;
+      // ignore: deprecated_member_use
+      case PopupSnap.top:
+      case PopupSnap.markerTop:
+      case PopupSnap.mapTop:
+        return Alignment.bottomCenter;
+      // ignore: deprecated_member_use
+      case PopupSnap.right:
+      case PopupSnap.markerRight:
+      case PopupSnap.mapRight:
+        return Alignment.centerLeft;
+      // ignore: deprecated_member_use
+      case PopupSnap.bottom:
+      case PopupSnap.markerBottom:
+      case PopupSnap.mapBottom:
+        return Alignment.topCenter;
+      // ignore: deprecated_member_use
+      case PopupSnap.center:
+      case PopupSnap.markerCenter:
+      case PopupSnap.mapCenter:
+        return Alignment.center;
+      default:
+        return null;
+    }
   }
 
   _isSpiderfyCluster(MarkerClusterNode cluster) {

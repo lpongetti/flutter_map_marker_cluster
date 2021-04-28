@@ -17,6 +17,12 @@ dependencies:
   latlong: ^0.6.1
   flutter_map_marker_popup: ^0.2.0
 
+dependency_overrides:
+  flutter_map_marker_popup:
+    git:
+      url: https://github.com/RooyeKhat-Media/flutter_map_marker_popup
+      ref: rotate-marker
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
