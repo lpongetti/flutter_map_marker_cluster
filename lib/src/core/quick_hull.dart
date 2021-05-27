@@ -90,7 +90,7 @@ class QuickHull {
       maxPt = maxLngPt;
     }
 
-    return List<LatLng>()
+    return <LatLng>[]
       ..addAll(_buildConvexHull([minPt, maxPt], latLngs))
       ..addAll(_buildConvexHull([maxPt, minPt], latLngs));
   }

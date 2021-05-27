@@ -17,6 +17,7 @@ class Spiderfy {
     final lengthFactor = distanceMultiplier * spiralLengthFactor * pi2;
     num angle = 0;
 
+    // ignore: deprecated_member_use
     final result = List<Point>(count);
     // Higher index, closer position to cluster center.
     for (var i = count; i >= 0; i--) {
@@ -34,14 +35,12 @@ class Spiderfy {
 
   static List<Point> circle(int radius, int count, Point center) {
     double angleStep = pi2 / count;
-    final result = List<Point>(count);
 
-    for (var i = 0; i < count; i++) {
-      double angle = circleStartAngle + i * angleStep;
+    return List<Point>.generate(count, (index) {
+      double angle = circleStartAngle + index * angleStep;
 
-      result[i] = CustomPoint<double>(
+      return CustomPoint<double>(
           center.x + radius * cos(angle), center.y + radius * sin(angle));
-    }
-    return result;
+    });
   }
 }

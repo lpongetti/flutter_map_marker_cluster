@@ -430,7 +430,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     if (layer is MarkerNode) {
       if (!_boundsContainsMarker(layer)) {
-        return List<Widget>();
+        return <Widget>[];
       }
 
       // fade in if
@@ -454,7 +454,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
     if (layer is MarkerClusterNode) {
       if (!_boundsContainsCluster(layer)) {
-        return List<Widget>();
+        return <Widget>[];
       }
 
       // fade in if
@@ -465,7 +465,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         // cluster
         layers.add(_buildCluster(layer, FadeType.FadeIn));
         // children
-        List<Marker> markersGettingClustered = List<Marker>();
+        List<Marker> markersGettingClustered = <Marker>[];
         layer.children.forEach((child) {
           if (child is MarkerNode) {
             markersGettingClustered.add(child.marker);
