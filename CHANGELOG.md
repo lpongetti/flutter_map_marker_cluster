@@ -1,3 +1,8 @@
+## [0.3.5] - 27/05/2021
+
+- Fix deprecate warning
+- Added marker_cluster_layer_widget
+
 ## [0.3.4] - 02/03/2021
 
 - #65 Ensure cluster is split when tapping it
