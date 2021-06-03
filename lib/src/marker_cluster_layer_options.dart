@@ -39,15 +39,26 @@ class AnimationsOptions {
 }
 
 class PopupOptions {
-  final PopupBuilder? popupBuilder;
-  final PopupController? popupController;
+  /// Used to construct the popup.
+  final PopupBuilder popupBuilder;
+
+  /// If a PopupController is provided it can be used to programmatically show
+  /// and hide the popup.
+  final PopupController popupController;
+
+  /// Controls the position of the popup relative to the marker or popup.
   final PopupSnap popupSnap;
 
-  const PopupOptions({
-    this.popupBuilder,
+  /// Allows the use of an animation for showing/hiding popups. Defaults to no
+  /// animation.
+  final PopupAnimation? popupAnimation;
+
+  PopupOptions({
+    required this.popupBuilder,
     this.popupSnap = PopupSnap.markerTop,
-    this.popupController,
-  });
+    PopupController? popupController,
+    this.popupAnimation,
+  }) : popupController = popupController ?? PopupController();
 }
 
 typedef ClusterWidgetBuilder = Widget Function(

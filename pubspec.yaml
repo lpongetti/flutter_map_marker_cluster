@@ -12,6 +12,7 @@ dependencies:
   flutter:
     sdk: flutter
   latlong2: ^0.8.0
+  flutter_map_marker_popup: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -24,9 +25,5 @@ dependency_overrides:
       ref: issues/829-nullsafety
   flutter_map_marker_popup:
     git:
-      url: git://github.com/bsneider/flutter_map_marker_popup.git
-      ref: nullsafety
-  flutter_image:
-    git:
-      url: "https://github.com/flutter/flutter_image"
-      ref: null-safety
+      url: git://github.com/rorystephenson/flutter_map_marker_popup.git
+      ref: nullsafety-2
