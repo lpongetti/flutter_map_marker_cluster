@@ -360,7 +360,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        List<Marker> markersGettingClustered = _spiderfyCluster!.markers
+        var markersGettingClustered = _spiderfyCluster!.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -369,7 +369,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -388,7 +388,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -487,7 +487,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         });
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -673,7 +673,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _fitBoundController.isAnimating) return null;
 
       if (widget.options.popupOptions != null) {
-        widget.options.popupOptions!.popupController!
+        widget.options.popupOptions!.popupController
             .togglePopup(marker.marker);
       }
 
