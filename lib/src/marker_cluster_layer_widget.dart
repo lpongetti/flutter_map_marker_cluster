@@ -10,7 +10,7 @@ class MarkerClusterLayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mapState = MapState.of(context);
+    final mapState = MapState.maybeOf(context);
     return MarkerClusterLayer(options, mapState, mapState.onMoved);
   }
 }

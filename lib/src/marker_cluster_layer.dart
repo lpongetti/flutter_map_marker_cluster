@@ -11,7 +11,8 @@ import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_map_marker_popup/flutter_map_marker_popup.dart';
 
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
@@ -546,7 +547,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     final PopupOptions popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(
-        MarkerPopup(
+        SimplePopupContainer(
           mapState: widget.map,
           popupController: popupOptions.popupController,
           snap: popupOptions.popupSnap,
