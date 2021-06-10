@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
@@ -359,7 +360,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        List<Marker> markersGettingClustered = _spiderfyCluster!.markers
+        var markersGettingClustered = _spiderfyCluster!.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -368,7 +369,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -387,7 +388,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               }));
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -486,7 +487,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         });
 
         if (widget.options.popupOptions != null) {
-          widget.options.popupOptions!.popupController!
+          widget.options.popupOptions!.popupController
               .hidePopupIfShowingFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
@@ -544,15 +545,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       layers.addAll(_buildLayer(layer));
     });
 
-    final PopupOptions? popupOptions = widget.options.popupOptions;
+    final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(
-        MarkerPopup(
+        PopupLayer(
+          popupBuilder: popupOptions.popupBuilder,
+          popupSnap: popupOptions.popupSnap,
+          popupController: popupOptions.popupController,
+          popupAnimation: popupOptions.popupAnimation,
+          markerRotate: false, // TODO: This should be set once this plugin supports marker rotation.
           mapState: widget.map,
-          popupController: popupOptions.popupController!,
-          snap: popupOptions.popupSnap,
-          popupBuilder: popupOptions.popupBuilder!,
-        ),
+        )
       );
     }
 
@@ -670,7 +673,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _fitBoundController.isAnimating) return null;
 
       if (widget.options.popupOptions != null) {
-        widget.options.popupOptions!.popupController!
+        widget.options.popupOptions!.popupController
             .togglePopup(marker.marker);
       }
 
