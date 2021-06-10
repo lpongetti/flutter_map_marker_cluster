@@ -31,11 +31,6 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-dependency_overrides:
-  flutter_map:
-    git:
-      url: git://github.com/fleaflet/flutter_map.git
-      ref: issues/829-nullsafety
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
