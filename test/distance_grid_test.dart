@@ -14,7 +14,7 @@ void main() {
           builder: (ctx) => FlutterLogo(),
         );
 
-    expect(grid.addObject(obj, Point(0, 0)), null);
+    grid.addObject(obj, Point(0, 0));
     expect(grid.removeObject(obj), true);
   });
 
@@ -27,7 +27,7 @@ void main() {
           ),
         );
 
-    expect(grid.addObject(obj, Point(0, 0)), null);
+    grid.addObject(obj, Point(0, 0));
 
     grid.eachObject((o) {
       expect(o, obj);
@@ -43,7 +43,7 @@ void main() {
           ),
         );
 
-    expect(grid.addObject(obj, Point(0, 0)), null);
+    grid.addObject(obj, Point(0, 0));
 
     expect(grid.getNearObject(Point(50, 50)), obj);
     expect(grid.getNearObject(Point(100, 0)), obj);
@@ -58,7 +58,7 @@ void main() {
           ),
         );
 
-    expect(grid.addObject(obj, Point(0.0, 0.0)), null);
+    grid.addObject(obj, Point(0, 0));
 
     expect(grid.getNearObject(Point(50.0, 50.0)), obj);
     expect(grid.getNearObject(Point(100.0, 0.0)), obj);
@@ -80,8 +80,8 @@ void main() {
           ),
         );
 
-    expect(grid.addObject(obj1, Point(50, 50)), null);
-    expect(grid.addObject(obj2, Point(0, 0)), null);
+    grid.addObject(obj1, Point(50, 50));
+    grid.addObject(obj2, Point(0, 0));
 
     expect(grid.getNearObject(Point(50, 50)), obj1);
     expect(grid.getNearObject(Point(0, 0)), obj2);
@@ -102,8 +102,8 @@ void main() {
           ),
         );
 
-    expect(grid.addObject(obj1, Point(50.0, 50.0)), null);
-    expect(grid.addObject(obj2, Point(0.0, 0.0)), null);
+    grid.addObject(obj1, Point(50.0, 50.0));
+    grid.addObject(obj2, Point(0.0, 0.0));
 
     expect(grid.getNearObject(Point(50.0, 50.0)), obj1);
     expect(grid.getNearObject(Point(0, 0)), obj2);

@@ -90,7 +90,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.refresh),
         onPressed: () {
           pointIndex++;
           if (pointIndex >= points.length) {
@@ -111,6 +110,7 @@ class _HomePageState extends State<HomePage> {
             // markers = []..addAll(markers);
           });
         },
+        child: Icon(Icons.refresh),
       ),
       body: FlutterMap(
         options: MapOptions(
@@ -148,16 +148,16 @@ class _HomePageState extends State<HomePage> {
                       height: 100,
                       color: Colors.white,
                       child: GestureDetector(
-                        onTap: () => debugPrint("Popup tap!"),
+                        onTap: () => debugPrint('Popup tap!'),
                         child: Text(
-                          "Container popup for marker at ${marker.point}",
+                          'Container popup for marker at ${marker.point}',
                         ),
                       ),
                     )),
             builder: (context, markers) {
               return FloatingActionButton(
-                child: Text(markers.length.toString()),
                 onPressed: null,
+                child: Text(markers.length.toString()),
               );
             },
           ),

@@ -18,7 +18,7 @@ class Spiderfy {
     num angle = 0;
 
     final result = List<Point?>.filled(count, null, growable: false);
-    
+
     // Higher index, closer position to cluster center.
     for (var i = count; i >= 0; i--) {
       // Skip the first position, so that we are already farther from center and we avoid
@@ -34,10 +34,10 @@ class Spiderfy {
   }
 
   static List<Point?> circle(int radius, int count, Point center) {
-    double angleStep = pi2 / count;
+    var angleStep = pi2 / count;
 
     return List<Point>.generate(count, (index) {
-      double angle = circleStartAngle + index * angleStep;
+      var angle = circleStartAngle + index * angleStep;
 
       return CustomPoint<double>(
           center.x + radius * cos(angle), center.y + radius * sin(angle));

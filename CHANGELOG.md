@@ -1,3 +1,7 @@
+## [0.4.0-nullsafety.0] - 21/06/2021
+
+- Null safety update
+
 ## [0.3.5] - 27/05/2021
 
 - Fix deprecate warning

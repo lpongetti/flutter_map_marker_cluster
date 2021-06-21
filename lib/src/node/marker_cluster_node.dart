@@ -13,7 +13,7 @@ class MarkerClusterNode {
   int? removeCount;
 
   List<MarkerNode> get markers {
-    List<MarkerNode> markers = [];
+    var markers = <MarkerNode>[];
 
     markers.addAll(children.whereType<MarkerNode>());
 
@@ -28,7 +28,7 @@ class MarkerClusterNode {
   MarkerClusterNode({
     required this.zoom,
     required this.map,
-  })   : bounds = LatLngBounds(),
+  })  : bounds = LatLngBounds(),
         children = [],
         parent = null;
 
@@ -39,19 +39,19 @@ class MarkerClusterNode {
     return map.unproject((swPoint + nePoint) / 2);
   }
 
-  addChild(dynamic child) {
+  void addChild(dynamic child) {
     assert(child is MarkerNode || child is MarkerClusterNode);
     children.add(child);
     child.parent = this;
     bounds.extend(child.point);
   }
 
-  removeChild(dynamic child) {
+  void removeChild(dynamic child) {
     children.remove(child);
     recalculateBounds();
   }
 
-  recalculateBounds() {
+  void recalculateBounds() {
     bounds = LatLngBounds();
 
     markers.forEach((marker) {
@@ -65,7 +65,7 @@ class MarkerClusterNode {
     });
   }
 
-  recursively(
+  void recursively(
       int? zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) {
     if (zoom == zoomLevel && zoomLevel! <= disableClusteringAtZoom) {
       fn(this);

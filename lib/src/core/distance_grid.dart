@@ -3,13 +3,13 @@ import 'dart:math';
 class DistanceGrid<T> {
   final num cellSize;
 
-  num _sqCellSize;
-  Map<num, Map<num, List<T>>> _grid = {};
-  Map<T, Point> _objectPoint = {};
+  final num _sqCellSize;
+  final Map<num, Map<num, List<T>>> _grid = {};
+  final Map<T, Point> _objectPoint = {};
 
   DistanceGrid(this.cellSize) : _sqCellSize = cellSize * cellSize;
 
-  addObject(T obj, Point point) {
+  void addObject(T obj, Point point) {
     var x = _getCoord(point.x), y = _getCoord(point.y);
     var row = _grid[y] ??= {};
     var cell = row[x] ??= [];
@@ -19,7 +19,7 @@ class DistanceGrid<T> {
     cell.add(obj);
   }
 
-  updateObject(T obj, Point point) {
+  void updateObject(T obj, Point point) {
     removeObject(obj);
     addObject(obj, point);
   }
@@ -53,7 +53,7 @@ class DistanceGrid<T> {
     return false;
   }
 
-  eachObject(Function(T) fn) {
+  void eachObject(Function(T) fn) {
     for (var i in _grid.keys) {
       var row = _grid[i]!;
 
@@ -74,7 +74,7 @@ class DistanceGrid<T> {
     T? closest;
 
     for (var i = y - 1; i <= y + 1; i++) {
-      Map<num, List<T>>? row = this._grid[i];
+      var row = _grid[i];
       if (row != null) {
         for (var j = x - 1; j <= x + 1; j++) {
           var cell = row[j];
