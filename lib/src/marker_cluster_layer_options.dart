@@ -53,11 +53,14 @@ class PopupOptions {
   /// animation.
   final PopupAnimation? popupAnimation;
 
+  final bool markerRotate;
+
   PopupOptions({
     required this.popupBuilder,
     this.popupSnap = PopupSnap.markerTop,
     PopupController? popupController,
     this.popupAnimation,
+    this.markerRotate = false,
   }) : popupController = popupController ?? PopupController();
 }
 

@@ -550,8 +550,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         popupSnap: popupOptions.popupSnap,
         popupController: popupOptions.popupController,
         popupAnimation: popupOptions.popupAnimation,
-        markerRotate:
-            false, // TODO: This should be set once this plugin supports marker rotation.
+        markerRotate: popupOptions.markerRotate,
         mapState: widget.map,
       ));
     }
