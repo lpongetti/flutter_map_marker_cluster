@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/foundation.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
@@ -39,15 +39,26 @@ class AnimationsOptions {
 }
 
 class PopupOptions {
+  /// Used to construct the popup.
   final PopupBuilder popupBuilder;
+
+  /// If a PopupController is provided it can be used to programmatically show
+  /// and hide the popup.
   final PopupController popupController;
+
+  /// Controls the position of the popup relative to the marker or popup.
   final PopupSnap popupSnap;
 
-  const PopupOptions({
-    this.popupBuilder,
+  /// Allows the use of an animation for showing/hiding popups. Defaults to no
+  /// animation.
+  final PopupAnimation? popupAnimation;
+
+  PopupOptions({
+    required this.popupBuilder,
     this.popupSnap = PopupSnap.markerTop,
-    this.popupController,
-  });
+    PopupController? popupController,
+    this.popupAnimation,
+  }) : popupController = popupController ?? PopupController();
 }
 
 typedef ClusterWidgetBuilder = Widget Function(
@@ -64,10 +75,10 @@ class MarkerClusterLayerOptions extends LayerOptions {
   final Size size;
 
   /// Cluster compute size
-  final Size Function(List<Marker>) computeSize;
+  final Size Function(List<Marker>)? computeSize;
 
   /// Cluster anchor
-  final AnchorPos anchor;
+  final AnchorPos? anchor;
 
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
@@ -98,7 +109,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
   final int circleSpiralSwitchover;
 
   /// Make it possible to provide custom function to calculate spiderfy shape positions
-  final List<Point> Function(int, Point) spiderfyShapePositions;
+  final List<Point> Function(int, Point)? spiderfyShapePositions;
 
   /// If true show polygon then tap on cluster
   final bool showPolygon;
@@ -107,19 +118,19 @@ class MarkerClusterLayerOptions extends LayerOptions {
   final PolygonOptions polygonOptions;
 
   /// Function to call when a Marker is tapped
-  final void Function(Marker) onMarkerTap;
+  final void Function(Marker)? onMarkerTap;
 
   /// Function to call when markers are clustered
-  final void Function(List<Marker>) onMarkersClustered;
+  final void Function(List<Marker>)? onMarkersClustered;
 
   /// Function to call when a cluster Marker is tapped
-  final void Function(MarkerClusterNode) onClusterTap;
+  final void Function(MarkerClusterNode)? onClusterTap;
 
   /// Popup's options that show when tapping markers or via the PopupController.
-  final PopupOptions popupOptions;
+  final PopupOptions? popupOptions;
 
   MarkerClusterLayerOptions({
-    @required this.builder,
+    required this.builder,
     this.markers = const [],
     this.size = const Size(30, 30),
     this.computeSize,
@@ -141,5 +152,5 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.onClusterTap,
     this.onMarkersClustered,
     this.popupOptions,
-  }) : assert(builder != null);
+  });
 }

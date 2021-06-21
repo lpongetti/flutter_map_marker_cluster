@@ -11,14 +11,14 @@ class Spiderfy {
 
   static const circleStartAngle = 0;
 
-  static List<Point> spiral(int distanceMultiplier, int count, Point center) {
+  static List<Point?> spiral(int distanceMultiplier, int count, Point center) {
     num legLength = distanceMultiplier * spiralLengthStart;
     final separation = distanceMultiplier * spiralFootSeparation;
     final lengthFactor = distanceMultiplier * spiralLengthFactor * pi2;
     num angle = 0;
 
-    // ignore: deprecated_member_use
-    final result = List<Point>(count);
+    final result = List<Point?>.filled(count, null, growable: false);
+    
     // Higher index, closer position to cluster center.
     for (var i = count; i >= 0; i--) {
       // Skip the first position, so that we are already farther from center and we avoid
@@ -33,7 +33,7 @@ class Spiderfy {
     return result;
   }
 
-  static List<Point> circle(int radius, int count, Point center) {
+  static List<Point?> circle(int radius, int count, Point center) {
     double angleStep = pi2 / count;
 
     return List<Point>.generate(count, (index) {

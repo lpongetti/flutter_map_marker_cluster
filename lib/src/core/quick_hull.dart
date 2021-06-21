@@ -1,8 +1,8 @@
-import 'package:latlong/latlong.dart';
+import 'package:latlong2/latlong.dart';
 
 class _QuickHullDistantPoint {
-  final LatLng maxPoint;
-  final List<LatLng> newPoints;
+  final LatLng? maxPoint;
+  final List<LatLng>? newPoints;
 
   _QuickHullDistantPoint({this.maxPoint, this.newPoints});
 }
@@ -18,7 +18,7 @@ class QuickHull {
   static _QuickHullDistantPoint _findMostDistantPointFromBaseLine(
       baseLine, latLngs) {
     double maxD = 0;
-    LatLng maxPt;
+    LatLng? maxPt;
     List<LatLng> newPoints = [];
 
     for (var i = latLngs.length - 1; i >= 0; i--) {
@@ -47,8 +47,8 @@ class QuickHull {
     if (t.maxPoint != null) {
       // if there is still a point "outside" the base line
       return []
-        ..addAll(_buildConvexHull([baseLine[0], t.maxPoint], t.newPoints))
-        ..addAll(_buildConvexHull([t.maxPoint, baseLine[1]], t.newPoints));
+        ..addAll(_buildConvexHull([baseLine[0], t.maxPoint!], t.newPoints!))
+        ..addAll(_buildConvexHull([t.maxPoint!, baseLine[1]], t.newPoints!));
     } else {
       // if there is no more point "outside" the base line, the current base line is part of the convex hull
       return [baseLine[0]];
@@ -57,9 +57,9 @@ class QuickHull {
 
   static List<LatLng> getConvexHull(List<LatLng> latLngs) {
     // find first baseline
-    double maxLat, minLat, maxLng, minLng;
+    double? maxLat, minLat, maxLng, minLng;
 
-    LatLng maxLatPt, minLatPt, maxLngPt, minLngPt, maxPt, minPt;
+    LatLng? maxLatPt, minLatPt, maxLngPt, minLngPt, maxPt, minPt;
 
     for (var i = latLngs.length - 1; i >= 0; i--) {
       var pt = latLngs[i];
@@ -91,7 +91,7 @@ class QuickHull {
     }
 
     return <LatLng>[]
-      ..addAll(_buildConvexHull([minPt, maxPt], latLngs))
+      ..addAll(_buildConvexHull([minPt!, maxPt!], latLngs))
       ..addAll(_buildConvexHull([maxPt, minPt], latLngs));
   }
 }
