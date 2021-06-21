@@ -1,4 +1,4 @@
-## [0.4.0-nullsafety.0] - 21/06/2021
+## [0.4.0] - 21/06/2021
 
 - Null safety update
 
