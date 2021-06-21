@@ -103,11 +103,7 @@ class _HomePageState extends State<HomePage> {
               width: 30,
               builder: (ctx) => Icon(Icons.pin_drop),
             );
-
-            // one of this
             markers = List.from(markers);
-            // markers = [...markers];
-            // markers = []..addAll(markers);
           });
         },
         child: Icon(Icons.refresh),
@@ -116,6 +112,7 @@ class _HomePageState extends State<HomePage> {
         options: MapOptions(
           center: points[0],
           zoom: 5,
+          maxZoom: 15,
           plugins: [
             MarkerClusterPlugin(),
           ],
@@ -129,7 +126,6 @@ class _HomePageState extends State<HomePage> {
           ),
           MarkerClusterLayerOptions(
             maxClusterRadius: 120,
-            disableClusteringAtZoom: 6,
             size: Size(40, 40),
             anchor: AnchorPos.align(AnchorAlign.center),
             fitBoundsOptions: FitBoundsOptions(
