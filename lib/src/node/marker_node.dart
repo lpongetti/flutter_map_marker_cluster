@@ -39,4 +39,6 @@ class MarkerNode implements Marker {
 
   @override
   Offset? get rotateOrigin => marker.rotateOrigin;
+  @override
+  String? get data => marker.data;
 }
