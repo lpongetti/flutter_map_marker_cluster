@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 
@@ -53,7 +54,18 @@ class PopupOptions {
   /// animation.
   final PopupAnimation? popupAnimation;
 
+  /// Whether or not the markers rotate counter clockwise to the map rotation,
+  /// defaults to false.
   final bool markerRotate;
+
+  /// The default MarkerTapBehavior is
+  /// [MarkerTapBehavior.togglePopupAndHideRest] which will toggle the popup of
+  /// the tapped marker and hide all other popups. This is a sensible default
+  /// when you only want to show a single popup at a time but if you show
+  /// multiple popups you probably want to use [MarkerTapBehavior.togglePopup].
+  ///
+  /// For more information and other options see [MarkerTapBehavior].
+  final MarkerTapBehavior markerTapBehavior;
 
   PopupOptions({
     required this.popupBuilder,
@@ -61,7 +73,9 @@ class PopupOptions {
     PopupController? popupController,
     this.popupAnimation,
     this.markerRotate = false,
-  }) : popupController = popupController ?? PopupController();
+    MarkerTapBehavior? markerTapBehavior,
+  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+        popupController = popupController ?? PopupController();
 }
 
 typedef ClusterWidgetBuilder = Widget Function(

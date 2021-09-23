@@ -116,8 +116,8 @@ class _HomePageState extends State<HomePage> {
           plugins: [
             MarkerClusterPlugin(),
           ],
-          onTap: (_) => _popupController
-              .hidePopup(), // Hide popup when the map is tapped.
+          onTap: (_, __) => _popupController
+              .hideAllPopups(), // Hide popup when the map is tapped.
         ),
         layers: [
           TileLayerOptions(
