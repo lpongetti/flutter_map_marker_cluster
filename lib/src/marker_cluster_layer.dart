@@ -369,7 +369,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
         if (widget.options.popupOptions != null) {
           widget.options.popupOptions!.popupController
-              .hidePopupIfShowingFor(markersGettingClustered);
+              .hidePopupsOnlyFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
@@ -388,7 +388,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
         if (widget.options.popupOptions != null) {
           widget.options.popupOptions!.popupController
-              .hidePopupIfShowingFor(markersGettingClustered);
+              .hidePopupsOnlyFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
@@ -486,7 +486,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
         if (widget.options.popupOptions != null) {
           widget.options.popupOptions!.popupController
-              .hidePopupIfShowingFor(markersGettingClustered);
+              .hidePopupsOnlyFor(markersGettingClustered);
         }
         if (widget.options.onMarkersClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
@@ -669,7 +669,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           _fitBoundController.isAnimating) return null;
 
       if (widget.options.popupOptions != null) {
-        widget.options.popupOptions!.popupController.togglePopup(marker.marker);
+        final popupOptions = widget.options.popupOptions!;
+        popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
       }
 
       // This is handled as an optional callback rather than leaving the package
