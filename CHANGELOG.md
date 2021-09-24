@@ -1,4 +1,4 @@
-## [0.x.y] - 23/09/2021
+## [0.4.1] - 23/09/2021
 
 - Upgrade to flutter_map_marker_popup v2.0.0 which now supports showing multiple
   popups at once. The default behaviour when using popups remains single-popup
@@ -8,7 +8,7 @@
   - hidePopupIfShowingFor -> hidePopupsOnlyFor
   - showPopup -> showPopupsOnlyFor
 
-  If you wish to show multiple popups at once you will want to change the 
+  If you wish to show multiple popups at once you will want to change the
   default MarkerTapBehavior, see the documentation in PopupMarkerLayerOptions.
 
 ## [0.4.0] - 21/06/2021

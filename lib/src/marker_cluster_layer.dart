@@ -1,7 +1,5 @@
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
@@ -670,7 +668,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       if (widget.options.popupOptions != null) {
         final popupOptions = widget.options.popupOptions!;
-        popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
+        popupOptions.markerTapBehavior
+            .apply(marker.marker, popupOptions.popupController);
       }
 
       // This is handled as an optional callback rather than leaving the package
