@@ -74,12 +74,11 @@ class PopupOptions {
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
-  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+  })  : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
 }
 
-typedef ClusterWidgetBuilder = Widget Function(
-    BuildContext context, List<Marker> markers);
+typedef ClusterWidgetBuilder = Widget Function(BuildContext context, List<Marker> markers);
 
 class MarkerClusterLayerOptions extends LayerOptions {
   /// Cluster builder
@@ -87,6 +86,30 @@ class MarkerClusterLayerOptions extends LayerOptions {
 
   /// List of markers
   final List<Marker> markers;
+
+  /// If true markers will be counter rotated to the map rotation
+  final bool? rotate;
+
+  /// The origin of the coordinate system (relative to the upper left corner of
+  /// this render object) in which to apply the matrix.
+  ///
+  /// Setting an origin is equivalent to conjugating the transform matrix by a
+  /// translation. This property is provided just for convenience.
+  final Offset? rotateOrigin;
+
+  /// The alignment of the origin, relative to the size of the box.
+  ///
+  /// This is equivalent to setting an origin based on the size of the box.
+  /// If it is specified at the same time as the [rotateOrigin], both are applied.
+  ///
+  /// An [AlignmentDirectional.centerStart] value is the same as an [Alignment]
+  /// whose [Alignment.x] value is `-1.0` if [Directionality.of] returns
+  /// [TextDirection.ltr], and `1.0` if [Directionality.of] returns
+  /// [TextDirection.rtl].	 Similarly [AlignmentDirectional.centerEnd] is the
+  /// same as an [Alignment] whose [Alignment.x] value is `1.0` if
+  /// [Directionality.of] returns	 [TextDirection.ltr], and `-1.0` if
+  /// [Directionality.of] returns [TextDirection.rtl].
+  final AlignmentGeometry? rotateAlignment;
 
   /// Cluster size
   final Size size;
@@ -148,6 +171,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
 
   MarkerClusterLayerOptions({
     required this.builder,
+    this.rotate,
+    this.rotateOrigin,
+    this.rotateAlignment,
     this.markers = const [],
     this.size = const Size(30, 30),
     this.computeSize,
@@ -155,8 +181,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
     this.animationsOptions = const AnimationsOptions(),
-    this.fitBoundsOptions =
-        const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
+    this.fitBoundsOptions = const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
     this.zoomToBoundsOnClick = true,
     this.centerMarkerOnClick = true,
     this.spiderfyCircleRadius = 40,
