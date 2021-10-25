@@ -64,8 +64,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   Point _removeAnchor(Point pos, double width, double height, Anchor anchor) {
-    final x = (pos.x - (width - anchor.left)).toDouble();
-    final y = (pos.y - (height - anchor.top)).toDouble();
+    final x = (pos.x - anchor.left).toDouble();
+    final y = (pos.y - anchor.top).toDouble();
     return Point(x, y);
   }
 
@@ -210,9 +210,24 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _translateAnimation(controller, translate, pos, newPos);
 
     return AnimatedBuilder(
-      key: Key('marker-${marker.hashCode}'),
+      key: Key('marker-${(marker.key ?? marker).hashCode}'),
       animation: controller,
       builder: (BuildContext context, Widget? child) {
+        final rotate = marker.rotate ?? widget.options.rotate ?? false;
+        final markerWidget = rotate
+            ? Transform.rotate(
+                angle: -widget.map.rotationRad,
+                origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
+                alignment: marker.rotateAlignment ?? widget.options.rotateAlignment,
+                child: Opacity(
+                  opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
+                  child: child,
+                ),
+              )
+            : Opacity(
+                opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
+                child: child,
+              );
         return Positioned(
           width: marker.width,
           height: marker.height,
@@ -222,10 +237,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           top: translate == TranslateType.None
               ? pos.y as double?
               : translateAnimation!.value.y as double?,
-          child: Opacity(
-            opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
-            child: child,
-          ),
+          child: markerWidget,
         );
       },
       child: GestureDetector(
