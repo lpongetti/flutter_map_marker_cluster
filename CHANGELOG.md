@@ -1,3 +1,7 @@
+## [0.4.2] - 25/10/2021
+
+- #94 Support Marker rotate, rotateOrigin and rotateAlignment options
+
 ## [0.4.1] - 23/09/2021
 
 - Upgrade to flutter_map_marker_popup v2.0.0 which now supports showing multiple
