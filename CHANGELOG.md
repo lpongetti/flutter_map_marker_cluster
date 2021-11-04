@@ -1,3 +1,7 @@
+## [0.4.3] - 04/11/2021
+
+- Fix #98: Loose marker alignment after upgrading library
+
 ## [0.4.2] - 25/10/2021
 
 - #94 Support Marker rotate, rotateOrigin and rotateAlignment options
