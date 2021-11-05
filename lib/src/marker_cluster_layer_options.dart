@@ -74,7 +74,8 @@ class PopupOptions {
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
-  }) : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+  })  : markerTapBehavior =
+            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
 }
 
