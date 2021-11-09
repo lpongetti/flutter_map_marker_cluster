@@ -63,3 +63,12 @@ Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`
 ### Run the example
 
 See the `example/` folder for a working example app.
+
+## Supporting Me
+
+A donation through my Ko-Fi page would be infinitly appriciated:
+[![ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/lorenzopongetti)
+
+but, if you can't or won't, a star on GitHub and a like on pub.dev would also go a long way!
+
+Every donation gives me fuel to continue my open-source projects and lets me know that I'm doing a good job.
