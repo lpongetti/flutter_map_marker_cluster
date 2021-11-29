@@ -1,3 +1,7 @@
+## [0.4.4] - 29/11/2021
+
+- Center cluster when spiderfy. Spiderfy when press cluster and current zoom is equal to fitBoundsOptions max zoom
+
 ## [0.4.3] - 04/11/2021
 
 - Fix #98: Loose marker alignment after upgrading library

@@ -590,31 +590,31 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         widget.options.onClusterTap!(cluster);
       }
 
-      // check if children can un-cluster
-      final cannotDivide = cluster.markers.every((marker) =>
-          marker.parent!.zoom == _maxZoom &&
-          marker.parent == cluster.markers[0].parent);
-      if (cannotDivide) {
+      if (!widget.options.zoomToBoundsOnClick) {
         _spiderfy(cluster);
         return null;
       }
-
-      if (!widget.options.zoomToBoundsOnClick) return null;
-
-      _showPolygon(cluster.markers.fold<List<LatLng>>(
-          [], (result, marker) => result..add(marker.point)));
 
       final center = widget.map.center;
       var dest = widget.map
           .getBoundsCenterZoom(cluster.bounds, widget.options.fitBoundsOptions);
 
-      // Force a jump to the next zoom level if that wouldn't otherwise occur.
-      if (dest.zoom < cluster.zoom) {
-        dest = CenterZoom(
-          center: dest.center,
-          zoom: cluster.zoom.toDouble() + 0.0000000001,
-        );
+      // check if children can un-cluster
+      var cannotDivide = cluster.markers.every((marker) =>
+              marker.parent!.zoom == _maxZoom &&
+              marker.parent == cluster.markers[0].parent) ||
+          (dest.zoom == _currentZoom &&
+              _currentZoom == widget.options.fitBoundsOptions.maxZoom);
+
+      if (cannotDivide) {
+        dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
       }
+
+      if (dest.zoom > _currentZoom && !cannotDivide) {
+        _showPolygon(cluster.markers.fold<List<LatLng>>(
+            [], (result, marker) => result..add(marker.point)));
+      }
+
       final _latTween =
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
       final _lngTween =
@@ -640,6 +640,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _fitBoundController
           ..removeListener(listener)
           ..reset();
+
+        if (cannotDivide) {
+          _spiderfy(cluster);
+        }
       });
     };
   }

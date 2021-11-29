@@ -81,6 +81,90 @@ class _HomePageState extends State<HomePage> {
         point: LatLng(49.8566, 3.3522),
         builder: (ctx) => Icon(Icons.pin_drop),
       ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
+      Marker(
+        anchorPos: AnchorPos.align(AnchorAlign.center),
+        height: 30,
+        width: 30,
+        point: LatLng(49.8566, 3.3522),
+        builder: (ctx) => Icon(Icons.pin_drop),
+      ),
     ];
 
     super.initState();
@@ -119,43 +203,102 @@ class _HomePageState extends State<HomePage> {
           onTap: (_, __) => _popupController
               .hideAllPopups(), // Hide popup when the map is tapped.
         ),
-        layers: [
-          TileLayerOptions(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: ['a', 'b', 'c'],
-          ),
-          MarkerClusterLayerOptions(
-            maxClusterRadius: 120,
-            size: Size(40, 40),
-            anchor: AnchorPos.align(AnchorAlign.center),
-            fitBoundsOptions: FitBoundsOptions(
-              padding: EdgeInsets.all(50),
+        // layers: [
+        //   TileLayerOptions(
+        //     urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        //     subdomains: ['a', 'b', 'c'],
+        //   ),
+        //   MarkerClusterLayerOptions(
+        //     spiderfyCircleRadius: 80,
+        //     spiderfySpiralDistanceMultiplier: 2,
+        //     circleSpiralSwitchover: 12,
+        //     maxClusterRadius: 120,
+        //     rotate: true,
+        //     size: Size(40, 40),
+        //     anchor: AnchorPos.align(AnchorAlign.top),
+        //     fitBoundsOptions: FitBoundsOptions(
+        //       padding: EdgeInsets.all(50),
+        //     ),
+        //     markers: markers,
+        //     polygonOptions: PolygonOptions(
+        //         borderColor: Colors.blueAccent,
+        //         color: Colors.black12,
+        //         borderStrokeWidth: 3),
+        //     popupOptions: PopupOptions(
+        //         popupSnap: PopupSnap.markerTop,
+        //         popupController: _popupController,
+        //         popupBuilder: (_, marker) => Container(
+        //               width: 200,
+        //               height: 100,
+        //               color: Colors.white,
+        //               child: GestureDetector(
+        //                 onTap: () => debugPrint('Popup tap!'),
+        //                 child: Text(
+        //                   'Container popup for marker at ${marker.point}',
+        //                 ),
+        //               ),
+        //             )),
+        //     builder: (context, markers) {
+        //       return FloatingActionButton(
+        //         onPressed: null,
+        //         child: Text(markers.length.toString()),
+        //       );
+        //     },
+        //   ),
+        // ],
+        children: <Widget>[
+          TileLayerWidget(
+            options: TileLayerOptions(
+              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+              subdomains: ['a', 'b', 'c'],
             ),
-            markers: markers,
-            polygonOptions: PolygonOptions(
-                borderColor: Colors.blueAccent,
-                color: Colors.black12,
-                borderStrokeWidth: 3),
-            popupOptions: PopupOptions(
-                popupSnap: PopupSnap.markerTop,
-                popupController: _popupController,
-                popupBuilder: (_, marker) => Container(
-                      width: 200,
-                      height: 100,
-                      color: Colors.white,
-                      child: GestureDetector(
-                        onTap: () => debugPrint('Popup tap!'),
-                        child: Text(
-                          'Container popup for marker at ${marker.point}',
+          ),
+          MarkerClusterLayerWidget(
+            options: MarkerClusterLayerOptions(
+              spiderfyCircleRadius: 80,
+              spiderfySpiralDistanceMultiplier: 2,
+              circleSpiralSwitchover: 12,
+              maxClusterRadius: 120,
+              rotate: true,
+              size: Size(40, 40),
+              anchor: AnchorPos.align(AnchorAlign.center),
+              fitBoundsOptions: FitBoundsOptions(
+                padding: EdgeInsets.all(50),
+                maxZoom: 15,
+              ),
+              markers: markers,
+              polygonOptions: PolygonOptions(
+                  borderColor: Colors.blueAccent,
+                  color: Colors.black12,
+                  borderStrokeWidth: 3),
+              popupOptions: PopupOptions(
+                  popupSnap: PopupSnap.markerTop,
+                  popupController: _popupController,
+                  popupBuilder: (_, marker) => Container(
+                        width: 200,
+                        height: 100,
+                        color: Colors.white,
+                        child: GestureDetector(
+                          onTap: () => debugPrint('Popup tap!'),
+                          child: Text(
+                            'Container popup for marker at ${marker.point}',
+                          ),
                         ),
-                      ),
-                    )),
-            builder: (context, markers) {
-              return FloatingActionButton(
-                onPressed: null,
-                child: Text(markers.length.toString()),
-              );
-            },
+                      )),
+              builder: (context, markers) {
+                return Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.0),
+                      color: Colors.blue),
+                  child: Center(
+                    child: Text(
+                      markers.length.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              },
+            ),
           ),
         ],
       ),
