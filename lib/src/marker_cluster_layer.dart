@@ -243,8 +243,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       },
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: _onMarkerTap(marker) as void Function()?,
-        child: marker.builder(context),
+        onTap: widget.options.popupOptions!.buildPopupOnHover ? () {} : _onMarkerTap(marker) as void Function()?,
+        child: widget.options.popupOptions!.buildPopupOnHover
+          ? MouseRegion(
+              onEnter: (_) => _onMarkerHoverEnter(marker),
+              onExit: (_) => _onMarkerHoverExit(marker),
+              child: marker.builder(context),
+            )
+          : marker.builder(context),
       ),
     );
   }
@@ -674,6 +680,34 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       setState(() {
         _polygon = null;
       });
+    }
+  }
+
+  void _onMarkerHoverEnter(MarkerNode marker) {
+    if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return null;
+
+    if (widget.options.popupOptions != null) {
+      final popupOptions = widget.options.popupOptions!;
+      popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
+    }
+
+    if (widget.options.onMarkerTap != null) {
+      widget.options.onMarkerHoverEnter!(marker.marker);
+    }
+  }
+
+  void _onMarkerHoverExit(MarkerNode marker) {
+    if (_zoomController.isAnimating ||
+        _centerMarkerController.isAnimating ||
+        _fitBoundController.isAnimating) return null;
+
+    if (widget.options.popupOptions != null) {
+      final popupOptions = widget.options.popupOptions!;
+      popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
+    }
+
+    if (widget.options.onMarkerTap != null) {
+      widget.options.onMarkerHoverExit!(marker.marker);
     }
   }
 

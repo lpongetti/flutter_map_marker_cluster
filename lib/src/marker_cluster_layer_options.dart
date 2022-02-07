@@ -67,6 +67,8 @@ class PopupOptions {
   /// For more information and other options see [MarkerTapBehavior].
   final MarkerTapBehavior markerTapBehavior;
 
+  final bool buildPopupOnHover;
+
   PopupOptions({
     required this.popupBuilder,
     this.popupSnap = PopupSnap.markerTop,
@@ -74,6 +76,7 @@ class PopupOptions {
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
+    this.buildPopupOnHover = false,
   })  : markerTapBehavior =
             markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
@@ -162,6 +165,12 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker)? onMarkerTap;
 
+  /// Function to call when a Marker starts to be hovered
+  final void Function(Marker)? onMarkerHoverEnter;
+
+  /// Function to call when a Marker stops to be hovered
+  final void Function(Marker)? onMarkerHoverExit;
+
   /// Function to call when markers are clustered
   final void Function(List<Marker>)? onMarkersClustered;
 
@@ -194,6 +203,8 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkerHoverEnter,
+    this.onMarkerHoverExit,
     this.onClusterTap,
     this.onMarkersClustered,
     this.popupOptions,
