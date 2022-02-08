@@ -698,7 +698,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
 
-      if(enter) assert(popupOptions.popupShowingTime >= 0);
+      assert(!enter || (popupOptions.popupShowingTime >= 0));
 
       Future.delayed(Duration(milliseconds: enter ? popupOptions.popupShowingTime : 0), () => popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController));
     }
