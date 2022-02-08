@@ -694,21 +694,20 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   /// Function that is called when the marker is hover (if popup building on hover is selected).
   /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
   void _onMarkerHover(MarkerNode marker, bool enter){
-    print("ok1");
     if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return null;
-    print("ok2");
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
-      print("ok3");
+
+      if(enter) assert(popupOptions.popupShowingTime >= 0);
+
       Future.delayed(Duration(milliseconds: enter ? popupOptions.popupShowingTime : 0), () => popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController));
     }
-    print("ok4");
 
     if (widget.options.onMarkerTap != null) {
-      print("ok5");
-      enter ? widget.options.onMarkerHoverEnter!(marker.marker) : widget.options.onMarkerHoverExit!(marker.marker);
+      enter
+        ? widget.options.onMarkerHoverEnter != null ? widget.options.onMarkerHoverEnter!(marker.marker) : null
+        : widget.options.onMarkerHoverExit != null ? widget.options.onMarkerHoverExit!(marker.marker) : null;
     }
-    print("ok6");
   }
 
   Function _onMarkerTap(MarkerNode marker) {
