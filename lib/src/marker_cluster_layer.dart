@@ -243,7 +243,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       },
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: widget.options.popupOptions!.buildPopupOnHover ? () { widget.options.onMarkerTap ?? null; } : _onMarkerTap(marker) as void Function()?,
+        onTap: widget.options.popupOptions!.buildPopupOnHover ? () { widget.options.onMarkerTap != null ? widget.options.onMarkerTap!(marker.marker) : null; } : _onMarkerTap(marker) as void Function()?,
         child: widget.options.popupOptions!.buildPopupOnHover
           ? MouseRegion(
               onEnter: (_) => _onMarkerHoverEnter(marker),
