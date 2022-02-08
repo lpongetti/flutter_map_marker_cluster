@@ -684,30 +684,27 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   void _onMarkerHoverEnter(MarkerNode marker) {
-    if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return null;
-
-    if (widget.options.popupOptions != null) {
-      final popupOptions = widget.options.popupOptions!;
-      popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
-    }
-
-    if (widget.options.onMarkerTap != null) {
-      widget.options.onMarkerHoverEnter!(marker.marker);
-    }
+    _onMarkerHover(marker, true);
   }
 
   void _onMarkerHoverExit(MarkerNode marker) {
+    _onMarkerHover(marker, false);
+  }
+
+  /// Function that is called when the marker is hover (if popup building on hover is selected).
+  /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
+  void _onMarkerHover(MarkerNode marker, bool enter){
     if (_zoomController.isAnimating ||
         _centerMarkerController.isAnimating ||
         _fitBoundController.isAnimating) return null;
 
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
-      popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController);
+      Future.delayed(Duration(milliseconds: enter ? popupOptions.popupShowingTime : 0), () => popupOptions.markerTapBehavior.apply(marker.marker, popupOptions.popupController));
     }
 
     if (widget.options.onMarkerTap != null) {
-      widget.options.onMarkerHoverExit!(marker.marker);
+      enter ? widget.options.onMarkerHoverEnter!(marker.marker) : widget.options.onMarkerHoverExit!(marker.marker);
     }
   }
 
