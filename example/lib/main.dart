@@ -274,6 +274,7 @@ class _HomePageState extends State<HomePage> {
               popupOptions: PopupOptions(
                   popupSnap: PopupSnap.markerTop,
                   popupController: _popupController,
+                  buildPopupOnHover: true,
                   popupBuilder: (_, marker) => Container(
                         width: 200,
                         height: 100,
