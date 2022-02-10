@@ -13,10 +13,7 @@ dependencies:
     sdk: flutter
   flutter_map: ">=0.13.1 <1.0.0"
   latlong2: ^0.8.0
-  #flutter_map_marker_popup: ^2.0.0
-  flutter_map_marker_popup:
-    git:
-      url: https://github.com/Feynallein/flutter_map_marker_popup.git
+  flutter_map_marker_popup: ^2.0.0
 
 dev_dependencies:
   flutter_test:
