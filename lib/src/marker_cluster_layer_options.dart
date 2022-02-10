@@ -71,7 +71,7 @@ class PopupOptions {
   final bool buildPopupOnHover;
 
   /// Time (in milliseconds) required before the popup is shown when hovering. Set to 300 ms by default.
-  final int popupShowingTime;
+  final int timeToShowPopupOnHover;
 
   PopupOptions({
     required this.popupBuilder,
@@ -81,7 +81,7 @@ class PopupOptions {
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
-    this.popupShowingTime = 300,
+    this.timeToShowPopupOnHover = 300,
   })  : markerTapBehavior =
             markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
