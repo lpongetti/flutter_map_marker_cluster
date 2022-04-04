@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -591,7 +592,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
 
       if (!widget.options.zoomToBoundsOnClick) {
-        _spiderfy(cluster);
+        if (widget.options.spiderfyCluster) {
+          _spiderfy(cluster);
+        }
         return null;
       }
 
@@ -641,7 +644,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
 
-        if (cannotDivide) {
+        if (cannotDivide && widget.options.spiderfyCluster) {
           _spiderfy(cluster);
         }
       });
