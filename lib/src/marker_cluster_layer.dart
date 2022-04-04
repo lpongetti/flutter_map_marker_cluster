@@ -255,12 +255,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     final points = _generatePointSpiderfy(
         cluster.markers.length, _getPixelFromPoint(cluster.point));
 
-    final fadeAnimation =
-        Tween<double>(begin: 1.0, end: 0.3).animate(_spiderfyController);
+    final fadeAnimation = (widget.options.animationsOptions.spiderfyTween ??
+            Tween<double>(begin: 1.0, end: 0.3))
+        .animate(_spiderfyController);
 
     var results = <Widget>[];
 
     var size = getClusterSize(cluster);
+
+    final builder = widget.options.animationsOptions.spiderfyAnimationBuilder ??
+        _defaultSpiderfyAnimationBuilder;
 
     results.add(
       AnimatedBuilder(
@@ -271,10 +275,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             height: size.height,
             left: pos.x as double?,
             top: pos.y as double?,
-            child: Opacity(
-              opacity: fadeAnimation.value,
-              child: child,
-            ),
+            child: builder(context, fadeAnimation, cluster, child),
           );
         },
         child: GestureDetector(
@@ -301,6 +302,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
 
     return results;
+  }
+
+  static Widget _defaultSpiderfyAnimationBuilder(
+    BuildContext context,
+    Animation<double> animation,
+    MarkerClusterNode node,
+    Widget? child,
+  ) {
+    return Opacity(opacity: animation.value, child: child);
   }
 
   List<Marker> getClusterMarkers(MarkerClusterNode cluster) =>

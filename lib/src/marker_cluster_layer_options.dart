@@ -21,6 +21,13 @@ class PolygonOptions {
   });
 }
 
+typedef SpiderfyAnimationBuilder = Widget Function(
+  BuildContext context,
+  Animation<double> animation,
+  MarkerClusterNode node,
+  Widget? child,
+);
+
 class AnimationsOptions {
   final Duration zoom;
   final Duration fitBound;
@@ -28,12 +35,16 @@ class AnimationsOptions {
   final Duration centerMarker;
   final Curve centerMarkerCurves;
   final Duration spiderfy;
+  final SpiderfyAnimationBuilder? spiderfyAnimationBuilder;
+  final Tween<double>? spiderfyTween;
 
   const AnimationsOptions({
     this.zoom = const Duration(milliseconds: 500),
     this.fitBound = const Duration(milliseconds: 500),
     this.centerMarker = const Duration(milliseconds: 500),
     this.spiderfy = const Duration(milliseconds: 500),
+    this.spiderfyAnimationBuilder,
+    this.spiderfyTween,
     this.fitBoundCurves = Curves.fastOutSlowIn,
     this.centerMarkerCurves = Curves.fastOutSlowIn,
   });
