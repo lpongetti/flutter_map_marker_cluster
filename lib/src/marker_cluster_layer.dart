@@ -349,23 +349,23 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               : translateAnimation!.value.y as double?,
           child: Opacity(
             opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
+            child: MouseRegion(
+            cursor: SystemMouseCursors.click,
             child: child,
           ),
-        );
+          ));
       },
       child: /*MouseRegion(
       cursor: SystemMouseCursors.click,
       child: */GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: _onClusterTap(cluster) as void Function()?,
-          child: MouseRegion(
-            cursor: SystemMouseCursors.click,
-            child: widget.options.builder(
+          child: widget.options.builder(
             context,
             getClusterMarkers(cluster),
           ),
         ),
-      )
+      //)
     );
   }
 
