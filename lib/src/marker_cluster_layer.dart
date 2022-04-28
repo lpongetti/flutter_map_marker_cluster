@@ -350,6 +350,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           child: Opacity(
             opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
             child: MouseRegion(
+              onEnter: (_) => print("aaaaaa"),
             cursor: SystemMouseCursors.click,
             child: child,
           ),
