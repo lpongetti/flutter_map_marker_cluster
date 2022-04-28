@@ -238,7 +238,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           top: translate == TranslateType.None
               ? pos.y as double?
               : translateAnimation!.value.y as double?,
-          child: markerWidget,
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: markerWidget,
+          )
         );
       },
       child: GestureDetector(
@@ -350,14 +353,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ),
         );
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _onClusterTap(cluster) as void Function()?,
-        child: widget.options.builder(
-          context,
-          getClusterMarkers(cluster),
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: _onClusterTap(cluster) as void Function()?,
+          child: widget.options.builder(
+            context,
+            getClusterMarkers(cluster),
+          ),
         ),
-      ),
+      )
     );
   }
 
