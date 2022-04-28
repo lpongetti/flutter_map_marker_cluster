@@ -353,12 +353,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ),
         );
       },
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
+      child: /*MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: */GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: _onClusterTap(cluster) as void Function()?,
-          child: widget.options.builder(
+          child: MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: widget.options.builder(
             context,
             getClusterMarkers(cluster),
           ),
