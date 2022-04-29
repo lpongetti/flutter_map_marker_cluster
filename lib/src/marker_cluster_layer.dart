@@ -350,15 +350,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           child: Opacity(
             opacity: fade == FadeType.None ? 1 : fadeAnimation!.value,
             child: MouseRegion(
-              onEnter: (_) => print("aaaaaa"),
-            cursor: SystemMouseCursors.click,
-            child: child,
-          ),
-          ));
+              cursor: SystemMouseCursors.click,
+              child: child,
+            ),
+          )
+        );
       },
-      child: /*MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: */GestureDetector(
+      child: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: _onClusterTap(cluster) as void Function()?,
           child: widget.options.builder(
