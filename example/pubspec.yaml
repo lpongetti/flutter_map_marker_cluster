@@ -11,8 +11,8 @@ dependencies:
     sdk: flutter
   flutter_map: #">=0.13.1 <1.0.0"
     git:
-      url: https://github.com/rorystephenson/flutter_map.git
-      ref: 876d4f7fca3cb314f86989d78ae1625d8318e7cb
+      url: https://github.com/fleaflet/flutter_map.git
+      ref: master
   flutter_map_marker_cluster:
     path: ../
   cupertino_icons: ^1.0.2

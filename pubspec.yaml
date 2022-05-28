@@ -13,13 +13,13 @@ dependencies:
     sdk: flutter
   flutter_map: #">=0.13.1 <1.0.0"
     git:
-      url: https://github.com/rorystephenson/flutter_map.git
-      ref: 876d4f7fca3cb314f86989d78ae1625d8318e7cb
+      url: https://github.com/fleaflet/flutter_map.git
+      ref: master
   flutter_map_marker_popup: #^2.0.0
     git:
       url: https://github.com/rorystephenson/flutter_map_marker_popup.git
-      ref: 27433f07ccfd6264dc22d0c5016ea72def44203f
-  latlong2: ^0.8.0
+      ref: fecc9c8aa67479a47a3bd7e723f3d2bf43589fb4
+  latlong2: ^0.8.1
 
 dev_dependencies:
   flutter_test:
