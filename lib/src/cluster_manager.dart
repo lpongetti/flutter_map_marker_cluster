@@ -8,6 +8,7 @@ import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 
 class ClusterManager {
   final MapCalculator mapCalculator;
+  final AnchorPos? anchorPos;
   final Size predefinedSize;
   final Size Function(List<Marker>)? computeSize;
 
@@ -19,6 +20,7 @@ class ClusterManager {
 
   ClusterManager._({
     required this.mapCalculator,
+    required this.anchorPos,
     required this.predefinedSize,
     required this.computeSize,
     required Map<int, DistanceGrid<MarkerClusterNode>> gridClusters,
@@ -30,6 +32,7 @@ class ClusterManager {
 
   factory ClusterManager.initialize({
     required MapCalculator mapCalculator,
+    required AnchorPos? anchorPos,
     required Size predefinedSize,
     required Size Function(List<Marker>)? computeSize,
     required int minZoom,
@@ -45,6 +48,7 @@ class ClusterManager {
     }
 
     final topClusterLevel = MarkerClusterNode(
+      anchorPos: anchorPos,
       zoom: minZoom - 1,
       mapCalculator: mapCalculator,
       predefinedSize: predefinedSize,
@@ -52,6 +56,7 @@ class ClusterManager {
     );
 
     return ClusterManager._(
+      anchorPos: anchorPos,
       mapCalculator: mapCalculator,
       predefinedSize: predefinedSize,
       computeSize: computeSize,
@@ -85,6 +90,7 @@ class ClusterManager {
 
           var newCluster = MarkerClusterNode(
             zoom: zoom,
+            anchorPos: anchorPos,
             mapCalculator: mapCalculator,
             predefinedSize: predefinedSize,
             computeSize: computeSize,
@@ -100,6 +106,7 @@ class ClusterManager {
           for (var z = zoom - 1; z > parent.zoom; z--) {
             var newParent = MarkerClusterNode(
               zoom: z,
+              anchorPos: anchorPos,
               mapCalculator: mapCalculator,
               predefinedSize: predefinedSize,
               computeSize: computeSize,

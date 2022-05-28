@@ -5,7 +5,6 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
-import 'package:latlong2/latlong.dart';
 
 class ClusterWidget extends StatelessWidget {
   final MarkerClusterNode cluster;
@@ -13,8 +12,6 @@ class ClusterWidget extends StatelessWidget {
   final MapCalculator mapCalculator;
   final AnimationController zoomController;
   final VoidCallback onTap;
-  final Point Function(MarkerClusterNode cluster, {LatLng? customPoint})
-      getPixelFromCluster;
   final Animation<double>? Function(
       AnimationController? controller, FadeType fadeType) fadeAnimation;
   final Animation<Point>? Function(AnimationController? controller,
@@ -30,7 +27,6 @@ class ClusterWidget extends StatelessWidget {
     required this.mapCalculator,
     required this.zoomController,
     required this.onTap,
-    required this.getPixelFromCluster,
     required this.fadeAnimation,
     required this.translateAnimation,
     this.fadeType = FadeType.none,
@@ -41,7 +37,7 @@ class ClusterWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final pos = getPixelFromCluster(cluster);
+    final pos = cluster.getPixel();
 
     final fadeAnimationCalculated = fadeAnimation(zoomController, fadeType);
     final translateAnimationCalculated =

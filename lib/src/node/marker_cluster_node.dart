@@ -1,12 +1,16 @@
+import 'dart:math';
 import 'dart:ui';
 
+import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong2/latlong.dart';
 
 class MarkerClusterNode {
   final int zoom;
+  final AnchorPos? anchorPos;
   final Size predefinedSize;
   final Size Function(List<Marker>)? computeSize;
   final MapCalculator mapCalculator;
@@ -31,6 +35,7 @@ class MarkerClusterNode {
 
   MarkerClusterNode({
     required this.zoom,
+    required this.anchorPos,
     required this.mapCalculator,
     required this.predefinedSize,
     this.computeSize,
@@ -91,4 +96,15 @@ class MarkerClusterNode {
   List<Marker> get mapMarkers => markers.map((node) => node.marker).toList();
 
   Size size() => computeSize?.call(mapMarkers) ?? predefinedSize;
+
+  Point getPixel({LatLng? customPoint}) {
+    final pos = mapCalculator.getPixelFromPoint(customPoint ?? point);
+
+    var calculatedSize = size();
+    var anchor =
+        Anchor.forPos(anchorPos, calculatedSize.width, calculatedSize.height);
+
+    return util.removeAnchor(
+        pos, calculatedSize.width, calculatedSize.height, anchor);
+  }
 }
