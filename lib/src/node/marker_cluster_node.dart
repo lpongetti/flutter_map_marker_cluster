@@ -4,7 +4,8 @@ import 'package:latlong2/latlong.dart';
 
 class MarkerClusterNode {
   final int zoom;
-  final MapState map;
+  final CustomPoint Function(LatLng latlng, [double? zoom]) project;
+  final LatLng Function(CustomPoint point, [double? zoom]) unproject;
   final List<dynamic> children;
   LatLngBounds bounds;
   MarkerClusterNode? parent;
@@ -26,16 +27,17 @@ class MarkerClusterNode {
 
   MarkerClusterNode({
     required this.zoom,
-    required this.map,
+    required this.project,
+    required this.unproject,
   })  : bounds = LatLngBounds(),
         children = [],
         parent = null;
 
   LatLng get point {
     // Not sure if this is ideal to do ?? LatLng(0, 0)
-    var swPoint = map.project(bounds.southWest ?? LatLng(0, 0));
-    var nePoint = map.project(bounds.northEast ?? LatLng(0, 0));
-    return map.unproject((swPoint + nePoint) / 2);
+    var swPoint = project(bounds.southWest ?? LatLng(0, 0));
+    var nePoint = project(bounds.northEast ?? LatLng(0, 0));
+    return unproject((swPoint + nePoint) / 2);
   }
 
   void addChild(dynamic child) {

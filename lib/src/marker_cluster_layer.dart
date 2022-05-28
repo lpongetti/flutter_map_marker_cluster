@@ -1,9 +1,10 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/anim_type.dart';
-import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
+import 'package:flutter_map_marker_cluster/src/cluster_manager.dart';
 import 'package:flutter_map_marker_cluster/src/core/quick_hull.dart';
 import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
@@ -25,9 +26,7 @@ class MarkerClusterLayer extends StatefulWidget {
 
 class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     with TickerProviderStateMixin {
-  final Map<int, DistanceGrid<MarkerClusterNode>> _gridClusters = {};
-  final Map<int, DistanceGrid<MarkerNode>> _gridUnclustered = {};
-  late MarkerClusterNode _topClusterLevel;
+  late ClusterManager _clusterManager;
   late int _maxZoom;
   late int _minZoom;
   late int _currentZoom;
@@ -91,82 +90,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     );
   }
 
-  void _initializeClusters() {
-    // set up DistanceGrids for each zoom
-    for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
-      _gridClusters[zoom] = DistanceGrid(widget.options.maxClusterRadius);
-      _gridUnclustered[zoom] = DistanceGrid(widget.options.maxClusterRadius);
-    }
-
-    _topClusterLevel = MarkerClusterNode(
-      zoom: _minZoom - 1,
-      map: widget.map,
-    );
-  }
-
-  void _addLayer(MarkerNode marker, int disableClusteringAtZoom) {
-    for (var zoom = _maxZoom; zoom >= _minZoom; zoom--) {
-      var markerPoint = widget.map.project(marker.point, zoom.toDouble());
-      if (zoom <= disableClusteringAtZoom) {
-        // try find a cluster close by
-        var cluster = _gridClusters[zoom]!.getNearObject(markerPoint);
-        if (cluster != null) {
-          cluster.addChild(marker);
-          return;
-        }
-
-        var closest = _gridUnclustered[zoom]!.getNearObject(markerPoint);
-        if (closest != null) {
-          var parent = closest.parent!;
-          parent.removeChild(closest);
-
-          var newCluster = MarkerClusterNode(zoom: zoom, map: widget.map)
-            ..addChild(closest)
-            ..addChild(marker);
-
-          _gridClusters[zoom]!.addObject(newCluster,
-              widget.map.project(newCluster.point, zoom.toDouble()));
-
-          //First create any new intermediate parent clusters that don't exist
-          var lastParent = newCluster;
-          for (var z = zoom - 1; z > parent.zoom; z--) {
-            var newParent = MarkerClusterNode(
-              zoom: z,
-              map: widget.map,
-            );
-            newParent.addChild(lastParent);
-            lastParent = newParent;
-            _gridClusters[z]!.addObject(
-                lastParent, widget.map.project(closest.point, z.toDouble()));
-          }
-          parent.addChild(lastParent);
-
-          _removeFromNewPosToMyPosGridUnclustered(closest, zoom);
-          return;
-        }
-      }
-
-      _gridUnclustered[zoom]!.addObject(marker, markerPoint);
-    }
-
-    //Didn't get in anything, add us to the top
-    _topClusterLevel.addChild(marker);
-  }
-
   void _addLayers() {
     for (var marker in widget.options.markers) {
-      _addLayer(MarkerNode(marker), widget.options.disableClusteringAtZoom);
+      _clusterManager.addLayer(
+        MarkerNode(marker),
+        widget.options.disableClusteringAtZoom,
+        _maxZoom,
+        _minZoom,
+      );
     }
 
-    _topClusterLevel.recalculateBounds();
-  }
-
-  void _removeFromNewPosToMyPosGridUnclustered(MarkerNode marker, int zoom) {
-    for (; zoom >= _minZoom; zoom--) {
-      if (!_gridUnclustered[zoom]!.removeObject(marker)) {
-        break;
-      }
-    }
+    _clusterManager.recalculateTopClusterLevelBounds();
   }
 
   Animation<double>? _fadeAnimation(
@@ -549,7 +483,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             })); // for remove previous layer (animation)
     }
 
-    _topClusterLevel.recursively(
+    _clusterManager.recursivelyFromTopClusterLevel(
         _currentZoom, widget.options.disableClusteringAtZoom, (layer) {
       layers.addAll(_buildLayer(layer));
     });
@@ -748,7 +682,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     _maxZoom = widget.map.options.maxZoom?.floor() ?? 20;
     _previousZoomDouble = widget.map.zoom;
     _initializeAnimationController();
-    _initializeClusters();
+    _clusterManager = ClusterManager.initialize(
+      minZoom: _minZoom,
+      maxZoom: _maxZoom,
+      maxClusterRadius: widget.options.maxClusterRadius,
+      project: widget.map.project,
+      unproject: widget.map.unproject,
+    );
     _addLayers();
 
     _zoomController.forward();
@@ -768,7 +708,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   @override
   void didUpdateWidget(MarkerClusterLayer oldWidget) {
     if (oldWidget.options.markers != widget.options.markers) {
-      _initializeClusters();
+      _clusterManager = ClusterManager.initialize(
+        minZoom: _minZoom,
+        maxZoom: _maxZoom,
+        maxClusterRadius: widget.options.maxClusterRadius,
+        project: widget.map.project,
+        unproject: widget.map.unproject,
+      );
       _addLayers();
     }
     super.didUpdateWidget(oldWidget);
