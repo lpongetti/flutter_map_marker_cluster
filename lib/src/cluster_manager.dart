@@ -8,6 +8,7 @@ class ClusterManager {
   late final Map<int, DistanceGrid<MarkerClusterNode>> _gridClusters;
   late final Map<int, DistanceGrid<MarkerNode>> _gridUnclustered;
   late MarkerClusterNode _topClusterLevel;
+  MarkerClusterNode? spiderfyCluster;
 
   final CustomPoint Function(LatLng latlng, [double? zoom]) project;
   final LatLng Function(CustomPoint point, [double? zoom]) unproject;
@@ -50,6 +51,10 @@ class ClusterManager {
       project: project,
       unproject: unproject,
     );
+  }
+
+  bool isSpiderfyCluster(MarkerClusterNode cluster) {
+    return spiderfyCluster != null && spiderfyCluster!.point == cluster.point;
   }
 
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,

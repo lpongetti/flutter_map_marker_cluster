@@ -1,11 +1,11 @@
 enum FadeType {
-  None,
-  FadeIn,
-  FadeOut,
+  none,
+  fadeIn,
+  fadeOut,
 }
 
 enum TranslateType {
-  None,
-  FromMyPosToNewPos,
-  FromNewPosToMyPos,
+  none,
+  fromMyPosToNewPos,
+  fromNewPosToMyPos,
 }

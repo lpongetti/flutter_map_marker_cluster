@@ -82,4 +82,6 @@ class MarkerClusterNode {
       }
     });
   }
+
+  List<Marker> get mapMarkers => markers.map((node) => node.marker).toList();
 }
