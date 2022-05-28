@@ -15,7 +15,7 @@ import 'package:latlong2/latlong.dart';
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapState map;
-  final Stream<Null> stream;
+  final Stream<void> stream;
 
   MarkerClusterLayer(this.options, this.map, this.stream);
 

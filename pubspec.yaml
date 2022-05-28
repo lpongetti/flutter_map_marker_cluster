@@ -11,11 +11,16 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ">=0.13.1 <1.0.0"
+  flutter_map: #">=0.13.1 <1.0.0"
+    git:
+      url: https://github.com/rorystephenson/flutter_map.git
+      ref: 876d4f7fca3cb314f86989d78ae1625d8318e7cb
+  flutter_map_marker_popup: #^2.0.0
+    git:
+      url: https://github.com/rorystephenson/flutter_map_marker_popup.git
+      ref: 27433f07ccfd6264dc22d0c5016ea72def44203f
   latlong2: ^0.8.0
-  flutter_map_marker_popup: ^2.0.0
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-
