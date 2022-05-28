@@ -1,34 +1,40 @@
+import 'dart:ui';
+
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
+import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
-import 'package:latlong2/latlong.dart';
 
 class ClusterManager {
+  final MapCalculator mapCalculator;
+  final Size predefinedSize;
+  final Size Function(List<Marker>)? computeSize;
+
   late final Map<int, DistanceGrid<MarkerClusterNode>> _gridClusters;
   late final Map<int, DistanceGrid<MarkerNode>> _gridUnclustered;
   late MarkerClusterNode _topClusterLevel;
+
   MarkerClusterNode? spiderfyCluster;
 
-  final CustomPoint Function(LatLng latlng, [double? zoom]) project;
-  final LatLng Function(CustomPoint point, [double? zoom]) unproject;
-
   ClusterManager._({
+    required this.mapCalculator,
+    required this.predefinedSize,
+    required this.computeSize,
     required Map<int, DistanceGrid<MarkerClusterNode>> gridClusters,
     required Map<int, DistanceGrid<MarkerNode>> gridUnclustered,
     required MarkerClusterNode topClusterLevel,
-    required this.project,
-    required this.unproject,
   })  : _gridClusters = gridClusters,
         _gridUnclustered = gridUnclustered,
         _topClusterLevel = topClusterLevel;
 
   factory ClusterManager.initialize({
+    required MapCalculator mapCalculator,
+    required Size predefinedSize,
+    required Size Function(List<Marker>)? computeSize,
     required int minZoom,
     required int maxZoom,
     required int maxClusterRadius,
-    required CustomPoint Function(LatLng latLng, [double? zoom]) project,
-    required LatLng Function(CustomPoint point, [double? zoom]) unproject,
   }) {
     final gridClusters = <int, DistanceGrid<MarkerClusterNode>>{};
     final gridUnclustered = <int, DistanceGrid<MarkerNode>>{};
@@ -40,16 +46,18 @@ class ClusterManager {
 
     final topClusterLevel = MarkerClusterNode(
       zoom: minZoom - 1,
-      project: project,
-      unproject: unproject,
+      mapCalculator: mapCalculator,
+      predefinedSize: predefinedSize,
+      computeSize: computeSize,
     );
 
     return ClusterManager._(
+      mapCalculator: mapCalculator,
+      predefinedSize: predefinedSize,
+      computeSize: computeSize,
       gridClusters: gridClusters,
       gridUnclustered: gridUnclustered,
       topClusterLevel: topClusterLevel,
-      project: project,
-      unproject: unproject,
     );
   }
 
@@ -60,7 +68,8 @@ class ClusterManager {
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,
       int minZoom) {
     for (var zoom = maxZoom; zoom >= minZoom; zoom--) {
-      var markerPoint = project(marker.point, zoom.toDouble());
+      var markerPoint =
+          mapCalculator.project(marker.point, zoom: zoom.toDouble());
       if (zoom <= disableClusteringAtZoom) {
         // try find a cluster close by
         var cluster = _gridClusters[zoom]!.getNearObject(markerPoint);
@@ -75,25 +84,35 @@ class ClusterManager {
           parent.removeChild(closest);
 
           var newCluster = MarkerClusterNode(
-              zoom: zoom, project: project, unproject: unproject)
+            zoom: zoom,
+            mapCalculator: mapCalculator,
+            predefinedSize: predefinedSize,
+            computeSize: computeSize,
+          )
             ..addChild(closest)
             ..addChild(marker);
 
-          _gridClusters[zoom]!.addObject(
-              newCluster, project(newCluster.point, zoom.toDouble()));
+          _gridClusters[zoom]!.addObject(newCluster,
+              mapCalculator.project(newCluster.point, zoom: zoom.toDouble()));
 
           //First create any new intermediate parent clusters that don't exist
           var lastParent = newCluster;
           for (var z = zoom - 1; z > parent.zoom; z--) {
             var newParent = MarkerClusterNode(
               zoom: z,
-              project: project,
-              unproject: unproject,
+              mapCalculator: mapCalculator,
+              predefinedSize: predefinedSize,
+              computeSize: computeSize,
             );
             newParent.addChild(lastParent);
             lastParent = newParent;
-            _gridClusters[z]!
-                .addObject(lastParent, project(closest.point, z.toDouble()));
+            _gridClusters[z]!.addObject(
+              lastParent,
+              mapCalculator.project(
+                closest.point,
+                zoom: z.toDouble(),
+              ),
+            );
           }
           parent.addChild(lastParent);
 

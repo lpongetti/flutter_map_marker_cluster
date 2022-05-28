@@ -11,4 +11,10 @@ class MapCalculator {
     return pos.multiplyBy(mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
         mapState.getPixelOrigin();
   }
+
+  CustomPoint project(LatLng latLng, {double? zoom}) =>
+      mapState.project(latLng, zoom);
+
+  LatLng unproject(CustomPoint point, {double? zoom}) =>
+      mapState.unproject(point, zoom);
 }

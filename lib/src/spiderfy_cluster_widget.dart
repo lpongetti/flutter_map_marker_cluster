@@ -13,7 +13,6 @@ class SpiderfyClusterWidget extends StatelessWidget {
   final MapCalculator mapCalculator;
 
   final VoidCallback onTap;
-  final Size Function(MarkerClusterNode cluster) getClusterSize;
   final AnimationController spiderfyController;
   final Point Function(MarkerClusterNode cluster, {LatLng? customPoint})
       getPixelFromCluster;
@@ -25,7 +24,6 @@ class SpiderfyClusterWidget extends StatelessWidget {
     required this.builder,
     required this.mapCalculator,
     required this.onTap,
-    required this.getClusterSize,
     required this.spiderfyController,
     required this.getPixelFromCluster,
     this.zoom,
@@ -38,7 +36,7 @@ class SpiderfyClusterWidget extends StatelessWidget {
     final fadeAnimation =
         Tween<double>(begin: 1.0, end: 0.3).animate(spiderfyController);
 
-    var size = getClusterSize(cluster);
+    var size = cluster.size();
 
     return AnimatedBuilder(
       animation: spiderfyController,

@@ -15,7 +15,6 @@ class ClusterWidget extends StatelessWidget {
   final VoidCallback onTap;
   final Point Function(MarkerClusterNode cluster, {LatLng? customPoint})
       getPixelFromCluster;
-  final Size Function(MarkerClusterNode cluster) getClusterSize;
   final Animation<double>? Function(
       AnimationController? controller, FadeType fadeType) fadeAnimation;
   final Animation<Point>? Function(AnimationController? controller,
@@ -32,7 +31,6 @@ class ClusterWidget extends StatelessWidget {
     required this.zoomController,
     required this.onTap,
     required this.getPixelFromCluster,
-    required this.getClusterSize,
     required this.fadeAnimation,
     required this.translateAnimation,
     this.fadeType = FadeType.none,
@@ -45,11 +43,11 @@ class ClusterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final pos = getPixelFromCluster(cluster);
 
-    var fadeAnimationCalculated = fadeAnimation(zoomController, fadeType);
-    var translateAnimationCalculated =
+    final fadeAnimationCalculated = fadeAnimation(zoomController, fadeType);
+    final translateAnimationCalculated =
         translateAnimation(zoomController, translateType, pos, newPos);
 
-    var size = getClusterSize(cluster);
+    final size = cluster.size();
 
     return AnimatedBuilder(
       animation: zoomController,

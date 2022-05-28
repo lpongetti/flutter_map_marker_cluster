@@ -1,11 +1,15 @@
+import 'dart:ui';
+
 import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong2/latlong.dart';
 
 class MarkerClusterNode {
   final int zoom;
-  final CustomPoint Function(LatLng latlng, [double? zoom]) project;
-  final LatLng Function(CustomPoint point, [double? zoom]) unproject;
+  final Size predefinedSize;
+  final Size Function(List<Marker>)? computeSize;
+  final MapCalculator mapCalculator;
   final List<dynamic> children;
   LatLngBounds bounds;
   MarkerClusterNode? parent;
@@ -27,17 +31,18 @@ class MarkerClusterNode {
 
   MarkerClusterNode({
     required this.zoom,
-    required this.project,
-    required this.unproject,
+    required this.mapCalculator,
+    required this.predefinedSize,
+    this.computeSize,
   })  : bounds = LatLngBounds(),
         children = [],
         parent = null;
 
   LatLng get point {
     // Not sure if this is ideal to do ?? LatLng(0, 0)
-    var swPoint = project(bounds.southWest ?? LatLng(0, 0));
-    var nePoint = project(bounds.northEast ?? LatLng(0, 0));
-    return unproject((swPoint + nePoint) / 2);
+    var swPoint = mapCalculator.project(bounds.southWest ?? LatLng(0, 0));
+    var nePoint = mapCalculator.project(bounds.northEast ?? LatLng(0, 0));
+    return mapCalculator.unproject((swPoint + nePoint) / 2);
   }
 
   void addChild(dynamic child) {
@@ -84,4 +89,6 @@ class MarkerClusterNode {
   }
 
   List<Marker> get mapMarkers => markers.map((node) => node.marker).toList();
+
+  Size size() => computeSize?.call(mapMarkers) ?? predefinedSize;
 }
