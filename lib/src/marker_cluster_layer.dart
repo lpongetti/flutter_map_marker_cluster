@@ -12,6 +12,7 @@ import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
 import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
+import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/translate.dart';
@@ -46,11 +47,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   _MarkerClusterLayerState();
 
-  Point<double> _getPixelFromMarker(MarkerNode marker, [LatLng? customPoint]) {
-    final pos = _mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    return util.removeAnchor(pos, marker.width, marker.height, marker.anchor);
-  }
-
   void _initializeAnimationController() {
     _zoomController = AnimationController(
       vsync: this,
@@ -76,7 +72,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _addLayers() {
     for (var marker in widget.options.markers) {
       _clusterManager.addLayer(
-        MarkerNode(marker),
+        MarkerNode(marker, mapCalculator: _mapCalculator),
         widget.options.disableClusteringAtZoom,
         _maxZoom,
         _minZoom,
@@ -86,48 +82,32 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     _clusterManager.recalculateTopClusterLevelBounds();
   }
 
-  Widget _buildMarker(
-    MarkerNode marker,
-    AnimationController controller, {
+  Widget _buildMarker({
+    required MarkerNode marker,
+    required AnimationController controller,
     required Translate translate,
     Fade? fade,
   }) {
-    final fadeAnimation = fade?.animation(controller);
-    final translateAnimation = translate.animation(controller);
+    Widget markerWidget = MarkerWidget(
+      marker: marker,
+      onTap: () => _onMarkerTap(marker),
+    );
 
-    return AnimatedBuilder(
-      key: Key('marker-${marker.hashCode}'),
-      animation: controller,
-      builder: (BuildContext context, Widget? child) {
-        final rotate = marker.rotate ?? widget.options.rotate ?? false;
-        final markerWidget = rotate
-            ? Transform.rotate(
-                angle: -widget.map.rotationRad,
-                origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
-                alignment:
-                    marker.rotateAlignment ?? widget.options.rotateAlignment,
-                child: Opacity(
-                  opacity: fade == null ? 1 : fadeAnimation!.value,
-                  child: child,
-                ),
-              )
-            : Opacity(
-                opacity: fade == null ? 1 : fadeAnimation!.value,
-                child: child,
-              );
-        return Positioned(
-          width: marker.width,
-          height: marker.height,
-          left: translateAnimation?.value.x ?? translate.position.x,
-          top: translateAnimation?.value.y ?? translate.position.y,
-          child: markerWidget,
-        );
-      },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: _onMarkerTap(marker) as void Function()?,
-        child: marker.builder(context),
-      ),
+    if (marker.rotate == true || widget.options.rotate == true) {
+      markerWidget = Transform.rotate(
+        angle: -widget.map.rotationRad,
+        origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
+        alignment: marker.rotateAlignment ?? widget.options.rotateAlignment,
+        child: markerWidget,
+      );
+    }
+
+    return AnimatedMapWidget(
+      size: Size(marker.width, marker.height),
+      animationController: controller,
+      translate: translate,
+      fade: fade,
+      child: markerWidget,
     );
   }
 
@@ -228,12 +208,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         // marker
         layers.add(
           _buildMarker(
-            layer,
-            _zoomController,
+            marker: layer,
+            controller: _zoomController,
             fade: Fade.fadeIn,
             translate: AnimatedTranslate.fromNewPosToMyPos(
-              position: _getPixelFromMarker(layer),
-              newPosition: _getPixelFromMarker(layer, layer.parent!.point),
+              position: layer.getPixel(),
+              newPosition: layer.getPixel(customPoint: layer.parent!.point),
             ),
           ),
         );
@@ -254,9 +234,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       } else {
         layers.add(
           _buildMarker(
-            layer,
-            _zoomController,
-            translate: StaticTranslate(_getPixelFromMarker(layer)),
+            marker: layer,
+            controller: _zoomController,
+            translate: StaticTranslate(layer.getPixel()),
           ),
         );
       }
@@ -293,12 +273,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
             layers.add(
               _buildMarker(
-                child,
-                _zoomController,
+                marker: child,
+                controller: _zoomController,
                 fade: Fade.fadeOut,
                 translate: AnimatedTranslate.fromMyPosToNewPos(
-                  position: _getPixelFromMarker(child),
-                  newPosition: _getPixelFromMarker(child, layer.point),
+                  position: child.getPixel(),
+                  newPosition: child.getPixel(customPoint: layer.point),
                 ),
               ),
             );
@@ -413,11 +393,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       results.add(
         _buildMarker(
-          marker,
-          _spiderfyController,
+          marker: marker,
+          controller: _spiderfyController,
           fade: Fade.fadeIn,
           translate: AnimatedTranslate.fromMyPosToNewPos(
-            position: _getPixelFromMarker(marker, cluster.point),
+            position: marker.getPixel(customPoint: cluster.point),
             newPosition: util.removeAnchor(
                 points[i]!, marker.width, marker.height, marker.anchor),
           ),
@@ -575,7 +555,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
   }
 
-  Function _onMarkerTap(MarkerNode marker) {
+  VoidCallback _onMarkerTap(MarkerNode marker) {
     return () {
       if (_zoomController.isAnimating ||
           _centerMarkerController.isAnimating ||
