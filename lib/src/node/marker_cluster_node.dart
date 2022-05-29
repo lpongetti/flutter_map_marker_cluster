@@ -97,7 +97,7 @@ class MarkerClusterNode {
 
   Size size() => computeSize?.call(mapMarkers) ?? predefinedSize;
 
-  Point getPixel({LatLng? customPoint}) {
+  Point<double> getPixel({LatLng? customPoint}) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? point);
 
     var calculatedSize = size();
