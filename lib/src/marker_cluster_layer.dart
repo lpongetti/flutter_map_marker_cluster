@@ -166,36 +166,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
   }
 
-  bool _boundsContainsMarker(MarkerNode marker) {
-    var pixelPoint = widget.map.project(marker.point);
-
-    final width = marker.width - marker.anchor.left;
-    final height = marker.height - marker.anchor.top;
-
-    var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
-    var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
-    return widget.map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
-  }
-
-  bool _boundsContainsCluster(MarkerClusterNode cluster) {
-    var pixelPoint = widget.map.project(cluster.point);
-
-    var size = cluster.size();
-    var anchor = Anchor.forPos(widget.options.anchor, size.width, size.height);
-
-    final width = size.width - anchor.left;
-    final height = size.height - anchor.top;
-
-    var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
-    var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
-    return widget.map.pixelBounds.containsPartialBounds(Bounds(sw, ne));
-  }
-
   List<Widget> _buildLayer(layer) {
     var layers = <Widget>[];
 
     if (layer is MarkerNode) {
-      if (!_boundsContainsMarker(layer)) {
+      if (!_mapCalculator.boundsContainsMarker(layer)) {
         return <Widget>[];
       }
 
@@ -242,7 +217,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
     }
     if (layer is MarkerClusterNode) {
-      if (!_boundsContainsCluster(layer)) {
+      if (!_mapCalculator.boundsContainsCluster(layer)) {
         return <Widget>[];
       }
 

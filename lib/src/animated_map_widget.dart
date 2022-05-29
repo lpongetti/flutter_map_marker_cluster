@@ -12,14 +12,14 @@ class AnimatedMapWidget extends StatelessWidget {
   final Point<double>? _position;
   final Animation<double>? _fadeAnimation;
 
-  AnimatedMapWidget(
-      {required this.child,
-      required this.size,
-      required this.animationController,
-      required Translate translate,
-      Fade? fade,
-      Key? key})
-      : _translateAnimation = translate.animation(animationController),
+  AnimatedMapWidget({
+    required this.child,
+    required this.size,
+    required this.animationController,
+    required Translate translate,
+    Fade? fade,
+    Key? key,
+  })  : _translateAnimation = translate.animation(animationController),
         _position = translate is StaticTranslate ? translate.position : null,
         _fadeAnimation = fade?.animation(animationController),
         assert(
