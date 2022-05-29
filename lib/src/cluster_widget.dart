@@ -10,10 +10,9 @@ class ClusterWidget extends StatelessWidget {
   final MarkerClusterNode cluster;
   final ClusterWidgetBuilder builder;
   final MapCalculator mapCalculator;
-  final AnimationController zoomController;
+  final AnimationController movementController;
   final VoidCallback onTap;
-  final Animation<double>? Function(
-      AnimationController? controller, FadeType fadeType) fadeAnimation;
+  final Animation<double>? fadeAnimation;
   final Animation<Point>? Function(AnimationController? controller,
       TranslateType translate, Point pos, Point? newPos) translateAnimation;
 
@@ -21,11 +20,26 @@ class ClusterWidget extends StatelessWidget {
   final TranslateType translateType;
   final Point? newPos;
 
+  ClusterWidget.spiderfy({
+    required this.cluster,
+    required this.builder,
+    required this.mapCalculator,
+    required AnimationController spiderfyController,
+    required this.onTap,
+  })  : movementController = spiderfyController,
+        fadeAnimation =
+            Tween<double>(begin: 1.0, end: 0.3).animate(spiderfyController),
+        translateAnimation = ((_, __, ___, ____) => null),
+        fadeType = FadeType.fadeIn,
+        // TODO: Not just fade in... not required here
+        translateType = TranslateType.none,
+        newPos = null;
+
   ClusterWidget({
     required this.cluster,
     required this.builder,
     required this.mapCalculator,
-    required this.zoomController,
+    required this.movementController,
     required this.onTap,
     required this.fadeAnimation,
     required this.translateAnimation,
@@ -39,14 +53,13 @@ class ClusterWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final pos = cluster.getPixel();
 
-    final fadeAnimationCalculated = fadeAnimation(zoomController, fadeType);
     final translateAnimationCalculated =
-        translateAnimation(zoomController, translateType, pos, newPos);
+        translateAnimation.call(movementController, translateType, pos, newPos);
 
     final size = cluster.size();
 
     return AnimatedBuilder(
-      animation: zoomController,
+      animation: movementController,
       builder: (BuildContext context, Widget? child) {
         return Positioned(
           width: size.width,
@@ -58,8 +71,7 @@ class ClusterWidget extends StatelessWidget {
               ? pos.y as double?
               : translateAnimationCalculated!.value.y as double?,
           child: Opacity(
-            opacity:
-                fadeType == FadeType.none ? 1 : fadeAnimationCalculated!.value,
+            opacity: fadeType == FadeType.none ? 1 : fadeAnimation!.value,
             child: child,
           ),
         );
@@ -67,10 +79,7 @@ class ClusterWidget extends StatelessWidget {
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: builder(
-          context,
-          cluster.mapMarkers,
-        ),
+        child: builder(context, cluster.mapMarkers),
       ),
     );
   }

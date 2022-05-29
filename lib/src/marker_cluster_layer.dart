@@ -13,7 +13,6 @@ import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
-import 'package:flutter_map_marker_cluster/src/spiderfy_cluster_widget.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -271,9 +270,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             cluster: layer.parent!,
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
-            zoomController: _zoomController,
+            movementController: _zoomController,
             onTap: _onClusterTap(layer.parent!),
-            fadeAnimation: _fadeAnimation,
+            fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeOut),
             translateAnimation: _translateAnimation,
             fadeType: FadeType.fadeOut));
       } else {
@@ -296,9 +295,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
             onTap: _onClusterTap(layer),
-            fadeAnimation: _fadeAnimation,
+            fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeIn),
             translateAnimation: _translateAnimation,
-            zoomController: _zoomController,
+            movementController: _zoomController,
             fadeType: FadeType.fadeIn));
         // children
         var markersGettingClustered = <Marker>[];
@@ -318,8 +317,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 builder: widget.options.builder,
                 mapCalculator: _mapCalculator,
                 onTap: _onClusterTap(child),
-                zoomController: _zoomController,
-                fadeAnimation: _fadeAnimation,
+                movementController: _zoomController,
+                fadeAnimation:
+                    _fadeAnimation(_zoomController, FadeType.fadeOut),
                 translateAnimation: _translateAnimation,
                 fadeType: FadeType.fadeOut,
                 translateType: TranslateType.fromMyPosToNewPos,
@@ -344,8 +344,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
             onTap: _onClusterTap(layer),
-            zoomController: _zoomController,
-            fadeAnimation: _fadeAnimation,
+            movementController: _zoomController,
+            fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeIn),
             translateAnimation: _translateAnimation,
             fadeType: FadeType.fadeIn,
             translateType: TranslateType.fromNewPosToMyPos,
@@ -356,8 +356,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             builder: widget.options.builder,
             onTap: _onClusterTap(layer.parent!),
             mapCalculator: _mapCalculator,
-            zoomController: _zoomController,
-            fadeAnimation: _fadeAnimation,
+            movementController: _zoomController,
+            fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeOut),
             translateAnimation: _translateAnimation,
             fadeType: FadeType.fadeOut));
       } else {
@@ -369,8 +369,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
             onTap: _onClusterTap(layer),
-            zoomController: _zoomController,
-            fadeAnimation: _fadeAnimation,
+            movementController: _zoomController,
+            fadeAnimation: _fadeAnimation(_zoomController, FadeType.none),
             translateAnimation: _translateAnimation,
           ));
         }
@@ -383,7 +383,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   List<Widget> _buildSpiderfyCluster(
       MarkerClusterNode cluster, int currentZoom) {
     final results = <Widget>[];
-    results.add(SpiderfyClusterWidget(
+    results.add(ClusterWidget.spiderfy(
       cluster: cluster,
       builder: widget.options.builder,
       mapCalculator: _mapCalculator,
