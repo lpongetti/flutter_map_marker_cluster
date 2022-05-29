@@ -16,7 +16,6 @@ class ClusterWidget extends StatelessWidget {
   final Animation<Point>? Function(AnimationController? controller,
       TranslateType translate, Point pos, Point? newPos) translateAnimation;
 
-  final FadeType fadeType;
   final TranslateType translateType;
   final Point? newPos;
 
@@ -30,8 +29,6 @@ class ClusterWidget extends StatelessWidget {
         fadeAnimation =
             Tween<double>(begin: 1.0, end: 0.3).animate(spiderfyController),
         translateAnimation = ((_, __, ___, ____) => null),
-        fadeType = FadeType.fadeIn,
-        // TODO: Not just fade in... not required here
         translateType = TranslateType.none,
         newPos = null;
 
@@ -41,9 +38,8 @@ class ClusterWidget extends StatelessWidget {
     required this.mapCalculator,
     required this.movementController,
     required this.onTap,
-    required this.fadeAnimation,
     required this.translateAnimation,
-    this.fadeType = FadeType.none,
+    this.fadeAnimation,
     this.translateType = TranslateType.none,
     this.newPos,
   }) : assert((translateType == TranslateType.none && newPos == null) ||
@@ -71,7 +67,7 @@ class ClusterWidget extends StatelessWidget {
               ? pos.y as double?
               : translateAnimationCalculated!.value.y as double?,
           child: Opacity(
-            opacity: fadeType == FadeType.none ? 1 : fadeAnimation!.value,
+            opacity: fadeAnimation?.value ?? 1,
             child: child,
           ),
         );

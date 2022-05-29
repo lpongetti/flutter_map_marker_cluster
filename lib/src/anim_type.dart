@@ -1,5 +1,4 @@
 enum FadeType {
-  none,
   fadeIn,
   fadeOut,
 }

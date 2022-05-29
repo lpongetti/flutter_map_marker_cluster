@@ -86,12 +86,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   Animation<double>? _fadeAnimation(
       AnimationController? controller, FadeType fade) {
-    if (fade == FadeType.fadeIn)
-      return Tween<double>(begin: 0.0, end: 1.0).animate(controller!);
-    if (fade == FadeType.fadeOut)
-      return Tween<double>(begin: 1.0, end: 0.0).animate(controller!);
-
-    return null;
+    switch (fade) {
+      case FadeType.fadeIn:
+        return Tween<double>(begin: 0.0, end: 1.0).animate(controller!);
+      case FadeType.fadeOut:
+        return Tween<double>(begin: 1.0, end: 0.0).animate(controller!);
+    }
   }
 
   Animation<Point>? _translateAnimation(AnimationController? controller,
@@ -111,7 +111,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   Widget _buildMarker(MarkerNode marker, AnimationController controller,
-      [FadeType fade = FadeType.none,
+      [FadeType? fade,
       TranslateType translate = TranslateType.none,
       Point? newPos,
       Point? myPos]) {
@@ -120,7 +120,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     final pos = myPos ?? _getPixelFromMarker(marker);
 
-    var fadeAnimation = _fadeAnimation(controller, fade);
+    var fadeAnimation = fade == null ? null : _fadeAnimation(controller, fade);
     var translateAnimation =
         _translateAnimation(controller, translate, pos, newPos);
 
@@ -136,12 +136,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 alignment:
                     marker.rotateAlignment ?? widget.options.rotateAlignment,
                 child: Opacity(
-                  opacity: fade == FadeType.none ? 1 : fadeAnimation!.value,
+                  opacity: fade == null ? 1 : fadeAnimation!.value,
                   child: child,
                 ),
               )
             : Opacity(
-                opacity: fade == FadeType.none ? 1 : fadeAnimation!.value,
+                opacity: fade == null ? 1 : fadeAnimation!.value,
                 child: child,
               );
         return Positioned(
@@ -266,7 +266,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             TranslateType.fromNewPosToMyPos,
             _getPixelFromMarker(layer, layer.parent!.point)));
         //parent
-        layers.add(ClusterWidget(
+        layers.add(
+          ClusterWidget(
             cluster: layer.parent!,
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
@@ -274,7 +275,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             onTap: _onClusterTap(layer.parent!),
             fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeOut),
             translateAnimation: _translateAnimation,
-            fadeType: FadeType.fadeOut));
+          ),
+        );
       } else {
         layers.add(_buildMarker(layer, _zoomController));
       }
@@ -290,7 +292,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       if (_zoomController.isAnimating &&
           (_currentZoom < _previousZoom && layer.children.length > 1)) {
         // cluster
-        layers.add(ClusterWidget(
+        layers.add(
+          ClusterWidget(
             cluster: layer,
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
@@ -298,7 +301,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeIn),
             translateAnimation: _translateAnimation,
             movementController: _zoomController,
-            fadeType: FadeType.fadeIn));
+          ),
+        );
         // children
         var markersGettingClustered = <Marker>[];
         layer.children.forEach((child) {
@@ -312,7 +316,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 TranslateType.fromMyPosToNewPos,
                 _getPixelFromMarker(child, layer.point)));
           } else {
-            layers.add(ClusterWidget(
+            layers.add(
+              ClusterWidget(
                 cluster: child,
                 builder: widget.options.builder,
                 mapCalculator: _mapCalculator,
@@ -321,10 +326,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 fadeAnimation:
                     _fadeAnimation(_zoomController, FadeType.fadeOut),
                 translateAnimation: _translateAnimation,
-                fadeType: FadeType.fadeOut,
                 translateType: TranslateType.fromMyPosToNewPos,
                 newPos: (child as MarkerClusterNode)
-                    .getPixel(customPoint: layer.point)));
+                    .getPixel(customPoint: layer.point),
+              ),
+            );
           }
         });
 
@@ -339,7 +345,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           (_currentZoom > _previousZoom &&
               layer.parent!.point != layer.point)) {
         // cluster
-        layers.add(ClusterWidget(
+        layers.add(
+          ClusterWidget(
             cluster: layer,
             builder: widget.options.builder,
             mapCalculator: _mapCalculator,
@@ -347,11 +354,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             movementController: _zoomController,
             fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeIn),
             translateAnimation: _translateAnimation,
-            fadeType: FadeType.fadeIn,
             translateType: TranslateType.fromNewPosToMyPos,
-            newPos: layer.getPixel(customPoint: layer.parent!.point)));
+            newPos: layer.getPixel(customPoint: layer.parent!.point),
+          ),
+        );
         //parent
-        layers.add(ClusterWidget(
+        layers.add(
+          ClusterWidget(
             cluster: layer.parent!,
             builder: widget.options.builder,
             onTap: _onClusterTap(layer.parent!),
@@ -359,7 +368,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             movementController: _zoomController,
             fadeAnimation: _fadeAnimation(_zoomController, FadeType.fadeOut),
             translateAnimation: _translateAnimation,
-            fadeType: FadeType.fadeOut));
+          ),
+        );
       } else {
         if (_clusterManager.isSpiderfyCluster(layer)) {
           layers.addAll(_buildSpiderfyCluster(layer, _currentZoom));
@@ -370,7 +380,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             mapCalculator: _mapCalculator,
             onTap: _onClusterTap(layer),
             movementController: _zoomController,
-            fadeAnimation: _fadeAnimation(_zoomController, FadeType.none),
             translateAnimation: _translateAnimation,
           ));
         }
