@@ -9,7 +9,7 @@ class Fade {
   static final fadeOut = Fade._(Tween<double>(begin: 1.0, end: 0.0));
   static final almostFadeOut = Fade._(Tween<double>(begin: 1.0, end: 0.3));
 
-  Fade._(this._tween);
+  const Fade._(this._tween);
 
   Animation<double> animation(AnimationController controller) =>
       _tween.animate(controller);

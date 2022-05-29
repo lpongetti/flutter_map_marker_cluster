@@ -1,18 +1,22 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_map_marker_cluster/src/map_widget.dart';
+import 'package:flutter_map_marker_cluster/src/rotate.dart';
 
-class PositionedMapWidget extends StatelessWidget {
+class PositionedMapWidget extends MapWidget {
   final Size size;
   final Widget child;
   final Point<double> position;
+  final Rotate? rotate;
 
-  PositionedMapWidget({
+  const PositionedMapWidget({
     required this.child,
     required this.size,
     required this.position,
-    required ObjectKey key,
-  }) : super(key: key);
+    this.rotate,
+    Key? key,
+  }) : super.withKey(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +25,14 @@ class PositionedMapWidget extends StatelessWidget {
       height: size.height,
       left: position.x,
       top: position.y,
-      child: child,
+      child: rotate == null
+          ? child
+          : Transform.rotate(
+              angle: rotate!.angle,
+              origin: rotate!.origin,
+              alignment: rotate!.alignment,
+              child: child,
+            ),
     );
   }
 }

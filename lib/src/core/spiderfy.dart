@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter_map/flutter_map.dart';
 
 class Spiderfy {
-  static final pi2 = pi * 2;
+  static const pi2 = pi * 2;
   static const spiralFootSeparation =
       28; //related to size of spiral (experiment!)
   static const spiralLengthStart = 11;

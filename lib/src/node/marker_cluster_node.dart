@@ -25,11 +25,11 @@ class MarkerClusterNode {
 
     markers.addAll(children.whereType<MarkerNode>());
 
-    children.forEach((child) {
+    for (final child in children) {
       if (child is MarkerClusterNode) {
         markers.addAll(child.markers);
       }
-    });
+    }
     return markers;
   }
 
@@ -65,15 +65,15 @@ class MarkerClusterNode {
   void recalculateBounds() {
     bounds = LatLngBounds();
 
-    markers.forEach((marker) {
+    for (final marker in markers) {
       bounds.extend(marker.point);
-    });
+    }
 
-    children.forEach((child) {
+    for (final child in children) {
       if (child is MarkerClusterNode) {
         child.recalculateBounds();
       }
-    });
+    }
   }
 
   void recursively(
@@ -83,14 +83,14 @@ class MarkerClusterNode {
       return;
     }
 
-    children.forEach((child) {
+    for (var child in children) {
       if (child is MarkerNode) {
         fn(child);
       }
       if (child is MarkerClusterNode) {
         child.recursively(zoomLevel, disableClusteringAtZoom, fn);
       }
-    });
+    }
   }
 
   List<Marker> get mapMarkers => markers.map((node) => node.marker).toList();

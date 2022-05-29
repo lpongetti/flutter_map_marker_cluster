@@ -9,6 +9,8 @@ import 'package:latlong2/latlong.dart';
 class ClusteringManyMarkersPage extends StatefulWidget {
   static const String route = 'clusteringManyMarkersPage';
 
+  const ClusteringManyMarkersPage({Key? key}) : super(key: key);
+
   @override
   _ClusteringManyMarkersPageState createState() =>
       _ClusteringManyMarkersPageState();
@@ -43,7 +45,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             height: 30,
             width: 30,
             point: latLng,
-            builder: (ctx) => Icon(Icons.pin_drop),
+            builder: (ctx) => const Icon(Icons.pin_drop),
           ),
         );
       }
@@ -55,7 +57,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Clustering Many Markers Page')),
+      appBar: AppBar(title: const Text('Clustering Many Markers Page')),
       drawer: buildDrawer(context, ClusteringManyMarkersPage.route),
       body: FlutterMap(
         options: MapOptions(
@@ -77,9 +79,9 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(
               maxClusterRadius: 45,
-              size: Size(40, 40),
+              size: const Size(40, 40),
               anchor: AnchorPos.align(AnchorAlign.center),
-              fitBoundsOptions: FitBoundsOptions(
+              fitBoundsOptions: const FitBoundsOptions(
                 padding: EdgeInsets.all(50),
                 maxZoom: 15,
               ),
@@ -92,7 +94,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
                   child: Center(
                     child: Text(
                       markers.length.toString(),
-                      style: TextStyle(color: Colors.white),
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 );

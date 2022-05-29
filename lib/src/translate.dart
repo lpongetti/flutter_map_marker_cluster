@@ -18,6 +18,7 @@ class StaticTranslate extends Translate {
 
   const StaticTranslate(this.position);
 
+  @override
   Animation<Point<double>>? animation(
           AnimationController animationController) =>
       null;
