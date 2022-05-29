@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-import 'package:flutter_map_marker_cluster/src/anim_type.dart';
 import 'package:flutter_map_marker_cluster/src/animated_map_widget.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_manager.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_widget.dart';
@@ -47,7 +46,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   _MarkerClusterLayerState();
 
-  Point _getPixelFromMarker(MarkerNode marker, [LatLng? customPoint]) {
+  Point<double> _getPixelFromMarker(MarkerNode marker, [LatLng? customPoint]) {
     final pos = _mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
     return util.removeAnchor(pos, marker.width, marker.height, marker.anchor);
   }
@@ -87,36 +86,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     _clusterManager.recalculateTopClusterLevelBounds();
   }
 
-  Animation<Point>? _translateAnimation(AnimationController? controller,
-      TranslateType translate, Point pos, Point? newPos) {
-    if (translate == TranslateType.fromNewPosToMyPos)
-      return Tween<Point>(
-        begin: Point(newPos!.x, newPos.y),
-        end: Point(pos.x, pos.y),
-      ).animate(controller!);
-    if (translate == TranslateType.fromMyPosToNewPos)
-      return Tween<Point>(
-        begin: Point(pos.x, pos.y),
-        end: Point(newPos!.x, newPos.y),
-      ).animate(controller!);
-
-    return null;
-  }
-
-  Widget _buildMarker(MarkerNode marker, AnimationController controller,
-      {Fade? fade,
-      TranslateType? translate,
-      Point? newPosition,
-      Point? position}) {
-    assert((translate == null && newPosition == null) ||
-        (translate != null && newPosition != null));
-
-    final pos = position ?? _getPixelFromMarker(marker);
-
+  Widget _buildMarker(
+    MarkerNode marker,
+    AnimationController controller, {
+    required Translate translate,
+    Fade? fade,
+  }) {
     final fadeAnimation = fade?.animation(controller);
-    final translateAnimation = translate == null
-        ? null
-        : _translateAnimation(controller, translate, pos, newPosition);
+    final translateAnimation = translate.animation(controller);
 
     return AnimatedBuilder(
       key: Key('marker-${marker.hashCode}'),
@@ -141,12 +118,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return Positioned(
           width: marker.width,
           height: marker.height,
-          left: translate == null
-              ? pos.x as double?
-              : translateAnimation!.value.x as double?,
-          top: translate == null
-              ? pos.y as double?
-              : translateAnimation!.value.y as double?,
+          left: translateAnimation?.value.x ?? translate.position.x,
+          top: translateAnimation?.value.y ?? translate.position.y,
           child: markerWidget,
         );
       },
@@ -253,10 +226,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           (_currentZoom > _previousZoom &&
               layer.parent!.zoom == _previousZoom)) {
         // marker
-        layers.add(_buildMarker(layer, _zoomController,
+        layers.add(
+          _buildMarker(
+            layer,
+            _zoomController,
             fade: Fade.fadeIn,
-            translate: TranslateType.fromNewPosToMyPos,
-            newPosition: _getPixelFromMarker(layer, layer.parent!.point)));
+            translate: AnimatedTranslate.fromNewPosToMyPos(
+              position: _getPixelFromMarker(layer),
+              newPosition: _getPixelFromMarker(layer, layer.parent!.point),
+            ),
+          ),
+        );
         //parent
         layers.add(
           AnimatedMapWidget(
@@ -272,7 +252,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ),
         );
       } else {
-        layers.add(_buildMarker(layer, _zoomController));
+        layers.add(
+          _buildMarker(
+            layer,
+            _zoomController,
+            translate: StaticTranslate(_getPixelFromMarker(layer)),
+          ),
+        );
       }
     }
     if (layer is MarkerClusterNode) {
@@ -310,8 +296,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                 child,
                 _zoomController,
                 fade: Fade.fadeOut,
-                translate: TranslateType.fromMyPosToNewPos,
-                newPosition: _getPixelFromMarker(child, layer.point),
+                translate: AnimatedTranslate.fromMyPosToNewPos(
+                  position: _getPixelFromMarker(child),
+                  newPosition: _getPixelFromMarker(child, layer.point),
+                ),
               ),
             );
           } else {
@@ -320,8 +308,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               AnimatedMapWidget(
                 size: child.size(),
                 animationController: _zoomController,
-                translate: AnimatedTranslate(
-                  type: TranslateType.fromMyPosToNewPos,
+                translate: AnimatedTranslate.fromMyPosToNewPos(
                   position: child.getPixel(),
                   newPosition: child.getPixel(customPoint: layer.point),
                 ),
@@ -351,8 +338,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           AnimatedMapWidget(
             size: layer.size(),
             animationController: _zoomController,
-            translate: AnimatedTranslate(
-                type: TranslateType.fromNewPosToMyPos,
+            translate: AnimatedTranslate.fromNewPosToMyPos(
                 position: layer.getPixel(),
                 newPosition: layer.getPixel(customPoint: layer.parent!.point)),
             fade: Fade.fadeIn,
@@ -425,12 +411,18 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     for (var i = 0; i < cluster.markers.length; i++) {
       final marker = cluster.markers[i];
 
-      results.add(_buildMarker(marker, _spiderfyController,
+      results.add(
+        _buildMarker(
+          marker,
+          _spiderfyController,
           fade: Fade.fadeIn,
-          translate: TranslateType.fromMyPosToNewPos,
-          newPosition: util.removeAnchor(
-              points[i]!, marker.width, marker.height, marker.anchor),
-          position: _getPixelFromMarker(marker, cluster.point)));
+          translate: AnimatedTranslate.fromMyPosToNewPos(
+            position: _getPixelFromMarker(marker, cluster.point),
+            newPosition: util.removeAnchor(
+                points[i]!, marker.width, marker.height, marker.anchor),
+          ),
+        ),
+      );
     }
     return results;
   }

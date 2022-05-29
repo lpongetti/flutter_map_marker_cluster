@@ -1,4 +1,0 @@
-enum TranslateType {
-  fromMyPosToNewPos,
-  fromNewPosToMyPos,
-}
