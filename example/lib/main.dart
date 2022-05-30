@@ -1,4 +1,4 @@
-// @dart=2.9
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster_example/clustering_many_markers_page.dart';
 import 'package:flutter_map_marker_cluster_example/clustering_page.dart';
@@ -6,7 +6,7 @@ import 'package:flutter_map_marker_cluster_example/clustering_page.dart';
 void main() => runApp(const MyApp());
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
