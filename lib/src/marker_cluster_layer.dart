@@ -549,8 +549,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
       final lonTween =
           Tween<double>(begin: center.longitude, end: dest.center.longitude);
-      final zoomTween =
-          Tween<double>(begin: _currentZoom.toDouble(), end: dest.zoom);
+      final zoomTween = Tween<double>(begin: widget.map.zoom, end: dest.zoom);
 
       final animation = CurvedAnimation(
           parent: _fitBoundController,
