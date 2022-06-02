@@ -177,7 +177,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             ),
       child: MarkerWidget(
         marker: marker,
-        onTap: () => _onMarkerTap(marker),
+        onTap: _onMarkerTap(marker),
       ),
     );
   }
