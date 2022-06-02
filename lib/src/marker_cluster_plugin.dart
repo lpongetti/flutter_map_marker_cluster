@@ -6,7 +6,10 @@ import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart
 class MarkerClusterPlugin extends MapPlugin {
   @override
   Widget createLayer(
-      LayerOptions options, MapState mapState, Stream<void> stream) {
+      LayerOptions options,
+      MapState mapState,
+      // ignore: prefer_void_to_null
+      Stream<Null> stream) {
     return MarkerClusterLayer(
         options as MarkerClusterLayerOptions, mapState, stream);
   }
