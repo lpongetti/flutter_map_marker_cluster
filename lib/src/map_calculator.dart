@@ -23,8 +23,14 @@ class MapCalculator {
     );
   }
 
+  LatLng clusterPoint(MarkerClusterNode cluster) {
+    final swPoint = project(cluster.bounds.southWest!);
+    final nePoint = project(cluster.bounds.northEast!);
+    return unproject((swPoint + nePoint) / 2);
+  }
+
   bool boundsContainsCluster(MarkerClusterNode cluster) {
-    final pixelPoint = mapState.project(cluster.point);
+    final pixelPoint = mapState.project(clusterPoint(cluster));
     var size = cluster.size();
     var anchor = Anchor.forPos(cluster.anchorPos, size.width, size.height);
 

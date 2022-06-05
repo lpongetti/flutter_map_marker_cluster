@@ -50,7 +50,6 @@ class ClusterManager {
     final topClusterLevel = MarkerClusterNode(
       anchorPos: anchorPos,
       zoom: minZoom - 1,
-      mapCalculator: mapCalculator,
       predefinedSize: predefinedSize,
       computeSize: computeSize,
     );
@@ -67,7 +66,9 @@ class ClusterManager {
   }
 
   bool isSpiderfyCluster(MarkerClusterNode cluster) {
-    return spiderfyCluster != null && spiderfyCluster!.point == cluster.point;
+    return spiderfyCluster != null &&
+        mapCalculator.clusterPoint(spiderfyCluster!) ==
+            mapCalculator.clusterPoint(cluster);
   }
 
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,
@@ -77,41 +78,47 @@ class ClusterManager {
           mapCalculator.project(marker.point, zoom: zoom.toDouble());
       if (zoom <= disableClusteringAtZoom) {
         // try find a cluster close by
-        var cluster = _gridClusters[zoom]!.getNearObject(markerPoint);
+        final cluster = _gridClusters[zoom]!.getNearObject(markerPoint);
         if (cluster != null) {
-          cluster.addChild(marker);
+          cluster.addChild(marker, marker.point);
           return;
         }
 
-        var closest = _gridUnclustered[zoom]!.getNearObject(markerPoint);
+        final closest = _gridUnclustered[zoom]!.getNearObject(markerPoint);
         if (closest != null) {
-          var parent = closest.parent!;
+          final parent = closest.parent!;
           parent.removeChild(closest);
 
           var newCluster = MarkerClusterNode(
             zoom: zoom,
             anchorPos: anchorPos,
-            mapCalculator: mapCalculator,
             predefinedSize: predefinedSize,
             computeSize: computeSize,
           )
-            ..addChild(closest)
-            ..addChild(marker);
+            ..addChild(closest, closest.point)
+            ..addChild(marker, closest.point);
 
-          _gridClusters[zoom]!.addObject(newCluster,
-              mapCalculator.project(newCluster.point, zoom: zoom.toDouble()));
+          _gridClusters[zoom]!.addObject(
+            newCluster,
+            mapCalculator.project(
+              mapCalculator.clusterPoint(newCluster),
+              zoom: zoom.toDouble(),
+            ),
+          );
 
-          //First create any new intermediate parent clusters that don't exist
+          // First create any new intermediate parent clusters that don't exist
           var lastParent = newCluster;
           for (var z = zoom - 1; z > parent.zoom; z--) {
             var newParent = MarkerClusterNode(
               zoom: z,
               anchorPos: anchorPos,
-              mapCalculator: mapCalculator,
               predefinedSize: predefinedSize,
               computeSize: computeSize,
             );
-            newParent.addChild(lastParent);
+            newParent.addChild(
+              lastParent,
+              mapCalculator.clusterPoint(lastParent),
+            );
             lastParent = newParent;
             _gridClusters[z]!.addObject(
               lastParent,
@@ -121,7 +128,7 @@ class ClusterManager {
               ),
             );
           }
-          parent.addChild(lastParent);
+          parent.addChild(lastParent, mapCalculator.clusterPoint(lastParent));
 
           _removeFromNewPosToMyPosGridUnclustered(closest, zoom, minZoom);
           return;
@@ -132,7 +139,7 @@ class ClusterManager {
     }
 
     //Didn't get in anything, add us to the top
-    _topClusterLevel.addChild(marker);
+    _topClusterLevel.addChild(marker, marker.point);
   }
 
   void _removeFromNewPosToMyPosGridUnclustered(

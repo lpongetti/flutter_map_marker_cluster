@@ -1,19 +1,12 @@
-import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
-import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
-import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
+import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:latlong2/latlong.dart';
 
-class MarkerNode implements Marker {
+class MarkerNode extends MarkerOrClusterNode implements Marker {
   final Marker marker;
-  final MapCalculator _mapCalculator;
-  MarkerClusterNode? parent;
 
-  MarkerNode(this.marker, {required MapCalculator mapCalculator})
-      : _mapCalculator = mapCalculator;
+  MarkerNode(this.marker) : super(parent: null);
 
   @override
   Key? get key => marker.key;
@@ -41,9 +34,4 @@ class MarkerNode implements Marker {
 
   @override
   Offset? get rotateOrigin => marker.rotateOrigin;
-
-  Point<double> getPixel({LatLng? customPoint}) {
-    final pos = _mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    return util.removeAnchor(pos, marker.width, marker.height, marker.anchor);
-  }
 }

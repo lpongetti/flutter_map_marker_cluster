@@ -1,22 +1,18 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/plugin_api.dart';
-import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
-import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
+import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:latlong2/latlong.dart';
 
-class MarkerClusterNode {
+class MarkerClusterNode extends MarkerOrClusterNode {
   final int zoom;
   final AnchorPos? anchorPos;
   final Size predefinedSize;
   final Size Function(List<Marker>)? computeSize;
-  final MapCalculator mapCalculator;
-  final List<dynamic> children;
+  final List<MarkerOrClusterNode> children;
   LatLngBounds bounds;
-  MarkerClusterNode? parent;
   int? addCount;
   int? removeCount;
 
@@ -36,28 +32,19 @@ class MarkerClusterNode {
   MarkerClusterNode({
     required this.zoom,
     required this.anchorPos,
-    required this.mapCalculator,
     required this.predefinedSize,
     this.computeSize,
   })  : bounds = LatLngBounds(),
         children = [],
-        parent = null;
+        super(parent: null);
 
-  LatLng get point {
-    // Not sure if this is ideal to do ?? LatLng(0, 0)
-    var swPoint = mapCalculator.project(bounds.southWest ?? LatLng(0, 0));
-    var nePoint = mapCalculator.project(bounds.northEast ?? LatLng(0, 0));
-    return mapCalculator.unproject((swPoint + nePoint) / 2);
-  }
-
-  void addChild(dynamic child) {
-    assert(child is MarkerNode || child is MarkerClusterNode);
+  void addChild(MarkerOrClusterNode child, LatLng childPoint) {
     children.add(child);
     child.parent = this;
-    bounds.extend(child.point);
+    bounds.extend(childPoint);
   }
 
-  void removeChild(dynamic child) {
+  void removeChild(MarkerOrClusterNode child) {
     children.remove(child);
     recalculateBounds();
   }
@@ -77,13 +64,16 @@ class MarkerClusterNode {
   }
 
   void recursively(
-      int? zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) {
+    int? zoomLevel,
+    int disableClusteringAtZoom,
+    Function(MarkerOrClusterNode node) fn,
+  ) {
     if (zoom == zoomLevel && zoomLevel! <= disableClusteringAtZoom) {
       fn(this);
       return;
     }
 
-    for (var child in children) {
+    for (final child in children) {
       if (child is MarkerNode) {
         fn(child);
       }
@@ -96,15 +86,4 @@ class MarkerClusterNode {
   List<Marker> get mapMarkers => markers.map((node) => node.marker).toList();
 
   Size size() => computeSize?.call(mapMarkers) ?? predefinedSize;
-
-  Point<double> getPixel({LatLng? customPoint}) {
-    final pos = mapCalculator.getPixelFromPoint(customPoint ?? point);
-
-    var calculatedSize = size();
-    var anchor =
-        Anchor.forPos(anchorPos, calculatedSize.width, calculatedSize.height);
-
-    return util.removeAnchor(
-        pos, calculatedSize.width, calculatedSize.height, anchor);
-  }
 }
