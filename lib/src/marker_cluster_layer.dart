@@ -22,15 +22,13 @@ import 'package:latlong2/latlong.dart';
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapState map;
-
-  // ignore: prefer_void_to_null
-  final Stream<Null> stream;
+  final Stream<void> stream;
 
   const MarkerClusterLayer(this.options, this.map, this.stream, {Key? key})
       : super(key: key);
 
   @override
-  _MarkerClusterLayerState createState() => _MarkerClusterLayerState();
+  State<MarkerClusterLayer> createState() => _MarkerClusterLayerState();
 }
 
 class _MarkerClusterLayerState extends State<MarkerClusterLayer>

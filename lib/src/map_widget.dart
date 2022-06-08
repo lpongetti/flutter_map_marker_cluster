@@ -16,11 +16,11 @@ abstract class MapWidget extends StatelessWidget {
     Key? key,
   }) =>
       PositionedMapWidget(
-        child: child,
         size: size,
         position: translate.position,
         rotate: rotate,
         key: key,
+        child: child,
       );
 
   factory MapWidget({
@@ -34,21 +34,21 @@ abstract class MapWidget extends StatelessWidget {
   }) {
     if (translate is StaticTranslate && fade == null) {
       return PositionedMapWidget(
-        child: child,
         size: size,
         position: translate.position,
         rotate: rotate,
         key: key,
+        child: child,
       );
     } else {
       return AnimatedMapWidget(
-        child: child,
         size: size,
         animationController: animationController,
         translate: translate,
         rotate: rotate,
         fade: fade,
         key: key,
+        child: child,
       );
     }
   }
