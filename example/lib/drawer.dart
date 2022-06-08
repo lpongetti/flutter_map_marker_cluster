@@ -4,7 +4,7 @@ import 'package:flutter_map_marker_cluster_example/clustering_page.dart';
 
 Widget _buildMenuItem(
     BuildContext context, Widget title, String routeName, String currentRoute) {
-  var isSelected = routeName == currentRoute;
+  final isSelected = routeName == currentRoute;
 
   return ListTile(
     title: title,

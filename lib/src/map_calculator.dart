@@ -9,7 +9,7 @@ class MapCalculator {
   MapCalculator(this.mapState);
 
   CustomPoint<num> getPixelFromPoint(LatLng point) {
-    var pos = mapState.project(point);
+    final pos = mapState.project(point);
     return pos.multiplyBy(mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
         mapState.getPixelOrigin();
   }
@@ -31,8 +31,8 @@ class MapCalculator {
 
   bool boundsContainsCluster(MarkerClusterNode cluster) {
     final pixelPoint = mapState.project(clusterPoint(cluster));
-    var size = cluster.size();
-    var anchor = Anchor.forPos(cluster.anchorPos, size.width, size.height);
+    final size = cluster.size();
+    final anchor = Anchor.forPos(cluster.anchorPos, size.width, size.height);
 
     return _boundsContains(pixelPoint, size.width, size.height, anchor);
   }
@@ -46,8 +46,8 @@ class MapCalculator {
     width = width - anchor.left;
     height = height - anchor.top;
 
-    var sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
-    var ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
+    final sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
+    final ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
     return mapState.pixelBounds.containsPartialBounds(Bounds(sw, ne));
   }
 

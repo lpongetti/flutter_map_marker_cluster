@@ -89,7 +89,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
               builder: (context, markers) {
                 return Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(20),
                       color: Colors.blue),
                   child: Center(
                     child: Text(

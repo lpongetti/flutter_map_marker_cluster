@@ -14,6 +14,7 @@ import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart
 import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
+import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/rotate.dart';
 import 'package:flutter_map_marker_cluster/src/translate.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
@@ -131,7 +132,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   void _addLayers() {
-    for (var marker in widget.options.markers) {
+    for (final marker in widget.options.markers) {
       _clusterManager.addLayer(
         MarkerNode(marker),
         widget.options.disableClusteringAtZoom,
@@ -196,7 +197,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        var markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -216,7 +217,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         }
         break;
       case AnimationStatus.forward:
-        var markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -237,7 +238,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
   }
 
-  List<Widget> _buildLayer(layer) {
+  List<Widget> _buildLayer(MarkerOrClusterNode layer) {
     if (layer is MarkerNode) {
       return _buildMarkerLayer(layer);
     } else if (layer is MarkerClusterNode) {
@@ -495,7 +496,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
 
     _clusterManager.recursivelyFromTopClusterLevel(
-        _currentZoom, widget.options.disableClusteringAtZoom, (layer) {
+        _currentZoom, widget.options.disableClusteringAtZoom,
+        (MarkerOrClusterNode layer) {
       layers.addAll(_buildLayer(layer));
     });
 
@@ -600,7 +602,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       final lonTween =
           Tween<double>(begin: center.longitude, end: marker.point.longitude);
 
-      Animation<double> animation = CurvedAnimation(
+      final Animation<double> animation = CurvedAnimation(
         parent: _centerMarkerController,
         curve: widget.options.animationsOptions.centerMarkerCurves,
       );

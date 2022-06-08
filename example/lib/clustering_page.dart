@@ -18,7 +18,7 @@ class _ClusteringPageState extends State<ClusteringPage> {
 
   late List<Marker> markers;
   late int pointIndex;
-  List points = [
+  List<LatLng> points = [
     LatLng(51.5, -0.09),
     LatLng(49.8566, 3.3522),
   ];
@@ -237,7 +237,7 @@ class _ClusteringPageState extends State<ClusteringPage> {
               builder: (context, markers) {
                 return Container(
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.0),
+                      borderRadius: BorderRadius.circular(20),
                       color: Colors.blue),
                   child: Center(
                     child: Text(

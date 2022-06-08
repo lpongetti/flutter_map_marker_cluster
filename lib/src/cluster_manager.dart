@@ -5,6 +5,7 @@ import 'package:flutter_map_marker_cluster/src/core/distance_grid.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
+import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 
 class ClusterManager {
   final MapCalculator mapCalculator;
@@ -74,7 +75,7 @@ class ClusterManager {
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,
       int minZoom) {
     for (var zoom = maxZoom; zoom >= minZoom; zoom--) {
-      var markerPoint =
+      final markerPoint =
           mapCalculator.project(marker.point, zoom: zoom.toDouble());
       if (zoom <= disableClusteringAtZoom) {
         // try find a cluster close by
@@ -89,7 +90,7 @@ class ClusterManager {
           final parent = closest.parent!;
           parent.removeChild(closest);
 
-          var newCluster = MarkerClusterNode(
+          final newCluster = MarkerClusterNode(
             zoom: zoom,
             anchorPos: anchorPos,
             predefinedSize: predefinedSize,
@@ -109,7 +110,7 @@ class ClusterManager {
           // First create any new intermediate parent clusters that don't exist
           var lastParent = newCluster;
           for (var z = zoom - 1; z > parent.zoom; z--) {
-            var newParent = MarkerClusterNode(
+            final newParent = MarkerClusterNode(
               zoom: z,
               anchorPos: anchorPos,
               predefinedSize: predefinedSize,
@@ -143,7 +144,7 @@ class ClusterManager {
   }
 
   void _removeFromNewPosToMyPosGridUnclustered(
-      MarkerNode marker, int zoom, minZoom) {
+      MarkerNode marker, int zoom, int minZoom) {
     for (; zoom >= minZoom; zoom--) {
       if (!_gridUnclustered[zoom]!.removeObject(marker)) {
         break;
@@ -154,7 +155,7 @@ class ClusterManager {
   void recalculateTopClusterLevelBounds() =>
       _topClusterLevel.recalculateBounds();
 
-  void recursivelyFromTopClusterLevel(
-          int? zoomLevel, int disableClusteringAtZoom, Function(dynamic) fn) =>
+  void recursivelyFromTopClusterLevel(int? zoomLevel,
+          int disableClusteringAtZoom, Function(MarkerOrClusterNode) fn) =>
       _topClusterLevel.recursively(zoomLevel, disableClusteringAtZoom, fn);
 }

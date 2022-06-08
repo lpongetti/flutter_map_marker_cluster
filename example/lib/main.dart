@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster_example/clustering_many_markers_page.dart';
 import 'package:flutter_map_marker_cluster_example/clustering_page.dart';

@@ -17,7 +17,7 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   int? removeCount;
 
   List<MarkerNode> get markers {
-    var markers = <MarkerNode>[];
+    final markers = <MarkerNode>[];
 
     markers.addAll(children.whereType<MarkerNode>());
 
