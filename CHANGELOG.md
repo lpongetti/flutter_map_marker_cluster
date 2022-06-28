@@ -1,3 +1,7 @@
+## [0.5.0] - 28/06/2022
+
+- #120 Bump flutter map 1.0.0
+
 ## [0.4.4] - 29/11/2021
 
 - Center cluster when spiderfy. Spiderfy when press cluster and current zoom is equal to fitBoundsOptions max zoom
