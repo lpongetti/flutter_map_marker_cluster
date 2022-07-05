@@ -10,7 +10,6 @@ import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/map_widget.dart';
-import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
@@ -174,11 +173,45 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               alignment:
                   marker.rotateAlignment ?? widget.options.rotateAlignment,
             ),
-      child: MarkerWidget(
-        marker: marker,
-        onTap: _onMarkerTap(marker),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: widget.options.popupOptions!.buildPopupOnHover ? () { widget.options.onMarkerTap != null ? widget.options.onMarkerTap!(marker.marker) : null; } : _onMarkerTap(marker) as void Function()?,
+        child: widget.options.popupOptions!.buildPopupOnHover
+          ? MouseRegion(
+            onEnter: (_) => _onMarkerHoverEnter(marker),
+            onExit: (_) => _onMarkerHoverExit(marker),
+            child: marker.builder(context),
+          )
+          : marker.builder(context),
       ),
     );
+  }
+
+  void _onMarkerHoverEnter(MarkerNode marker) {
+    _onMarkerHover(marker, true);
+  }
+
+  void _onMarkerHoverExit(MarkerNode marker) {
+    _onMarkerHover(marker, false);
+  }
+
+  /// Function that is called when the marker is hover (if popup building on hover is selected).
+  /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
+  void _onMarkerHover(MarkerNode marker, bool enter){
+    if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return;
+    if (widget.options.popupOptions != null) {
+      final popupOptions = widget.options.popupOptions!;
+
+      Future.delayed(Duration(milliseconds: enter ? popupOptions.timeToShowPopupOnHover >= 0 ? popupOptions.timeToShowPopupOnHover : 0 : 0),
+        () => popupOptions.markerTapBehavior.apply(marker.marker, PopupState(), popupOptions.popupController) //Todo: modify the popup state
+      );
+    }
+
+    if (widget.options.onMarkerTap != null) {
+      enter
+        ? widget.options.onMarkerHoverEnter != null ? widget.options.onMarkerHoverEnter!(marker.marker) : null
+        : widget.options.onMarkerHoverExit != null ? widget.options.onMarkerHoverExit!(marker.marker) : null;
+    }
   }
 
   void _spiderfy(MarkerClusterNode cluster) {
