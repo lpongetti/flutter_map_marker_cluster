@@ -44,6 +44,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
   PolygonLayer? _polygon;
+  final PopupState popupState = PopupState();
 
   _MarkerClusterLayerState();
 
@@ -203,7 +204,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       final popupOptions = widget.options.popupOptions!;
 
       Future.delayed(Duration(milliseconds: enter ? popupOptions.timeToShowPopupOnHover >= 0 ? popupOptions.timeToShowPopupOnHover : 0 : 0),
-        () => popupOptions.markerTapBehavior.apply(marker.marker, PopupState(), popupOptions.popupController) //Todo: modify the popup state
+        () => popupOptions.markerTapBehavior.apply(marker.marker, popupState, popupOptions.popupController)
       );
     }
 
@@ -542,7 +543,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
         mapState: widget.map,
-        popupState: PopupState(), //todo: modify
+        popupState: popupState,
       ));
     }
 
@@ -621,7 +622,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
-          PopupState(),//todo: modify
+          popupState,
           popupOptions.popupController,
         );
       }
