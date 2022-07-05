@@ -23,11 +23,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ">=0.13.1 <1.0.0"
+  flutter_map: 1.1.1
   flutter_map_marker_cluster:
     path: ../
-  cupertino_icons: ^1.0.2
-  latlong2: ^0.8.0
+  cupertino_icons: ^1.0.5
+  latlong2: ^0.8.1
 
 dev_dependencies:
   flutter_test:
