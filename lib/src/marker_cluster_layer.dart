@@ -304,7 +304,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   List<Widget> _buildMarkerClusterLayer(MarkerClusterNode clusterNode) {
     final layers = <Widget>[];
     final isSpidered = _clusterManager.isSpiderfyCluster(clusterNode);
-    print("isSpidered: $isSpidered");
+    debugPrint("isSpidered: $isSpidered");
     List<Point<num>?> points = [];
     if (isSpidered) {
       points = _generatePointSpiderfy(
