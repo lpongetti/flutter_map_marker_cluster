@@ -303,20 +303,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   List<Widget> _buildMarkerClusterLayer(MarkerClusterNode clusterNode) {
     final layers = <Widget>[];
-    final isSpidered = _clusterManager.isSpiderfyCluster(clusterNode);
-    debugPrint("isSpidered: $isSpidered");
-    List<Point<num>?> points = [];
-    if (isSpidered) {
-      points = _generatePointSpiderfy(
-        clusterNode.markers.length,
-        _mapCalculator.getPixelFromPoint(
-          _mapCalculator.clusterPoint(clusterNode),
-        ),
-      );
-    }
-    if (!_mapCalculator.boundsContainsCluster(clusterNode, points)) {
-      return layers;
-    }
+    if (!_mapCalculator.boundsContainsCluster(clusterNode)) return layers;
+
     if (_zoomingOut && clusterNode.children.length > 1) {
       return _buildClusterClosingLayer(clusterNode);
     } else if (_zoomingIn &&
