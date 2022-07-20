@@ -146,6 +146,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
+    _initializeClusterManager();
+    _addLayers();
     return StreamBuilder<void>(
       stream: widget.stream, // a Stream<void> or null
       builder: (BuildContext context, _) {
@@ -674,55 +676,5 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
 
     return Spiderfy.circle(widget.options.spiderfyCircleRadius, count, center);
-  }
-  
-  @override
-  void initState() {
-    _currentZoom = _previousZoom = widget.map.zoom.ceil();
-    _previousZoomDouble = widget.map.zoom;
-    _minZoom = widget.map.options.minZoom?.ceil() ?? 1;
-    _maxZoom = widget.map.options.maxZoom?.floor() ?? 20;
-    _previousZoomDouble = widget.map.zoom;
-    _initializeAnimationController();
-    _initializeClusters();
-    _addLayers();
-
-    _zoomController.forward();
-
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    _zoomController.dispose();
-    _fitBoundController.dispose();
-    _centerMarkerController.dispose();
-    _spiderfyController.dispose();
-    super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(MarkerClusterLayer oldWidget) {
-    if (oldWidget.options.markers != widget.options.markers) {
-      _initializeClusters();
-      _addLayers();
-    }
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    _initializeClusters();
-    _addLayers();
-    return StreamBuilder<void>(
-      stream: widget.stream, // a Stream<void> or null
-      builder: (BuildContext context, _) {
-        return Container(
-          child: Stack(
-            children: _buildLayers(),
-          ),
-        );
-      },
-    );
   }
 }
