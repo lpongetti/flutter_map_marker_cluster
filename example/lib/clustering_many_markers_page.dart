@@ -65,9 +65,6 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
               (maxLatLng.longitude + minLatLng.longitude) / 2),
           zoom: 6,
           maxZoom: 15,
-          plugins: [
-            MarkerClusterPlugin(),
-          ],
         ),
         children: <Widget>[
           TileLayerWidget(

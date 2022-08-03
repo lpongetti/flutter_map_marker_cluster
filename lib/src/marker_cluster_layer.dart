@@ -23,9 +23,8 @@ import 'package:latlong2/latlong.dart';
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapState map;
-  final Stream<void> stream;
 
-  const MarkerClusterLayer(this.options, this.map, this.stream, {Key? key})
+  const MarkerClusterLayer(this.options, this.map, {Key? key})
       : super(key: key);
 
   @override
@@ -45,7 +44,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   late AnimationController _fitBoundController;
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
-  PolygonLayer? _polygon;
+  PolygonLayerWidget? _polygon;
 
   _MarkerClusterLayerState();
 
@@ -146,13 +145,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<void>(
-      stream: widget.stream, // a Stream<void> or null
-      builder: (BuildContext context, _) {
-        return Stack(
-          children: _buildLayers(),
-        );
-      },
+    return Stack(
+      children: _buildLayers(),
     );
   }
 
@@ -504,12 +498,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(PopupLayer(
+        popupState: popupOptions.popupState,
         popupBuilder: popupOptions.popupBuilder,
         popupSnap: popupOptions.popupSnap,
         popupController: popupOptions.popupController,
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
-        mapState: widget.map,
       ));
     }
 
@@ -588,6 +582,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
+          popupOptions.popupState,
           popupOptions.popupController,
         );
       }
@@ -635,7 +630,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _showPolygon(List<LatLng> points) {
     if (widget.options.showPolygon) {
       setState(() {
-        _polygon = PolygonLayer(
+        _polygon = PolygonLayerWidget(options:
           PolygonLayerOptions(polygons: [
             Polygon(
               points: QuickHull.getConvexHull(points),
@@ -645,9 +640,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               borderColor: widget.options.polygonOptions.borderColor,
               isDotted: widget.options.polygonOptions.isDotted,
             ),
-          ]),
-          widget.map,
-          widget.stream,
+          ])
         );
       });
     }
