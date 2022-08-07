@@ -510,6 +510,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
         mapState: widget.map,
+        popupState: PopupState.maybeOf(context) ?? PopupState(),
       ));
     }
 
@@ -588,6 +589,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
+          PopupState.maybeOf(context) ?? PopupState(),
           popupOptions.popupController,
         );
       }
