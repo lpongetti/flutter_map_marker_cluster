@@ -193,11 +193,9 @@ class _ClusteringPageState extends State<ClusteringPage> {
               .hideAllPopups(), // Hide popup when the map is tapped.
         ),
         children: <Widget>[
-          TileLayerWidget(
-            options: TileLayerOptions(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
-            ),
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
           ),
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(

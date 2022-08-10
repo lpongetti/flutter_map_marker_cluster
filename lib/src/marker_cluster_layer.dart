@@ -22,7 +22,7 @@ import 'package:latlong2/latlong.dart';
 
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
-  final MapState map;
+  final FlutterMapState map;
 
   const MarkerClusterLayer(this.options, this.map, {Key? key})
       : super(key: key);
@@ -44,7 +44,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   late AnimationController _fitBoundController;
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
-  PolygonLayerWidget? _polygon;
+  PolygonLayer? _polygon;
 
   _MarkerClusterLayerState();
 
@@ -630,8 +630,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _showPolygon(List<LatLng> points) {
     if (widget.options.showPolygon) {
       setState(() {
-        _polygon = PolygonLayerWidget(options:
-          PolygonLayerOptions(polygons: [
+        _polygon = PolygonLayer(polygons: [
             Polygon(
               points: QuickHull.getConvexHull(points),
               borderStrokeWidth:
@@ -640,8 +639,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               borderColor: widget.options.polygonOptions.borderColor,
               isDotted: widget.options.polygonOptions.isDotted,
             ),
-          ])
-        );
+          ]);
       });
     }
   }

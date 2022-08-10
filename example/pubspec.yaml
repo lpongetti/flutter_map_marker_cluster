@@ -9,7 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^3.0.0
+  flutter_map: #^3.0.0
+    git: https://github.com/MooNag/flutter_map
   flutter_map_marker_cluster:
     path: ../
   cupertino_icons: ^1.0.2

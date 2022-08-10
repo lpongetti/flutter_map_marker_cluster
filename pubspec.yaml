@@ -11,8 +11,10 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^3.0.0
-  flutter_map_marker_popup: ^2.2.0
+  flutter_map: #^3.0.0
+    git: https://github.com/MooNag/flutter_map
+  flutter_map_marker_popup: #^2.2.0
+    git: https://github.com/MooNag/flutter_map_marker_popup
   latlong2: ^0.8.1
 
 dev_dependencies:

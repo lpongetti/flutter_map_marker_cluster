@@ -4,14 +4,14 @@ import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapCalculator {
-  final MapState mapState;
+  final FlutterMapState mapState;
 
   MapCalculator(this.mapState);
 
   CustomPoint<num> getPixelFromPoint(LatLng point) {
     final pos = mapState.project(point);
     return pos.multiplyBy(mapState.getZoomScale(mapState.zoom, mapState.zoom)) -
-        mapState.getPixelOrigin();
+        mapState.pixelOrigin;
   }
 
   bool boundsContainsMarker(MarkerNode marker) {
