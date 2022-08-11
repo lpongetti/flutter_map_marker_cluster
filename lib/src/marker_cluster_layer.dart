@@ -161,7 +161,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     Fade? fade,
   }) {
     return MapWidget(
-      key: marker.key ?? ObjectKey(marker.marker),
       size: Size(marker.width, marker.height),
       animationController: controller,
       translate: translate,
@@ -174,6 +173,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               alignment:
                   marker.rotateAlignment ?? widget.options.rotateAlignment,
             ),
+      key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(
         marker: marker,
         onTap: _onMarkerTap(marker),
