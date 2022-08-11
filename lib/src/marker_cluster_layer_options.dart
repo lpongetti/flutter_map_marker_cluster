@@ -57,6 +57,12 @@ class PopupOptions {
   /// defaults to false.
   final bool markerRotate;
 
+  /// Set the popup building on hover rather than on tap.
+  final bool buildPopupOnHover;
+
+  /// Time (in milliseconds) required before the popup is shown when hovering. Set to 300 ms by default.
+  final int timeToShowPopupOnHover;
+
   /// The default MarkerTapBehavior is
   /// [MarkerTapBehavior.togglePopupAndHideRest] which will toggle the popup of
   /// the tapped marker and hide all other popups. This is a sensible default
@@ -73,6 +79,8 @@ class PopupOptions {
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
+    this.buildPopupOnHover = false,
+    this.timeToShowPopupOnHover = 300,
   })  : markerTapBehavior =
             markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
@@ -164,6 +172,12 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker)? onMarkerTap;
 
+  /// Function to call when a Marker starts to be hovered
+  final void Function(Marker)? onMarkerHoverEnter;
+
+  /// Function to call when a Marker stops to be hovered
+  final void Function(Marker)? onMarkerHoverExit;
+
   /// Function to call when markers are clustered
   final void Function(List<Marker>)? onMarkersClustered;
 
@@ -196,6 +210,8 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkerHoverEnter,
+    this.onMarkerHoverExit,
     this.onClusterTap,
     this.onMarkersClustered,
     this.popupOptions,
