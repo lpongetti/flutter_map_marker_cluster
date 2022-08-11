@@ -186,8 +186,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
     this.animationsOptions = const AnimationsOptions(),
-    this.fitBoundsOptions =
-        const FitBoundsOptions(padding: EdgeInsets.all(12.0)),
+    this.fitBoundsOptions = const FitBoundsOptions(padding: EdgeInsets.all(12)),
     this.zoomToBoundsOnClick = true,
     this.centerMarkerOnClick = true,
     this.spiderfyCircleRadius = 40,
