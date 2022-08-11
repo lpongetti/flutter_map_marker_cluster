@@ -10,7 +10,6 @@ import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/map_widget.dart';
-import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
 import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
@@ -510,6 +509,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
         mapState: widget.map,
+        popupState: PopupState.maybeOf(context, listen: false) ?? PopupState(),
       ));
     }
 
@@ -588,6 +588,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
+          PopupState.maybeOf(context, listen: false) ?? PopupState(),
           popupOptions.popupController,
         );
       }
