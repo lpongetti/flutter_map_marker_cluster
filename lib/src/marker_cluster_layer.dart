@@ -174,6 +174,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               alignment:
                   marker.rotateAlignment ?? widget.options.rotateAlignment,
             ),
+      key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(
         marker: marker,
         onTap: _onMarkerTap(marker),
