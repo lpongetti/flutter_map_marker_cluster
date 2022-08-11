@@ -19,15 +19,14 @@ class MarkerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: buildOnHover && hoverOnTap != null ? hoverOnTap : onTap,
-      child: buildOnHover && onHover != null
-        ? MouseRegion(
-          onEnter: (_) => onHover!(true),
-          onExit: (_) => onHover!(false),
-          child: marker.builder(context),
-        )
-        : marker.builder(context)
-    );
+        behavior: HitTestBehavior.opaque,
+        onTap: buildOnHover && hoverOnTap != null ? hoverOnTap : onTap,
+        child: buildOnHover && onHover != null
+            ? MouseRegion(
+                onEnter: (_) => onHover!(true),
+                onExit: (_) => onHover!(false),
+                child: marker.builder(context),
+              )
+            : marker.builder(context));
   }
 }

@@ -1,4 +1,9 @@
-## [0.5.1] - 28/06/2022
+## [0.5.2] - 12/08/2022
+
+- Merge pull request #132 from aytunch/null-check-bug
+- Merge pull request #110 from Feynallein/master
+
+## [0.5.1] - 11/08/2022
 
 - Merge pull request #130 from RicardoRB/master
 - Merge pull request #125 from appsup-dart/flicker-issue
