@@ -10,7 +10,7 @@ class ClusteringPage extends StatefulWidget {
   const ClusteringPage({Key? key}) : super(key: key);
 
   @override
-  _ClusteringPageState createState() => _ClusteringPageState();
+  State<ClusteringPage> createState() => _ClusteringPageState();
 }
 
 class _ClusteringPageState extends State<ClusteringPage> {

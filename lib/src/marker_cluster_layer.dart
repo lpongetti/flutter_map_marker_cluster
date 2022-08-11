@@ -10,7 +10,7 @@ import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/map_widget.dart';
-import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
+import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/rotate.dart';
@@ -50,9 +50,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   bool get _animating =>
       _zoomController.isAnimating ||
-      _fitBoundController.isAnimating ||
-      _centerMarkerController.isAnimating ||
-      _spiderfyController.isAnimating;
+          _fitBoundController.isAnimating ||
+          _centerMarkerController.isAnimating ||
+          _spiderfyController.isAnimating;
 
   bool get _zoomingIn =>
       _zoomController.isAnimating && _currentZoom > _previousZoom;
@@ -169,49 +169,44 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       rotate: marker.rotate != true && widget.options.rotate != true
           ? null
           : Rotate(
-              angle: -widget.map.rotationRad,
-              origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
-              alignment:
-                  marker.rotateAlignment ?? widget.options.rotateAlignment,
-            ),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: widget.options.popupOptions!.buildPopupOnHover ? () { widget.options.onMarkerTap != null ? widget.options.onMarkerTap!(marker.marker) : null; } : _onMarkerTap(marker) as void Function()?,
-        child: widget.options.popupOptions!.buildPopupOnHover
-          ? MouseRegion(
-            onEnter: (_) => _onMarkerHoverEnter(marker),
-            onExit: (_) => _onMarkerHoverExit(marker),
-            child: marker.builder(context),
-          )
-          : marker.builder(context),
+        angle: -widget.map.rotationRad,
+        origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
+        alignment:
+        marker.rotateAlignment ?? widget.options.rotateAlignment,
+      ),
+      key: marker.key ?? ObjectKey(marker.marker),
+      child: MarkerWidget(
+        marker: marker,
+        onTap: _onMarkerTap(marker),
+        onHover: (bool value) => _onMarkerHover(marker, value),
+        buildOnHover: widget.options.popupOptions?.buildPopupOnHover ?? false,
+        hoverOnTap: () => widget.options.onMarkerTap!(marker),
       ),
     );
-  }
-
-  void _onMarkerHoverEnter(MarkerNode marker) {
-    _onMarkerHover(marker, true);
-  }
-
-  void _onMarkerHoverExit(MarkerNode marker) {
-    _onMarkerHover(marker, false);
   }
 
   /// Function that is called when the marker is hover (if popup building on hover is selected).
   /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
   void _onMarkerHover(MarkerNode marker, bool enter){
     if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return;
+
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
-
-      Future.delayed(Duration(milliseconds: enter ? popupOptions.timeToShowPopupOnHover >= 0 ? popupOptions.timeToShowPopupOnHover : 0 : 0),
-        () => popupOptions.markerTapBehavior.apply(marker.marker, popupState, popupOptions.popupController)
-      );
+      enter
+          ? Future.delayed(Duration(milliseconds: popupOptions.timeToShowPopupOnHover >= 0 ? popupOptions.timeToShowPopupOnHover : 0), () {
+        popupOptions.markerTapBehavior.apply(
+          marker.marker,
+          PopupState.maybeOf(context, listen: false) ?? PopupState(),
+          popupOptions.popupController,
+        );
+      })
+          : popupOptions.popupController.hideAllPopups();
     }
 
     if (widget.options.onMarkerTap != null) {
       enter
-        ? widget.options.onMarkerHoverEnter != null ? widget.options.onMarkerHoverEnter!(marker.marker) : null
-        : widget.options.onMarkerHoverExit != null ? widget.options.onMarkerHoverExit!(marker.marker) : null;
+          ? widget.options.onMarkerHoverEnter != null ? widget.options.onMarkerHoverEnter!(marker.marker) : null
+          : widget.options.onMarkerHoverExit != null ? widget.options.onMarkerHoverExit!(marker.marker) : null;
     }
   }
 
@@ -236,9 +231,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
         _spiderfyController.reverse().then(
               (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
-              }),
-            );
+            _clusterManager.spiderfyCluster = null;
+          }),
+        );
 
         if (widget.options.popupOptions != null) {
           widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
@@ -257,7 +252,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _spiderfyController
           ..stop()
           ..reverse().then(
-            (_) => setState(() {
+                (_) => setState(() {
               _clusterManager.spiderfyCluster = null;
             }),
           );
@@ -460,9 +455,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Widget> _buildSpiderfyCluster(
-    MarkerClusterNode cluster,
-    int currentZoom,
-  ) {
+      MarkerClusterNode cluster,
+      int currentZoom,
+      ) {
     final results = <Widget>[];
     results.add(
       MapWidget(
@@ -522,7 +517,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _zoomController
         ..reset()
         ..forward().then(
-          (_) => setState(() {
+              (_) => setState(() {
             _hidePolygon();
           }),
         );
@@ -530,9 +525,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     _clusterManager.recursivelyFromTopClusterLevel(
         _currentZoom, widget.options.disableClusteringAtZoom,
-        (MarkerOrClusterNode layer) {
-      layers.addAll(_buildLayer(layer));
-    });
+            (MarkerOrClusterNode layer) {
+          layers.addAll(_buildLayer(layer));
+        });
 
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
@@ -543,7 +538,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
         mapState: widget.map,
-        popupState: popupState,
+        popupState: PopupState.maybeOf(context, listen: false) ?? PopupState(),
       ));
     }
 
@@ -557,7 +552,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       widget.options.onClusterTap?.call(cluster);
 
       if (!widget.options.zoomToBoundsOnClick) {
-        _spiderfy(cluster);
+        if (widget.options.spiderfyCluster) {
+          _spiderfy(cluster);
+        }
         return;
       }
 
@@ -569,8 +566,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       // check if children can un-cluster
       final cannotDivide = cluster.markers.every((marker) =>
-              marker.parent!.zoom == _maxZoom &&
-              marker.parent == cluster.markers[0].parent) ||
+      marker.parent!.zoom == _maxZoom &&
+          marker.parent == cluster.markers[0].parent) ||
           (dest.zoom == _currentZoom &&
               _currentZoom == widget.options.fitBoundsOptions.maxZoom);
 
@@ -582,15 +579,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _showPolygon(
           cluster.markers.fold<List<LatLng>>(
             [],
-            (result, marker) => result..add(marker.point),
+                (result, marker) => result..add(marker.point),
           ),
         );
       }
 
       final latTween =
-          Tween<double>(begin: center.latitude, end: dest.center.latitude);
+      Tween<double>(begin: center.latitude, end: dest.center.latitude);
       final lonTween =
-          Tween<double>(begin: center.longitude, end: dest.center.longitude);
+      Tween<double>(begin: center.longitude, end: dest.center.longitude);
       final zoomTween = Tween<double>(begin: widget.map.zoom, end: dest.zoom);
 
       final animation = CurvedAnimation(
@@ -607,7 +604,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
 
-        if (cannotDivide) {
+        if (cannotDivide && widget.options.spiderfyCluster) {
           _spiderfy(cluster);
         }
       });
@@ -622,7 +619,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
-          popupState,
+          PopupState.maybeOf(context, listen: false) ?? PopupState(),
           popupOptions.popupController,
         );
       }
@@ -633,9 +630,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       final center = widget.map.center;
       final latTween =
-          Tween<double>(begin: center.latitude, end: marker.point.latitude);
+      Tween<double>(begin: center.latitude, end: marker.point.latitude);
       final lonTween =
-          Tween<double>(begin: center.longitude, end: marker.point.longitude);
+      Tween<double>(begin: center.longitude, end: marker.point.longitude);
 
       final Animation<double> animation = CurvedAnimation(
         parent: _centerMarkerController,
@@ -653,11 +650,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   VoidCallback _centerMarkerListener(
-    Animation<double> animation,
-    Tween<double> latTween,
-    Tween<double> lonTween, {
-    Tween<double>? zoomTween,
-  }) {
+      Animation<double> animation,
+      Tween<double> latTween,
+      Tween<double> lonTween, {
+        Tween<double>? zoomTween,
+      }) {
     return () {
       widget.map.move(
         LatLng(latTween.evaluate(animation), lonTween.evaluate(animation)),
@@ -675,7 +672,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             Polygon(
               points: QuickHull.getConvexHull(points),
               borderStrokeWidth:
-                  widget.options.polygonOptions.borderStrokeWidth,
+              widget.options.polygonOptions.borderStrokeWidth,
               color: widget.options.polygonOptions.color,
               borderColor: widget.options.polygonOptions.borderColor,
               isDotted: widget.options.polygonOptions.isDotted,

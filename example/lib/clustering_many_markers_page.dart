@@ -12,7 +12,7 @@ class ClusteringManyMarkersPage extends StatefulWidget {
   const ClusteringManyMarkersPage({Key? key}) : super(key: key);
 
   @override
-  _ClusteringManyMarkersPageState createState() =>
+  State<ClusteringManyMarkersPage> createState() =>
       _ClusteringManyMarkersPageState();
 }
 

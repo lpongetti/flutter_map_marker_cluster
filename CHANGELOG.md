@@ -1,3 +1,9 @@
+## [0.5.1] - 28/06/2022
+
+- Merge pull request #130 from RicardoRB/master
+- Merge pull request #125 from appsup-dart/flicker-issue
+- Merge pull request #112 from thoKling/master
+
 ## [0.5.0] - 28/06/2022
 
 - #120 Bump flutter map 1.0.0
