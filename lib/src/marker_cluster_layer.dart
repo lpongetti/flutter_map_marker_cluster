@@ -196,7 +196,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _unspiderfy() {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -206,17 +206,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               }),
             );
 
-        if (widget.options.popupOptions != null) {
+        if (widget.options.popupOptions != null &&
+            markersGettingClustered != null) {
           widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
             markersGettingClustered,
           );
         }
-        if (widget.options.onMarkersClustered != null) {
+        if (widget.options.onMarkersClustered != null &&
+            markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
         }
         break;
       case AnimationStatus.forward:
-        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -227,10 +229,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               _clusterManager.spiderfyCluster = null;
             }),
           );
-
-        widget.options.popupOptions?.popupController
-            .hidePopupsOnlyFor(markersGettingClustered);
-        widget.options.onMarkersClustered?.call(markersGettingClustered);
+        if (markersGettingClustered != null) {
+          widget.options.popupOptions?.popupController
+              .hidePopupsOnlyFor(markersGettingClustered);
+          widget.options.onMarkersClustered?.call(markersGettingClustered);
+        }
         break;
       default:
         break;
