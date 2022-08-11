@@ -137,6 +137,9 @@ class MarkerClusterLayerOptions extends LayerOptions {
   /// When click marker, center it with animation
   final bool centerMarkerOnClick;
 
+  /// If false remove spiderfy effect on tap
+  final bool spiderfyCluster;
+
   /// Increase to increase the distance away that circle spiderfied markers appear from the center
   final int spiderfyCircleRadius;
 
@@ -190,6 +193,7 @@ class MarkerClusterLayerOptions extends LayerOptions {
     this.spiderfySpiralDistanceMultiplier = 1,
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,
+    this.spiderfyCluster = true,
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,

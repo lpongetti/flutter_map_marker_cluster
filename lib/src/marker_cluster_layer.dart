@@ -524,7 +524,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       widget.options.onClusterTap?.call(cluster);
 
       if (!widget.options.zoomToBoundsOnClick) {
-        _spiderfy(cluster);
+        if (widget.options.spiderfyCluster) {
+          _spiderfy(cluster);
+        }
         return;
       }
 
@@ -574,7 +576,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
 
-        if (cannotDivide) {
+        if (cannotDivide && widget.options.spiderfyCluster) {
           _spiderfy(cluster);
         }
       });
