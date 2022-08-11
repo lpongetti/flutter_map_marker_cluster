@@ -11,7 +11,6 @@ import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/map_widget.dart';
 import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
-import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/rotate.dart';
