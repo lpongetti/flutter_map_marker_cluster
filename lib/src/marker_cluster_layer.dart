@@ -211,12 +211,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     if (widget.options.onMarkerTap != null) {
       enter
-          ? widget.options.onMarkerHoverEnter != null
-              ? widget.options.onMarkerHoverEnter!(marker.marker)
-              : null
-          : widget.options.onMarkerHoverExit != null
-              ? widget.options.onMarkerHoverExit!(marker.marker)
-              : null;
+          ? widget.options.onMarkerHoverEnter?.call(marker.marker)
+          : widget.options.onMarkerHoverExit?.call(marker.marker);
     }
   }
 

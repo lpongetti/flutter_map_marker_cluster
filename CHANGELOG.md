@@ -1,3 +1,7 @@
+## [0.5.3] - 12/08/2022
+
+- Fix lint errors
+
 ## [0.5.2] - 12/08/2022
 
 - Merge pull request #132 from aytunch/null-check-bug
