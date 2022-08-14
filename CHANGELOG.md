@@ -1,3 +1,7 @@
+## [0.5.4] - 15/08/2022
+
+- Wait unspiderfy before to spiderfy another cluster
+
 ## [0.5.3] - 12/08/2022
 
 - Fix lint errors

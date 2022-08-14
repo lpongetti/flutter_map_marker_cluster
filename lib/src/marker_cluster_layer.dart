@@ -217,29 +217,18 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   void _spiderfy(MarkerClusterNode cluster) {
-    if (_clusterManager.spiderfyCluster != null) {
-      _unspiderfy();
-      return;
-    }
-
     setState(() {
       _clusterManager.spiderfyCluster = cluster;
     });
     _spiderfyController.forward();
   }
 
-  void _unspiderfy() {
+  Future<void> _unspiderfy() async {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
         final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
-
-        _spiderfyController.reverse().then(
-              (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
-              }),
-            );
 
         if (widget.options.popupOptions != null &&
             markersGettingClustered != null) {
@@ -251,24 +240,30 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
         }
+
+        await _spiderfyController.reverse().then(
+              (_) => setState(() {
+                _clusterManager.spiderfyCluster = null;
+              }),
+            );
         break;
       case AnimationStatus.forward:
         final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
-        _spiderfyController
-          ..stop()
-          ..reverse().then(
-            (_) => setState(() {
-              _clusterManager.spiderfyCluster = null;
-            }),
-          );
         if (markersGettingClustered != null) {
           widget.options.popupOptions?.popupController
               .hidePopupsOnlyFor(markersGettingClustered);
           widget.options.onMarkersClustered?.call(markersGettingClustered);
         }
+
+        _spiderfyController.stop();
+        await _spiderfyController.reverse().then(
+              (_) => setState(() {
+                _clusterManager.spiderfyCluster = null;
+              }),
+            );
         break;
       default:
         break;
@@ -555,13 +550,21 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   VoidCallback _onClusterTap(MarkerClusterNode cluster) {
-    return () {
+    return () async {
       if (_animating) return;
 
       widget.options.onClusterTap?.call(cluster);
 
       if (!widget.options.zoomToBoundsOnClick) {
         if (widget.options.spiderfyCluster) {
+          if (_clusterManager.spiderfyCluster != null) {
+            if (_clusterManager.spiderfyCluster == cluster) {
+              _unspiderfy();
+              return;
+            } else {
+              await _unspiderfy();
+            }
+          }
           _spiderfy(cluster);
         }
         return;
@@ -582,6 +585,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       if (cannotDivide) {
         dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+
+        if (_clusterManager.spiderfyCluster != null) {
+          if (_clusterManager.spiderfyCluster == cluster) {
+            _unspiderfy();
+            return;
+          } else {
+            await _unspiderfy();
+          }
+        }
       }
 
       if (dest.zoom > _currentZoom && !cannotDivide) {
