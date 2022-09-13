@@ -43,11 +43,16 @@ class MapCalculator {
     double height,
     Anchor anchor,
   ) {
-    width = width - anchor.left;
-    height = height - anchor.top;
+    final rightPortion = width - anchor.left;
+    final leftPortion = anchor.left;
+    final bottomPortion = height - anchor.top;
+    final topPortion = anchor.top;
 
-    final sw = CustomPoint(pixelPoint.x + width, pixelPoint.y - height);
-    final ne = CustomPoint(pixelPoint.x - width, pixelPoint.y + height);
+    final sw =
+        CustomPoint(pixelPoint.x + leftPortion, pixelPoint.y - bottomPortion);
+    final ne =
+        CustomPoint(pixelPoint.x - rightPortion, pixelPoint.y + topPortion);
+
     return mapState.pixelBounds.containsPartialBounds(Bounds(sw, ne));
   }
 

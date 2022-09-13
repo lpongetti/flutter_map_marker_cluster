@@ -10,9 +10,7 @@ import 'package:flutter_map_marker_cluster/src/core/spiderfy.dart';
 import 'package:flutter_map_marker_cluster/src/fade.dart';
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/map_widget.dart';
-import 'package:flutter_map_marker_cluster/src/marker_cluster_layer_options.dart';
 import 'package:flutter_map_marker_cluster/src/marker_widget.dart';
-import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:flutter_map_marker_cluster/src/rotate.dart';
@@ -45,6 +43,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
   PolygonLayer? _polygon;
+  final PopupState popupState = PopupState();
 
   _MarkerClusterLayerState();
 
@@ -169,63 +168,96 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               alignment:
                   marker.rotateAlignment ?? widget.options.rotateAlignment,
             ),
+      key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(
         marker: marker,
         onTap: _onMarkerTap(marker),
+        onHover: (bool value) => _onMarkerHover(marker, value),
+        buildOnHover: widget.options.popupOptions?.buildPopupOnHover ?? false,
+        hoverOnTap: () => widget.options.onMarkerTap!(marker),
       ),
     );
   }
 
-  void _spiderfy(MarkerClusterNode cluster) {
-    if (_clusterManager.spiderfyCluster != null) {
-      _unspiderfy();
-      return;
+  /// Function that is called when the marker is hover (if popup building on hover is selected).
+  /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
+  void _onMarkerHover(MarkerNode marker, bool enter) {
+    if (_zoomController.isAnimating ||
+        _centerMarkerController.isAnimating ||
+        _fitBoundController.isAnimating) return;
+
+    if (widget.options.popupOptions != null) {
+      final popupOptions = widget.options.popupOptions!;
+      enter
+          ? Future.delayed(
+              Duration(
+                  milliseconds: popupOptions.timeToShowPopupOnHover >= 0
+                      ? popupOptions.timeToShowPopupOnHover
+                      : 0), () {
+              popupOptions.markerTapBehavior.apply(
+                marker.marker,
+                PopupState.maybeOf(context, listen: false) ?? PopupState(),
+                popupOptions.popupController,
+              );
+            })
+          : popupOptions.popupController.hideAllPopups();
     }
 
+    if (widget.options.onMarkerTap != null) {
+      enter
+          ? widget.options.onMarkerHoverEnter?.call(marker.marker)
+          : widget.options.onMarkerHoverExit?.call(marker.marker);
+    }
+  }
+
+  void _spiderfy(MarkerClusterNode cluster) {
     setState(() {
       _clusterManager.spiderfyCluster = cluster;
     });
     _spiderfyController.forward();
   }
 
-  void _unspiderfy() {
+  Future<void> _unspiderfy() async {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
-        _spiderfyController.reverse().then(
-              (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
-              }),
-            );
-
-        if (widget.options.popupOptions != null) {
+        if (widget.options.popupOptions != null &&
+            markersGettingClustered != null) {
           widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
             markersGettingClustered,
           );
         }
-        if (widget.options.onMarkersClustered != null) {
+        if (widget.options.onMarkersClustered != null &&
+            markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
         }
+
+        await _spiderfyController.reverse().then(
+              (_) => setState(() {
+                _clusterManager.spiderfyCluster = null;
+              }),
+            );
         break;
       case AnimationStatus.forward:
-        final markersGettingClustered = _clusterManager.spiderfyCluster!.markers
+        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
-        _spiderfyController
-          ..stop()
-          ..reverse().then(
-            (_) => setState(() {
-              _clusterManager.spiderfyCluster = null;
-            }),
-          );
+        if (markersGettingClustered != null) {
+          widget.options.popupOptions?.popupController
+              .hidePopupsOnlyFor(markersGettingClustered);
+          widget.options.onMarkersClustered?.call(markersGettingClustered);
+        }
 
-        widget.options.popupOptions?.popupController
-            .hidePopupsOnlyFor(markersGettingClustered);
-        widget.options.onMarkersClustered?.call(markersGettingClustered);
+        _spiderfyController.stop();
+        await _spiderfyController.reverse().then(
+              (_) => setState(() {
+                _clusterManager.spiderfyCluster = null;
+              }),
+            );
         break;
       default:
         break;
@@ -498,7 +530,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(PopupLayer(
-        popupState: popupOptions.popupState,
+        popupState: PopupState.maybeOf(context, listen: false) ?? PopupState(),
         popupBuilder: popupOptions.popupBuilder,
         popupSnap: popupOptions.popupSnap,
         popupController: popupOptions.popupController,
@@ -511,13 +543,23 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   VoidCallback _onClusterTap(MarkerClusterNode cluster) {
-    return () {
+    return () async {
       if (_animating) return;
 
       widget.options.onClusterTap?.call(cluster);
 
       if (!widget.options.zoomToBoundsOnClick) {
-        _spiderfy(cluster);
+        if (widget.options.spiderfyCluster) {
+          if (_clusterManager.spiderfyCluster != null) {
+            if (_clusterManager.spiderfyCluster == cluster) {
+              _unspiderfy();
+              return;
+            } else {
+              await _unspiderfy();
+            }
+          }
+          _spiderfy(cluster);
+        }
         return;
       }
 
@@ -536,6 +578,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       if (cannotDivide) {
         dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+
+        if (_clusterManager.spiderfyCluster != null) {
+          if (_clusterManager.spiderfyCluster == cluster) {
+            _unspiderfy();
+            return;
+          } else {
+            await _unspiderfy();
+          }
+        }
       }
 
       if (dest.zoom > _currentZoom && !cannotDivide) {
@@ -567,7 +618,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
 
-        if (cannotDivide) {
+        if (cannotDivide && widget.options.spiderfyCluster) {
           _spiderfy(cluster);
         }
       });
@@ -582,7 +633,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
           marker.marker,
-          popupOptions.popupState,
+          PopupState.maybeOf(context, listen: false) ?? PopupState(),
           popupOptions.popupController,
         );
       }

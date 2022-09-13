@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
-import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 
 class PolygonOptions {
@@ -60,6 +59,12 @@ class PopupOptions {
   /// defaults to false.
   final bool markerRotate;
 
+  /// Set the popup building on hover rather than on tap.
+  final bool buildPopupOnHover;
+
+  /// Time (in milliseconds) required before the popup is shown when hovering. Set to 300 ms by default.
+  final int timeToShowPopupOnHover;
+
   /// The default MarkerTapBehavior is
   /// [MarkerTapBehavior.togglePopupAndHideRest] which will toggle the popup of
   /// the tapped marker and hide all other popups. This is a sensible default
@@ -77,6 +82,8 @@ class PopupOptions {
     this.popupAnimation,
     this.markerRotate = false,
     MarkerTapBehavior? markerTapBehavior,
+    this.buildPopupOnHover = false,
+    this.timeToShowPopupOnHover = 300,
   })  : markerTapBehavior =
             markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
@@ -140,6 +147,9 @@ class MarkerClusterLayerOptions {
   /// When click marker, center it with animation
   final bool centerMarkerOnClick;
 
+  /// If false remove spiderfy effect on tap
+  final bool spiderfyCluster;
+
   /// Increase to increase the distance away that circle spiderfied markers appear from the center
   final int spiderfyCircleRadius;
 
@@ -164,6 +174,12 @@ class MarkerClusterLayerOptions {
 
   /// Function to call when a Marker is tapped
   final void Function(Marker)? onMarkerTap;
+
+  /// Function to call when a Marker starts to be hovered
+  final void Function(Marker)? onMarkerHoverEnter;
+
+  /// Function to call when a Marker stops to be hovered
+  final void Function(Marker)? onMarkerHoverExit;
 
   /// Function to call when markers are clustered
   final void Function(List<Marker>)? onMarkersClustered;
@@ -193,9 +209,12 @@ class MarkerClusterLayerOptions {
     this.spiderfySpiralDistanceMultiplier = 1,
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,
+    this.spiderfyCluster = true,
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkerHoverEnter,
+    this.onMarkerHoverExit,
     this.onClusterTap,
     this.onMarkersClustered,
     this.popupOptions,

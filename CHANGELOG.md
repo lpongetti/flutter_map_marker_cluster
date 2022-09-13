@@ -1,3 +1,22 @@
+## [0.5.4] - 15/08/2022
+
+- Wait unspiderfy before to spiderfy another cluster
+
+## [0.5.3] - 12/08/2022
+
+- Fix lint errors
+
+## [0.5.2] - 12/08/2022
+
+- Merge pull request #132 from aytunch/null-check-bug
+- Merge pull request #110 from Feynallein/master
+
+## [0.5.1] - 11/08/2022
+
+- Merge pull request #130 from RicardoRB/master
+- Merge pull request #125 from appsup-dart/flicker-issue
+- Merge pull request #112 from thoKling/master
+
 ## [0.5.0] - 28/06/2022
 
 - #120 Bump flutter map 1.0.0

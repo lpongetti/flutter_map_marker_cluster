@@ -18,3 +18,4 @@ linter:
     type_annotate_public_apis: true
     prefer_int_literals: true
     use_named_constants: true
+    unnecessary_statements: true
