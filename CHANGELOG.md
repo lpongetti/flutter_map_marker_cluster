@@ -1,3 +1,7 @@
+## [1.0.0] - 26/09/2022
+
+- Merge pull request #128 from MooNag/master
+
 ## [0.5.4] - 15/08/2022
 
 - Wait unspiderfy before to spiderfy another cluster
