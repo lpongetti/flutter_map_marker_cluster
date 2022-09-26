@@ -27,11 +27,6 @@ Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`
 ```dart
   Widget build(BuildContext context) {
     return FlutterMap(
-      options: new MapOptions(
-        plugins: [
-          MarkerClusterPlugin(),
-        ],
-      ),
       layers: [
         TileLayerOptions(
           urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',

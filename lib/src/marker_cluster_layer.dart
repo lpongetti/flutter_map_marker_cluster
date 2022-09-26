@@ -20,10 +20,9 @@ import 'package:latlong2/latlong.dart';
 
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
-  final MapState map;
-  final Stream<void> stream;
+  final FlutterMapState map;
 
-  const MarkerClusterLayer(this.options, this.map, this.stream, {Key? key})
+  const MarkerClusterLayer(this.options, this.map, {Key? key})
       : super(key: key);
 
   @override
@@ -145,13 +144,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<void>(
-      stream: widget.stream, // a Stream<void> or null
-      builder: (BuildContext context, _) {
-        return Stack(
-          children: _buildLayers(),
-        );
-      },
+    return Stack(
+      children: _buildLayers(),
     );
   }
 
@@ -536,13 +530,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(PopupLayer(
+        popupState: PopupState.maybeOf(context, listen: false) ?? PopupState(),
         popupBuilder: popupOptions.popupBuilder,
         popupSnap: popupOptions.popupSnap,
         popupController: popupOptions.popupController,
         popupAnimation: popupOptions.popupAnimation,
         markerRotate: popupOptions.markerRotate,
-        mapState: widget.map,
-        popupState: PopupState.maybeOf(context, listen: false) ?? PopupState(),
       ));
     }
 
@@ -688,8 +681,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _showPolygon(List<LatLng> points) {
     if (widget.options.showPolygon) {
       setState(() {
-        _polygon = PolygonLayer(
-          PolygonLayerOptions(polygons: [
+        _polygon = PolygonLayer(polygons: [
             Polygon(
               points: QuickHull.getConvexHull(points),
               borderStrokeWidth:
@@ -698,10 +690,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               borderColor: widget.options.polygonOptions.borderColor,
               isDotted: widget.options.polygonOptions.isDotted,
             ),
-          ]),
-          widget.map,
-          widget.stream,
-        );
+          ]);
       });
     }
   }

@@ -65,16 +65,11 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
               (maxLatLng.longitude + minLatLng.longitude) / 2),
           zoom: 6,
           maxZoom: 15,
-          plugins: [
-            MarkerClusterPlugin(),
-          ],
         ),
         children: <Widget>[
-          TileLayerWidget(
-            options: TileLayerOptions(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
-            ),
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
           ),
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(

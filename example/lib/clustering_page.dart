@@ -189,18 +189,13 @@ class _ClusteringPageState extends State<ClusteringPage> {
           center: points[0],
           zoom: 5,
           maxZoom: 15,
-          plugins: [
-            MarkerClusterPlugin(),
-          ],
           onTap: (_, __) => _popupController
               .hideAllPopups(), // Hide popup when the map is tapped.
         ),
         children: <Widget>[
-          TileLayerWidget(
-            options: TileLayerOptions(
-              urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-              subdomains: ['a', 'b', 'c'],
-            ),
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: ['a', 'b', 'c'],
           ),
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(
@@ -221,6 +216,7 @@ class _ClusteringPageState extends State<ClusteringPage> {
                   color: Colors.black12,
                   borderStrokeWidth: 3),
               popupOptions: PopupOptions(
+                  popupState: PopupState(),
                   popupSnap: PopupSnap.markerTop,
                   popupController: _popupController,
                   popupBuilder: (_, marker) => Container(

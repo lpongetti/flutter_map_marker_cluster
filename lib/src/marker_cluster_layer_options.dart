@@ -46,6 +46,8 @@ class PopupOptions {
   /// and hide the popup.
   final PopupController popupController;
 
+  final PopupState popupState;
+
   /// Controls the position of the popup relative to the marker or popup.
   final PopupSnap popupSnap;
 
@@ -74,6 +76,7 @@ class PopupOptions {
 
   PopupOptions({
     required this.popupBuilder,
+    required this.popupState,
     this.popupSnap = PopupSnap.markerTop,
     PopupController? popupController,
     this.popupAnimation,
@@ -89,7 +92,7 @@ class PopupOptions {
 typedef ClusterWidgetBuilder = Widget Function(
     BuildContext context, List<Marker> markers);
 
-class MarkerClusterLayerOptions extends LayerOptions {
+class MarkerClusterLayerOptions {
   /// Cluster builder
   final ClusterWidgetBuilder builder;
 
