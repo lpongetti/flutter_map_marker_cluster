@@ -682,15 +682,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     if (widget.options.showPolygon) {
       setState(() {
         _polygon = PolygonLayer(polygons: [
-            Polygon(
-              points: QuickHull.getConvexHull(points),
-              borderStrokeWidth:
-                  widget.options.polygonOptions.borderStrokeWidth,
-              color: widget.options.polygonOptions.color,
-              borderColor: widget.options.polygonOptions.borderColor,
-              isDotted: widget.options.polygonOptions.isDotted,
-            ),
-          ]);
+          Polygon(
+            points: QuickHull.getConvexHull(points),
+            borderStrokeWidth: widget.options.polygonOptions.borderStrokeWidth,
+            color: widget.options.polygonOptions.color,
+            borderColor: widget.options.polygonOptions.borderColor,
+            isDotted: widget.options.polygonOptions.isDotted,
+          ),
+        ]);
       });
     }
   }
