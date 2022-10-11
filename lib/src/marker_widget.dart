@@ -14,7 +14,7 @@ class MarkerWidget extends StatelessWidget {
     this.onHover,
     this.buildOnHover = false,
     this.hoverOnTap,
-  }) : super(key: ObjectKey(marker));
+  }) : super(key: marker.key ?? ObjectKey(marker.marker));
 
   @override
   Widget build(BuildContext context) {
