@@ -1,6 +1,6 @@
-## [1.0.0] - 26/09/2022
+## [1.0.1] - 11/10/2022
 
-- Merge pull request #128 from MooNag/master
+- Merge pull request #141 from hahrot/patch-1
 
 ## [0.5.4] - 15/08/2022
 
