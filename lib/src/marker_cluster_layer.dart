@@ -139,7 +139,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       );
     }
 
-    _clusterManager.recalculateTopClusterLevelBounds();
+    _clusterManager.recalculateTopClusterLevelProperties();
   }
 
   @override
@@ -492,15 +492,23 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         );
     }
 
+    // We bounds so that we only recurse into clusters that stick into a
+    // bounding box that is 4x the size of what's on screen (i.e. stick on
+    // factor of 0.5 for the lack of a better name). Note that this could lead
+    // to visual glitches if someone had markers that are larger than the map
+    // viewport itself. Doing that however would be very silly, i.e. you
+    // wouldn't see the map anymore because it's entirely covered by the
+    // marker.
+    final recursionBounds = _extendBounds(widget.map.bounds, 0.5);
+
     _clusterManager.recursivelyFromTopClusterLevel(
-        _currentZoom, widget.options.disableClusteringAtZoom,
+        _currentZoom, widget.options.disableClusteringAtZoom, recursionBounds,
         (MarkerOrClusterNode layer) {
-      // This is the performance critical hoth path recursed on every map
-      // event!
+      // This is the performance critical hot path recursed on every map event!
 
       // Cull markers/clusters that are not on screen.
-      final map = _mapCalculator.mapState;
-      if (!map.pixelBounds.containsPartialBounds(layer.pixelBounds(map))) {
+      if (!widget.map.pixelBounds
+          .containsPartialBounds(layer.pixelBounds(widget.map))) {
         return;
       }
 
@@ -697,4 +705,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     return Spiderfy.circle(widget.options.spiderfyCircleRadius, count, center);
   }
+}
+
+// Builds LatLngBounds that extended upon the given bounds by a given "factor".
+LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
+  final sw = bounds.southWest;
+  final ne = bounds.northEast;
+  final heightBuffer = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
+  final widthBuffer = (sw!.longitude - ne!.longitude).abs() * stickonFactor;
+
+  final point1 = LatLng((90 + sw!.latitude - heightBuffer) % 180 - 90,
+      (180 + sw!.longitude - widthBuffer) % 360 - 180);
+  final point2 = LatLng((90 + ne!.latitude + heightBuffer) % 180 - 90,
+      (180 + ne!.longitude + widthBuffer) % 360 - 180);
+
+  return LatLngBounds(point1, point2);
 }

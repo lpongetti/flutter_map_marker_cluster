@@ -68,8 +68,7 @@ class ClusterManager {
 
   bool isSpiderfyCluster(MarkerClusterNode cluster) {
     return spiderfyCluster != null &&
-        spiderfyCluster!.bounds.center ==
-            cluster.bounds.center;
+        spiderfyCluster!.bounds.center == cluster.bounds.center;
   }
 
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,
@@ -152,10 +151,14 @@ class ClusterManager {
     }
   }
 
-  void recalculateTopClusterLevelBounds() =>
-      _topClusterLevel.recalculateBounds();
+  void recalculateTopClusterLevelProperties() =>
+      _topClusterLevel.recalculateBoundsRecursively();
 
-  void recursivelyFromTopClusterLevel(int? zoomLevel,
-          int disableClusteringAtZoom, Function(MarkerOrClusterNode) fn) =>
-      _topClusterLevel.recursively(zoomLevel, disableClusteringAtZoom, fn);
+  void recursivelyFromTopClusterLevel(
+          int zoomLevel,
+          int disableClusteringAtZoom,
+          LatLngBounds recursionBounds,
+          Function(MarkerOrClusterNode) fn) =>
+      _topClusterLevel.recursively(
+          zoomLevel, disableClusteringAtZoom, recursionBounds, fn);
 }

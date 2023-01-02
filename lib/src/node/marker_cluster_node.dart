@@ -14,15 +14,17 @@ class _Derived {
 
   _Derived(List<MarkerOrClusterNode> children,
       Size Function(List<Marker>)? computeSize) {
+    // Recursively add all markers.
     markerNodes.addAll(children.whereType<MarkerNode>());
     for (final child in children) {
       if (child is MarkerClusterNode) {
-        markerNodes.addAll(child.markers);
-      }
-    }
+        child.recalculateBoundsRecursively();
 
-    for (final marker in markerNodes) {
-      bounds.extend(marker.point);
+        markerNodes.addAll(child.markers);
+        bounds.extendBounds(child.bounds);
+      } else if (child is MarkerNode) {
+        bounds.extend(child.point);
+      }
     }
 
     markers = markerNodes.map((m) => m.marker).toList();
@@ -39,11 +41,6 @@ class MarkerClusterNode extends MarkerOrClusterNode {
 
   late _Derived _derived;
 
-  List<MarkerNode> get markers => _derived.markerNodes;
-  LatLngBounds get bounds => _derived.bounds;
-  List<Marker> get mapMarkers => _derived.markers;
-  Size size() => _derived.size ?? predefinedSize;
-
   MarkerClusterNode({
     required this.zoom,
     required this.anchorPos,
@@ -53,36 +50,59 @@ class MarkerClusterNode extends MarkerOrClusterNode {
     _derived = _Derived(children, computeSize);
   }
 
+  /// A list of all marker nodex recursively, i.e including child layers.
+  List<MarkerNode> get markers => _derived.markerNodes;
+
+  /// A list of all Marker widgets recursively, i.e. including child layers.
+  List<Marker> get mapMarkers => _derived.markers;
+
+  /// LatLong bounds of the transitive markers covered by this cluster.
+  LatLngBounds get bounds => _derived.bounds;
+
+  Size size() => _derived.size ?? predefinedSize;
+
   void addChild(MarkerOrClusterNode child, LatLng childPoint) {
     children.add(child);
     child.parent = this;
-    recalculateBounds();
+    recalculateBoundsRecursively();
   }
 
   void removeChild(MarkerOrClusterNode child) {
     children.remove(child);
-    recalculateBounds();
+    recalculateBoundsRecursively();
   }
 
-  void recalculateBounds() {
+  // TODO: Could use a better name now.
+  void recalculateBoundsRecursively() {
     _derived = _Derived(children, computeSize);
   }
 
   void recursively(
-    int? zoomLevel,
+    int zoomLevel,
     int disableClusteringAtZoom,
+    LatLngBounds recursionBounds,
     Function(MarkerOrClusterNode node) fn,
   ) {
-    if (zoom == zoomLevel && zoomLevel! <= disableClusteringAtZoom) {
+    if (zoom == zoomLevel && zoomLevel <= disableClusteringAtZoom) {
       fn(this);
+
+      // Stop recursion. We've recursed to the point where we won't
+      // draw any smaller levels
       return;
     }
+    assert(zoom <= disableClusteringAtZoom,
+        '$zoom $disableClusteringAtZoom $zoomLevel');
 
     for (final child in children) {
       if (child is MarkerNode) {
         fn(child);
       } else if (child is MarkerClusterNode) {
-        child.recursively(zoomLevel, disableClusteringAtZoom, fn);
+        // OPTIMIZATION: Skip clusters that don't overlap with given recursion
+        // (map) bounds. Their markers would get culled later anyway.
+        if (recursionBounds.isOverlapping(child.bounds)) {
+          child.recursively(
+              zoomLevel, disableClusteringAtZoom, recursionBounds, fn);
+        }
       }
     }
   }
