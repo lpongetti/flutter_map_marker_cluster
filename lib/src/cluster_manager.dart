@@ -152,7 +152,7 @@ class ClusterManager {
   }
 
   void recalculateTopClusterLevelProperties() =>
-      _topClusterLevel.recalculateBounds();
+      _topClusterLevel.recalculate(recursively: true);
 
   void recursivelyFromTopClusterLevel(
           int zoomLevel,

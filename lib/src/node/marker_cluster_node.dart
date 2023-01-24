@@ -12,13 +12,28 @@ class _Derived {
   late final List<Marker> markers;
   late final Size? size;
 
-  _Derived(List<MarkerOrClusterNode> children,
-      Size Function(List<Marker>)? computeSize) {
-    // Recursively add all markers.
+  _Derived(
+    List<MarkerOrClusterNode> children,
+    Size Function(List<Marker>)? computeSize, {
+    required bool recursively,
+  }) {
+    // Depth first traversal.
+    void dfs(MarkerClusterNode child) {
+      for (final c in child.children) {
+        if (c is MarkerClusterNode) {
+          dfs(c);
+        }
+      }
+      child.recalculate(recursively: false);
+    }
+
     markerNodes.addAll(children.whereType<MarkerNode>());
     for (final child in children) {
       if (child is MarkerClusterNode) {
-        child.recalculateBounds();
+        // If `recursively` is true, update children first from the leafs up.
+        if (recursively) {
+          dfs(child);
+        }
 
         markerNodes.addAll(child.markers);
         bounds.extendBounds(child.bounds);
@@ -28,7 +43,7 @@ class _Derived {
     }
 
     markers = markerNodes.map((m) => m.marker).toList();
-    size = (computeSize != null) ? computeSize(markers) : null;
+    size = computeSize?.call(markers);
   }
 }
 
@@ -47,7 +62,7 @@ class MarkerClusterNode extends MarkerOrClusterNode {
     required this.predefinedSize,
     this.computeSize,
   }) : super(parent: null) {
-    _derived = _Derived(children, computeSize);
+    _derived = _Derived(children, computeSize, recursively: false);
   }
 
   /// A list of all marker nodex recursively, i.e including child layers.
@@ -64,16 +79,16 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   void addChild(MarkerOrClusterNode child, LatLng childPoint) {
     children.add(child);
     child.parent = this;
-    recalculateBounds();
+    recalculate(recursively: false);
   }
 
   void removeChild(MarkerOrClusterNode child) {
     children.remove(child);
-    recalculateBounds();
+    recalculate(recursively: false);
   }
 
-  void recalculateBounds() {
-    _derived = _Derived(children, computeSize);
+  void recalculate({required bool recursively}) {
+    _derived = _Derived(children, computeSize, recursively: recursively);
   }
 
   void recursively(
