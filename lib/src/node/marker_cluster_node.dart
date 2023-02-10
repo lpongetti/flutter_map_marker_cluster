@@ -18,7 +18,7 @@ class _Derived {
     markerNodes.addAll(children.whereType<MarkerNode>());
     for (final child in children) {
       if (child is MarkerClusterNode) {
-        child.recalculateBoundsRecursively();
+        child.recalculateBounds();
 
         markerNodes.addAll(child.markers);
         bounds.extendBounds(child.bounds);
@@ -64,16 +64,15 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   void addChild(MarkerOrClusterNode child, LatLng childPoint) {
     children.add(child);
     child.parent = this;
-    recalculateBoundsRecursively();
+    recalculateBounds();
   }
 
   void removeChild(MarkerOrClusterNode child) {
     children.remove(child);
-    recalculateBoundsRecursively();
+    recalculateBounds();
   }
 
-  // TODO: Could use a better name now.
-  void recalculateBoundsRecursively() {
+  void recalculateBounds() {
     _derived = _Derived(children, computeSize);
   }
 

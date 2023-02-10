@@ -712,12 +712,12 @@ LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
   final sw = bounds.southWest;
   final ne = bounds.northEast;
   final heightBuffer = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
-  final widthBuffer = (sw!.longitude - ne!.longitude).abs() * stickonFactor;
+  final widthBuffer = (sw.longitude - ne.longitude).abs() * stickonFactor;
 
-  final point1 = LatLng((90 + sw!.latitude - heightBuffer) % 180 - 90,
-      (180 + sw!.longitude - widthBuffer) % 360 - 180);
-  final point2 = LatLng((90 + ne!.latitude + heightBuffer) % 180 - 90,
-      (180 + ne!.longitude + widthBuffer) % 360 - 180);
+  final point1 = LatLng((90 + sw.latitude - heightBuffer) % 180 - 90,
+      (180 + sw.longitude - widthBuffer) % 360 - 180);
+  final point2 = LatLng((90 + ne.latitude + heightBuffer) % 180 - 90,
+      (180 + ne.longitude + widthBuffer) % 360 - 180);
 
   return LatLngBounds(point1, point2);
 }

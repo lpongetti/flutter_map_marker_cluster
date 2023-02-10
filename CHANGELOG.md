@@ -1,3 +1,7 @@
+## [1.0.2] - 10/02/2022
+
+- Merge pull request #148 from ignatz/fast_traversal
+
 ## [1.0.1] - 11/10/2022
 
 - Merge pull request #141 from hahrot/patch-1
