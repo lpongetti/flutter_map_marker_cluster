@@ -139,7 +139,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       );
     }
 
-    _clusterManager.recalculateTopClusterLevelBounds();
+    _clusterManager.recalculateTopClusterLevelProperties();
   }
 
   @override
@@ -264,35 +264,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
   }
 
-  List<Widget> _buildLayer(MarkerOrClusterNode layer) {
-    if (layer is MarkerNode) {
-      return _buildMarkerLayer(layer);
-    } else if (layer is MarkerClusterNode) {
-      return _buildMarkerClusterLayer(layer);
-    } else {
-      throw 'Unexpected layer type: ${layer.runtimeType}';
-    }
-  }
-
-  List<Widget> _buildMarkerLayer(MarkerNode markerNode) {
-    if (!_mapCalculator.boundsContainsMarker(markerNode)) return <Widget>[];
-
+  void _addMarkerLayer(MarkerNode markerNode, List<Widget> layers) {
     if (_zoomingIn && markerNode.parent!.zoom == _previousZoom) {
-      return _buildZoomingInMarkerLayer(markerNode);
+      _addZoomingInMarkerLayer(markerNode, layers);
     } else {
-      return [
-        _buildMarker(
-          marker: markerNode,
-          controller: _zoomController,
-          translate: StaticTranslate(_mapCalculator, markerNode),
-        ),
-      ];
+      layers.add(_buildMarker(
+        marker: markerNode,
+        controller: _zoomController,
+        translate: StaticTranslate(_mapCalculator, markerNode),
+      ));
     }
   }
 
-  List<Widget> _buildZoomingInMarkerLayer(MarkerNode markerNode) {
-    final layers = <Widget>[];
-
+  void _addZoomingInMarkerLayer(MarkerNode markerNode, List<Widget> layers) {
     layers.add(
       _buildMarker(
         marker: markerNode,
@@ -320,20 +304,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         ),
       ),
     );
-
-    return layers;
   }
 
-  List<Widget> _buildMarkerClusterLayer(MarkerClusterNode clusterNode) {
-    final layers = <Widget>[];
-    if (!_mapCalculator.boundsContainsCluster(clusterNode)) return layers;
-
+  void _addMarkerClusterLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
     if (_zoomingOut && clusterNode.children.length > 1) {
-      return _buildClusterClosingLayer(clusterNode);
+      _addClusterClosingLayer(clusterNode, layers);
     } else if (_zoomingIn &&
-        _mapCalculator.clusterPoint(clusterNode.parent!) !=
-            _mapCalculator.clusterPoint(clusterNode)) {
-      return _buildClusterOpeningLayer(clusterNode);
+        clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
+      _addClusterOpeningLayer(clusterNode, layers);
     } else if (_clusterManager.isSpiderfyCluster(clusterNode)) {
       layers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
     } else {
@@ -349,13 +328,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         ),
       );
     }
-
-    return layers;
   }
 
-  List<Widget> _buildClusterClosingLayer(MarkerClusterNode clusterNode) {
-    final layers = <Widget>[];
-
+  void _addClusterClosingLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
     // cluster
     layers.add(
       MapWidget(
@@ -415,41 +391,38 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       markersGettingClustered,
     );
     widget.options.onMarkersClustered?.call(markersGettingClustered);
-
-    return layers;
   }
 
-  List<Widget> _buildClusterOpeningLayer(MarkerClusterNode clusterNode) {
-    return <Widget>[
-      // cluster
-      MapWidget(
-        size: clusterNode.size(),
-        animationController: _zoomController,
-        translate: AnimatedTranslate.fromNewPosToMyPos(
-          mapCalculator: _mapCalculator,
-          from: clusterNode,
-          to: clusterNode.parent!,
-        ),
-        fade: Fade.fadeIn,
-        child: ClusterWidget(
-          cluster: clusterNode,
-          builder: widget.options.builder,
-          onTap: _onClusterTap(clusterNode),
-        ),
+  void _addClusterOpeningLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
+    // cluster
+    layers.add(MapWidget(
+      size: clusterNode.size(),
+      animationController: _zoomController,
+      translate: AnimatedTranslate.fromNewPosToMyPos(
+        mapCalculator: _mapCalculator,
+        from: clusterNode,
+        to: clusterNode.parent!,
       ),
-      //parent
-      MapWidget(
-        size: clusterNode.parent!.size(),
-        animationController: _zoomController,
-        translate: StaticTranslate(_mapCalculator, clusterNode.parent!),
-        fade: Fade.fadeOut,
-        child: ClusterWidget(
-          cluster: clusterNode.parent!,
-          builder: widget.options.builder,
-          onTap: _onClusterTap(clusterNode.parent!),
-        ),
+      fade: Fade.fadeIn,
+      child: ClusterWidget(
+        cluster: clusterNode,
+        builder: widget.options.builder,
+        onTap: _onClusterTap(clusterNode),
       ),
-    ];
+    ));
+    //parent
+    layers.add(MapWidget(
+      size: clusterNode.parent!.size(),
+      animationController: _zoomController,
+      translate: StaticTranslate(_mapCalculator, clusterNode.parent!),
+      fade: Fade.fadeOut,
+      child: ClusterWidget(
+        cluster: clusterNode.parent!,
+        builder: widget.options.builder,
+        onTap: _onClusterTap(clusterNode.parent!),
+      ),
+    ));
   }
 
   List<Widget> _buildSpiderfyCluster(
@@ -472,9 +445,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     );
     final points = _generatePointSpiderfy(
       cluster.markers.length,
-      _mapCalculator.getPixelFromPoint(
-        _mapCalculator.clusterPoint(cluster),
-      ),
+      _mapCalculator.getPixelFromPoint(cluster.bounds.center),
     );
 
     for (var i = 0; i < cluster.markers.length; i++) {
@@ -521,10 +492,33 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         );
     }
 
+    // We bounds so that we only recurse into clusters that stick into a
+    // bounding box that is 4x the size of what's on screen (i.e. stick on
+    // factor of 0.5 for the lack of a better name). Note that this could lead
+    // to visual glitches if someone had markers that are larger than the map
+    // viewport itself. Doing that however would be very silly, i.e. you
+    // wouldn't see the map anymore because it's entirely covered by the
+    // marker.
+    final recursionBounds = _extendBounds(widget.map.bounds, 0.5);
+
     _clusterManager.recursivelyFromTopClusterLevel(
-        _currentZoom, widget.options.disableClusteringAtZoom,
+        _currentZoom, widget.options.disableClusteringAtZoom, recursionBounds,
         (MarkerOrClusterNode layer) {
-      layers.addAll(_buildLayer(layer));
+      // This is the performance critical hot path recursed on every map event!
+
+      // Cull markers/clusters that are not on screen.
+      if (!widget.map.pixelBounds
+          .containsPartialBounds(layer.pixelBounds(widget.map))) {
+        return;
+      }
+
+      if (layer is MarkerNode) {
+        _addMarkerLayer(layer, layers);
+      } else if (layer is MarkerClusterNode) {
+        _addMarkerClusterLayer(layer, layers);
+      } else {
+        throw 'Unexpected layer type: ${layer.runtimeType}';
+      }
     });
 
     final popupOptions = widget.options.popupOptions;
@@ -572,7 +566,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       // check if children can un-cluster
       final cannotDivide = cluster.markers.every((marker) =>
               marker.parent!.zoom == _maxZoom &&
-              marker.parent == cluster.markers[0].parent) ||
+              marker.parent == cluster.markers.first.parent) ||
           (dest.zoom == _currentZoom &&
               _currentZoom == widget.options.fitBoundsOptions.maxZoom);
 
@@ -590,12 +584,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
 
       if (dest.zoom > _currentZoom && !cannotDivide) {
-        _showPolygon(
-          cluster.markers.fold<List<LatLng>>(
-            [],
-            (result, marker) => result..add(marker.point),
-          ),
-        );
+        _showPolygon(cluster.markers.map((m) => m.point).toList());
       }
 
       final latTween =
@@ -716,4 +705,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     return Spiderfy.circle(widget.options.spiderfyCircleRadius, count, center);
   }
+}
+
+// Builds LatLngBounds that extended upon the given bounds by a given "factor".
+LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
+  final sw = bounds.southWest;
+  final ne = bounds.northEast;
+  final heightBuffer = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
+  final widthBuffer = (sw!.longitude - ne!.longitude).abs() * stickonFactor;
+
+  final point1 = LatLng((90 + sw!.latitude - heightBuffer) % 180 - 90,
+      (180 + sw!.longitude - widthBuffer) % 360 - 180);
+  final point2 = LatLng((90 + ne!.latitude + heightBuffer) % 180 - 90,
+      (180 + ne!.longitude + widthBuffer) % 360 - 180);
+
+  return LatLngBounds(point1, point2);
 }

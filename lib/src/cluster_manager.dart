@@ -68,8 +68,7 @@ class ClusterManager {
 
   bool isSpiderfyCluster(MarkerClusterNode cluster) {
     return spiderfyCluster != null &&
-        mapCalculator.clusterPoint(spiderfyCluster!) ==
-            mapCalculator.clusterPoint(cluster);
+        spiderfyCluster!.bounds.center == cluster.bounds.center;
   }
 
   void addLayer(MarkerNode marker, int disableClusteringAtZoom, int maxZoom,
@@ -102,7 +101,7 @@ class ClusterManager {
           _gridClusters[zoom]!.addObject(
             newCluster,
             mapCalculator.project(
-              mapCalculator.clusterPoint(newCluster),
+              newCluster.bounds.center,
               zoom: zoom.toDouble(),
             ),
           );
@@ -118,7 +117,7 @@ class ClusterManager {
             );
             newParent.addChild(
               lastParent,
-              mapCalculator.clusterPoint(lastParent),
+              lastParent.bounds.center,
             );
             lastParent = newParent;
             _gridClusters[z]!.addObject(
@@ -129,7 +128,7 @@ class ClusterManager {
               ),
             );
           }
-          parent.addChild(lastParent, mapCalculator.clusterPoint(lastParent));
+          parent.addChild(lastParent, lastParent.bounds.center);
 
           _removeFromNewPosToMyPosGridUnclustered(closest, zoom, minZoom);
           return;
@@ -152,10 +151,14 @@ class ClusterManager {
     }
   }
 
-  void recalculateTopClusterLevelBounds() =>
-      _topClusterLevel.recalculateBounds();
+  void recalculateTopClusterLevelProperties() =>
+      _topClusterLevel.recalculateBoundsRecursively();
 
-  void recursivelyFromTopClusterLevel(int? zoomLevel,
-          int disableClusteringAtZoom, Function(MarkerOrClusterNode) fn) =>
-      _topClusterLevel.recursively(zoomLevel, disableClusteringAtZoom, fn);
+  void recursivelyFromTopClusterLevel(
+          int zoomLevel,
+          int disableClusteringAtZoom,
+          LatLngBounds recursionBounds,
+          Function(MarkerOrClusterNode) fn) =>
+      _topClusterLevel.recursively(
+          zoomLevel, disableClusteringAtZoom, recursionBounds, fn);
 }
