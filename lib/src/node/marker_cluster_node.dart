@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 class _Derived {
   final markerNodes = <MarkerNode>[];
-  final bounds = LatLngBounds();
+  late final LatLngBounds bounds;
   late final List<Marker> markers;
   late final Size? size;
 
@@ -27,6 +27,7 @@ class _Derived {
       child.recalculate(recursively: false);
     }
 
+    bool boundsInitialized = false;
     markerNodes.addAll(children.whereType<MarkerNode>());
     for (final child in children) {
       if (child is MarkerClusterNode) {
@@ -36,12 +37,25 @@ class _Derived {
         }
 
         markerNodes.addAll(child.markers);
-        bounds.extendBounds(child.bounds);
+        if (!boundsInitialized) {
+          bounds = child.bounds;
+        } else {
+          bounds.extendBounds(child.bounds);
+        }
+        boundsInitialized = true;
       } else if (child is MarkerNode) {
-        bounds.extend(child.point);
+        if (!boundsInitialized) {
+          bounds = LatLngBounds(child.point, child.point);
+        } else {
+          bounds.extend(child.point);
+        }
+        boundsInitialized = true;
       }
     }
 
+    if (!boundsInitialized) {
+      bounds = LatLngBounds(LatLng(0, 0),LatLng(0, 0));
+    }
     markers = markerNodes.map((m) => m.marker).toList();
     size = computeSize?.call(markers);
   }
