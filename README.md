@@ -22,35 +22,53 @@ dependencies:
   flutter_map_marker_cluster: any # or the latest version on Pub
 ```
 
-Add it in you FlutterMap and configure it using `MarkerClusterGroupLayerOptions`.
+[flutter_map](https://github.com/fleaflet/flutter_map/releases) package removed old layering system with v3.0.0 use `MarkerClusterLayerWidget` as member of `children` parameter list and configure it using `MarkerClusterLayerOptions`.
 
 ```dart
+ @override
   Widget build(BuildContext context) {
-    return FlutterMap(
-      layers: [
-        TileLayerOptions(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: ['a', 'b', 'c'],
+    return Scaffold(
+      appBar: AppBar(title: const Text('Clustering Many Markers Page')),
+      drawer: buildDrawer(context, ClusteringManyMarkersPage.route),
+      body: FlutterMap(
+        options: MapOptions(
+          center: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
+              (maxLatLng.longitude + minLatLng.longitude) / 2),
+          zoom: 6,
+          maxZoom: 15,
         ),
-        MarkerClusterLayerOptions(
-          maxClusterRadius: 120,
-          size: Size(40, 40),
-          fitBoundsOptions: FitBoundsOptions(
-            padding: EdgeInsets.all(50),
+        children: <Widget>[
+          TileLayer(
+            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: const ['a', 'b', 'c'],
           ),
-          markers: markers,
-          polygonOptions: PolygonOptions(
-              borderColor: Colors.blueAccent,
-              color: Colors.black12,
-              borderStrokeWidth: 3),
-          builder: (context, markers) {
-            return FloatingActionButton(
-              child: Text(markers.length.toString()),
-              onPressed: null,
-            );
-          },
-        ),
-      ],
+          MarkerClusterLayerWidget(
+            options: MarkerClusterLayerOptions(
+              maxClusterRadius: 45,
+              size: const Size(40, 40),
+              anchor: AnchorPos.align(AnchorAlign.center),
+              fitBoundsOptions: const FitBoundsOptions(
+                padding: EdgeInsets.all(50),
+                maxZoom: 15,
+              ),
+              markers: markers,
+              builder: (context, markers) {
+                return Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.blue),
+                  child: Center(
+                    child: Text(
+                      markers.length.toString(),
+                      style: const TextStyle(color: Colors.white),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
     );
   }
 ```
