@@ -8,7 +8,7 @@ import 'package:latlong2/latlong.dart';
 
 class _Derived {
   final markerNodes = <MarkerNode>[];
-  final bounds = LatLngBounds();
+  late final LatLngBounds? bounds;
   late final List<Marker> markers;
   late final Size? size;
 
@@ -17,6 +17,8 @@ class _Derived {
     Size Function(List<Marker>)? computeSize, {
     required bool recursively,
   }) {
+    markerNodes.addAll(children.whereType<MarkerNode>());
+
     // Depth first traversal.
     void dfs(MarkerClusterNode child) {
       for (final c in child.children) {
@@ -27,20 +29,19 @@ class _Derived {
       child.recalculate(recursively: false);
     }
 
-    markerNodes.addAll(children.whereType<MarkerNode>());
-    for (final child in children) {
-      if (child is MarkerClusterNode) {
-        // If `recursively` is true, update children first from the leafs up.
-        if (recursively) {
-          dfs(child);
-        }
-
-        markerNodes.addAll(child.markers);
-        bounds.extendBounds(child.bounds);
-      } else if (child is MarkerNode) {
-        bounds.extend(child.point);
+    for (final child in children.whereType<MarkerClusterNode>()) {
+      // If `recursively` is true, update children first from the leafs up.
+      if (recursively) {
+        dfs(child);
       }
+
+      markerNodes.addAll(child.markers);
     }
+
+    bounds = markerNodes.isEmpty
+        ? null
+        : LatLngBounds.fromPoints(List<LatLng>.generate(
+            markerNodes.length, (index) => markerNodes[index].point));
 
     markers = markerNodes.map((m) => m.marker).toList();
     size = computeSize?.call(markers);
@@ -72,7 +73,10 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   List<Marker> get mapMarkers => _derived.markers;
 
   /// LatLong bounds of the transitive markers covered by this cluster.
-  LatLngBounds get bounds => _derived.bounds;
+  /// Note, hacky way of dealing with now null-safe LatLngBounds. Ideally we'd
+  // return null here for nodes that are empty and don't have bounds.
+  LatLngBounds get bounds =>
+      _derived.bounds ?? LatLngBounds(LatLng(0, 0), LatLng(0, 0));
 
   Size size() => _derived.size ?? predefinedSize;
 
