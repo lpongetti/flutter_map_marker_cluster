@@ -711,13 +711,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
   final sw = bounds.southWest;
   final ne = bounds.northEast;
-  final heightBuffer = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
-  final widthBuffer = (sw.longitude - ne.longitude).abs() * stickonFactor;
+  final height = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
+  final width = (sw!.longitude - ne!.longitude).abs() * stickonFactor;
 
-  final point1 = LatLng((90 + sw.latitude - heightBuffer) % 180 - 90,
-      (180 + sw.longitude - widthBuffer) % 360 - 180);
-  final point2 = LatLng((90 + ne.latitude + heightBuffer) % 180 - 90,
-      (180 + ne.longitude + widthBuffer) % 360 - 180);
+  // Clamp rather than wrap around. This function is used in the context of
+  // drawing things onto a map. Since the map renderer does't wrap maps itself,
+  // we also shouldn't wrap around the bounding boxes.
+  final point1 = LatLng((bounds.south - height).clamp(-90, 90),
+      (bounds.west - width).clamp(-180, 180));
+  final point2 = LatLng((bounds.north + height).clamp(-90, 90),
+      (bounds.east + width).clamp(-180, 180));
 
   return LatLngBounds(point1, point2);
 }
