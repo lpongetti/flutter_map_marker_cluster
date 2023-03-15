@@ -1,3 +1,10 @@
+## [1.1.0] - 15/03/2023
+
+- Merge pull request #159 from ignatz/null-safe_latlngbounds
+- Merge pull request #156 from abdulmeLINK/master
+- Merge pull request #154 from philipgiuliani/patch-1
+- Merge pull request #152 from ignatz/master
+
 ## [1.0.2] - 10/02/2023
 
 - Merge pull request #148 from ignatz/fast_traversal

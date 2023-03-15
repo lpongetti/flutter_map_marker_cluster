@@ -712,7 +712,7 @@ LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
   final sw = bounds.southWest;
   final ne = bounds.northEast;
   final height = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
-  final width = (sw!.longitude - ne!.longitude).abs() * stickonFactor;
+  final width = (sw.longitude - ne.longitude).abs() * stickonFactor;
 
   // Clamp rather than wrap around. This function is used in the context of
   // drawing things onto a map. Since the map renderer does't wrap maps itself,

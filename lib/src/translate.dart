@@ -48,8 +48,8 @@ abstract class Translate {
     MarkerClusterNode clusterNode, {
     LatLng? customPoint,
   }) {
-    final pos = mapCalculator.getPixelFromPoint(
-        customPoint ?? clusterNode.bounds.center);
+    final pos = mapCalculator
+        .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
     final anchor = Anchor.forPos(
