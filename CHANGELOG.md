@@ -1,4 +1,4 @@
-## [1.0.2] - 10/02/2022
+## [1.0.2] - 10/02/2023
 
 - Merge pull request #148 from ignatz/fast_traversal
 
