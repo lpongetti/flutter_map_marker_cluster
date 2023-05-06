@@ -711,7 +711,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
   final sw = bounds.southWest;
   final ne = bounds.northEast;
-  final height = (sw!.latitude - ne!.latitude).abs() * stickonFactor;
+  final height = (sw.latitude - ne.latitude).abs() * stickonFactor;
   final width = (sw.longitude - ne.longitude).abs() * stickonFactor;
 
   // Clamp rather than wrap around. This function is used in the context of

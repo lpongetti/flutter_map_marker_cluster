@@ -9,7 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^3.1.0
+  flutter_map: ^4.0.0
   flutter_map_marker_cluster:
     path: ../
   cupertino_icons: ^1.0.5

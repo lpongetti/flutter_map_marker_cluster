@@ -11,8 +11,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^3.1.0
-  flutter_map_marker_popup: ^4.0.0
+  flutter_map: ^4.0.0
+  flutter_map_marker_popup: 
+    git:
+      url: https://github.com/Railway-Engineering-Solutions/flutter_map_marker_popup
+      ref: master
   latlong2: ^0.8.1
 
 dev_dependencies:

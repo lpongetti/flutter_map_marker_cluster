@@ -9,5 +9,5 @@ abstract class MarkerOrClusterNode {
 
   MarkerOrClusterNode({required this.parent});
 
-  Bounds pixelBounds(FlutterMapState map);
+  Bounds<double> pixelBounds(FlutterMapState map);
 }
