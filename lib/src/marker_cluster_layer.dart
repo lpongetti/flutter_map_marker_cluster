@@ -174,7 +174,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         onTap: _onMarkerTap(marker),
         onHover: (bool value) => _onMarkerHover(marker, value),
         buildOnHover: widget.options.popupOptions?.buildPopupOnHover ?? false,
-        hoverOnTap: () => widget.options.onMarkerTap!(marker),
       ),
     );
   }
