@@ -1,3 +1,8 @@
+## [1.1.1] - 31/05/2023
+
+- Merge pull request #162 from proformance/fix_marker_ontap
+- Merge pull request #164 from nploi/upgrade_flutter_map_v4
+
 ## [1.1.0] - 15/03/2023
 
 - Merge pull request #159 from ignatz/null-safe_latlngbounds
