@@ -4,16 +4,17 @@ description: Example for Flutter Map Marker cluster
 publish_to: "none"
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
 
 dependencies:
   flutter:
     sdk: flutter
-  flutter_map: ^4.0.0
+  flutter_map: ^5.0.0
   flutter_map_marker_cluster:
     path: ../
   cupertino_icons: ^1.0.5
-  latlong2: ^0.8.1
+  latlong2: ^0.9.0
 
 dev_dependencies:
   flutter_lints: ^2.0.1

@@ -10,7 +10,7 @@ void main() {
   test('addObject', () {
     final grid = DistanceGrid<Marker>(100),
         obj = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         );
 
@@ -21,7 +21,7 @@ void main() {
   test('eachObject', () {
     final grid = DistanceGrid<Marker>(100),
         obj = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         );
 
@@ -35,7 +35,7 @@ void main() {
   test('getNearObject', () {
     final grid = DistanceGrid<Marker>(100),
         obj = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         );
 
@@ -48,7 +48,7 @@ void main() {
   test('getNearObject double', () {
     final grid = DistanceGrid<Marker>(100),
         obj = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         );
 
@@ -62,11 +62,11 @@ void main() {
   test('getNearObject with cellSize 0', () {
     final grid = DistanceGrid<Marker>(0),
         obj1 = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         ),
         obj2 = Marker(
-          point: LatLng(2, 3),
+          point: const LatLng(2, 3),
           builder: (ctx) => const FlutterLogo(),
         );
 
@@ -80,11 +80,11 @@ void main() {
   test('getNearObject with cellSize 0 double', () {
     final grid = DistanceGrid<Marker>(0),
         obj1 = Marker(
-          point: LatLng(1, 2),
+          point: const LatLng(1, 2),
           builder: (ctx) => const FlutterLogo(),
         ),
         obj2 = Marker(
-          point: LatLng(2, 3),
+          point: const LatLng(2, 3),
           builder: (ctx) => const FlutterLogo(),
         );
 

@@ -7,18 +7,18 @@ void main() {
     expect(
         QuickHull.getConvexHull(
           [
-            LatLng(0, 0),
-            LatLng(10, 0),
-            LatLng(10, 10),
-            LatLng(0, 10),
-            LatLng(5, 5),
+            const LatLng(0, 0),
+            const LatLng(10, 0),
+            const LatLng(10, 10),
+            const LatLng(0, 10),
+            const LatLng(5, 5),
           ],
         ),
         [
-          LatLng(0, 10),
-          LatLng(10, 10),
-          LatLng(10, 0),
-          LatLng(0, 0),
+          const LatLng(0, 10),
+          const LatLng(10, 10),
+          const LatLng(10, 0),
+          const LatLng(0, 0),
         ]);
   });
 
@@ -26,14 +26,14 @@ void main() {
     expect(
         QuickHull.getConvexHull(
           [
-            LatLng(0, 0),
-            LatLng(5, 0),
-            LatLng(10, 0),
+            const LatLng(0, 0),
+            const LatLng(5, 0),
+            const LatLng(10, 0),
           ],
         ),
         [
-          LatLng(0, 0),
-          LatLng(10, 0),
+          const LatLng(0, 0),
+          const LatLng(10, 0),
         ]);
   });
 
@@ -41,14 +41,14 @@ void main() {
     expect(
         QuickHull.getConvexHull(
           [
-            LatLng(0, 0),
-            LatLng(0, 5),
-            LatLng(0, 10),
+            const LatLng(0, 0),
+            const LatLng(0, 5),
+            const LatLng(0, 10),
           ],
         ),
         [
-          LatLng(0, 0),
-          LatLng(0, 10),
+          const LatLng(0, 0),
+          const LatLng(0, 10),
         ]);
   });
 }

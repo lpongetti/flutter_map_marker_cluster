@@ -76,7 +76,7 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   /// Note, hacky way of dealing with now null-safe LatLngBounds. Ideally we'd
   // return null here for nodes that are empty and don't have bounds.
   LatLngBounds get bounds =>
-      _derived.bounds ?? LatLngBounds(LatLng(0, 0), LatLng(0, 0));
+      _derived.bounds ?? LatLngBounds(const LatLng(0, 0), const LatLng(0, 0));
 
   Size size() => _derived.size ?? predefinedSize;
 
@@ -129,7 +129,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   Bounds<double> pixelBounds(FlutterMapState map) {
     final width = size().width;
     final height = size().height;
-    final anchor = Anchor.forPos(anchorPos, width, height);
+    final anchor = Anchor.fromPos(
+        anchorPos ?? AnchorPos.align(AnchorAlign.center), width, height);
 
     final rightPortion = width - anchor.left;
     final leftPortion = anchor.left;
