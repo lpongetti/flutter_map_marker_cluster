@@ -192,7 +192,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
                       ? popupOptions.timeToShowPopupOnHover
                       : 0), () {
               popupOptions.markerTapBehavior.apply(
-                PopupSpec.wrap(marker),
+                PopupSpec.wrap(marker.marker),
                 PopupState.maybeOf(context, listen: false)!,
                 popupOptions.popupController,
               );
@@ -616,7 +616,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       if (widget.options.popupOptions != null) {
         final popupOptions = widget.options.popupOptions!;
         popupOptions.markerTapBehavior.apply(
-          PopupSpec.wrap(marker),
+          PopupSpec.wrap(marker.marker),
           PopupState.maybeOf(context, listen: false)!,
           popupOptions.popupController,
         );
