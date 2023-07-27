@@ -16,7 +16,6 @@ class MarkerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(buildOnHover);
     final m = marker.builder(context);
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
