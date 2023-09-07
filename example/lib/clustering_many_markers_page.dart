@@ -18,8 +18,8 @@ class ClusteringManyMarkersPage extends StatefulWidget {
 
 class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
   static const totalMarkers = 2000.0;
-  final minLatLng = LatLng(49.8566, 1.3522);
-  final maxLatLng = LatLng(58.3498, -10.2603);
+  final minLatLng = const LatLng(49.8566, 1.3522);
+  final maxLatLng = const LatLng(58.3498, -10.2603);
 
   late List<Marker> markers;
 
@@ -75,7 +75,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             options: MarkerClusterLayerOptions(
               maxClusterRadius: 45,
               size: const Size(40, 40),
-              anchor: AnchorPos.align(AnchorAlign.center),
+              anchorPos: AnchorPos.align(AnchorAlign.center),
               fitBoundsOptions: const FitBoundsOptions(
                 padding: EdgeInsets.all(50),
                 maxZoom: 15,
