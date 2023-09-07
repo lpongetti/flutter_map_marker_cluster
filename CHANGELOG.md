@@ -1,3 +1,8 @@
+## [1.2.0] - 07/09/2023
+
+- Merge pull request #175 from enricostrijks/master
+- Merge pull request #173 from andreystavitsky/master
+
 ## [1.1.1] - 31/05/2023
 
 - Merge pull request #162 from proformance/fix_marker_ontap
