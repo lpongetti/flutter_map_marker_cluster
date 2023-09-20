@@ -142,6 +142,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
+    _initializeClusterManager();
+    _addLayers();
     return Stack(
       children: _buildLayers(),
     );
