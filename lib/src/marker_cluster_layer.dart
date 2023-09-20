@@ -108,10 +108,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void didUpdateWidget(MarkerClusterLayer oldWidget) {
-    if (oldWidget.options.markers != widget.options.markers) {
-      _initializeClusterManager();
-      _addLayers();
-    }
+    // if (oldWidget.options.markers != widget.options.markers) {
+    _initializeClusterManager();
+    _addLayers();
+    // }
     super.didUpdateWidget(oldWidget);
   }
 
@@ -142,8 +142,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    _initializeClusterManager();
-    _addLayers();
+    // _initializeClusterManager();
+    // _addLayers();
     return Stack(
       children: _buildLayers(),
     );
