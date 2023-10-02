@@ -315,6 +315,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     } else {
       layers.add(
         MapWidget.static(
+          key: ObjectKey(clusterNode),
           size: clusterNode.size(),
           translate: StaticTranslate(_mapCalculator, clusterNode),
           child: ClusterWidget(
