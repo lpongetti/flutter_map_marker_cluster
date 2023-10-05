@@ -117,6 +117,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _initializeClusterManager();
       _addLayers();
     }
+    if (oldWidget.mapCamera.pixelOrigin != widget.mapCamera.pixelOrigin) {
+      _mapCalculator = MapCalculator(widget.mapCamera);
+    }
     super.didUpdateWidget(oldWidget);
   }
 
