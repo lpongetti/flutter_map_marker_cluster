@@ -20,9 +20,11 @@ import 'package:latlong2/latlong.dart';
 class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapController mapController;
+  final MapCamera mapCamera;
 
   const MarkerClusterLayer({
     required this.mapController,
+    required this.mapCamera,
     required this.options,
     Key? key,
   }) : super(key: key);
@@ -62,13 +64,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void initState() {
-    _mapCalculator = MapCalculator(widget.mapController.camera);
+    _mapCalculator = MapCalculator(widget.mapCamera);
 
-    _currentZoom = _previousZoom = widget.mapController.camera.zoom.ceil();
-    _previousZoomDouble = widget.mapController.camera.zoom;
-    _minZoom = widget.mapController.camera.minZoom?.ceil() ?? 1;
-    _maxZoom = widget.mapController.camera.maxZoom?.floor() ?? 20;
-    _previousZoomDouble = widget.mapController.camera.zoom;
+    _currentZoom = _previousZoom = widget.mapCamera.zoom.ceil();
+    _previousZoomDouble = widget.mapCamera.zoom;
+    _minZoom = widget.mapCamera.minZoom?.ceil() ?? 1;
+    _maxZoom = widget.mapCamera.maxZoom?.floor() ?? 20;
+    _previousZoomDouble = widget.mapCamera.zoom;
     _initializeAnimationControllers();
     _initializeClusterManager();
     _addLayers();
@@ -164,7 +166,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       rotate: marker.rotate != true && widget.options.rotate != true
           ? null
           : Rotate(
-              angle: -widget.mapController.camera.rotationRad,
+              angle: -widget.mapCamera.rotationRad,
               origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
               alignment:
                   marker.rotateAlignment ?? widget.options.rotateAlignment,
@@ -469,12 +471,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   }
 
   List<Widget> _buildLayers() {
-    if (widget.mapController.camera.zoom != _previousZoomDouble) {
-      _previousZoomDouble = widget.mapController.camera.zoom;
+    if (widget.mapCamera.zoom != _previousZoomDouble) {
+      _previousZoomDouble = widget.mapCamera.zoom;
       _unspiderfy();
     }
 
-    final zoom = widget.mapController.camera.zoom.ceil();
+    final zoom = widget.mapCamera.zoom.ceil();
     final layers = <Widget>[];
 
     if (_polygon != null) layers.add(_polygon!);
@@ -500,7 +502,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     // wouldn't see the map anymore because it's entirely covered by the
     // marker.
     final recursionBounds = _extendBounds(
-      widget.mapController.camera.visibleBounds,
+      widget.mapCamera.visibleBounds,
       0.5,
     );
 
@@ -510,8 +512,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       // This is the performance critical hot path recursed on every map event!
 
       // Cull markers/clusters that are not on screen.
-      if (!widget.mapController.camera.pixelBounds.containsPartialBounds(
-        layer.pixelBounds(widget.mapController.camera),
+      if (!widget.mapCamera.pixelBounds.containsPartialBounds(
+        layer.pixelBounds(widget.mapCamera),
       )) {
         return;
       }
@@ -559,7 +561,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         return;
       }
 
-      final center = widget.mapController.camera.center;
+      final center = widget.mapCamera.center;
       var dest = widget.mapController.centerZoomFitBounds(
         cluster.bounds,
         options: widget.options.fitBoundsOptions,
@@ -593,8 +595,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           Tween<double>(begin: center.latitude, end: dest.center.latitude);
       final lonTween =
           Tween<double>(begin: center.longitude, end: dest.center.longitude);
-      final zoomTween = Tween<double>(
-          begin: widget.mapController.camera.zoom, end: dest.zoom);
+      final zoomTween =
+          Tween<double>(begin: widget.mapCamera.zoom, end: dest.zoom);
 
       final animation = CurvedAnimation(
           parent: _fitBoundController,
@@ -634,7 +636,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       if (!widget.options.centerMarkerOnClick) return;
 
-      final center = widget.mapController.camera.center;
+      final center = widget.mapCamera.center;
       final latTween =
           Tween<double>(begin: center.latitude, end: marker.point.latitude);
       final lonTween =
@@ -664,7 +666,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     return () {
       widget.mapController.move(
         LatLng(latTween.evaluate(animation), lonTween.evaluate(animation)),
-        zoomTween?.evaluate(animation) ?? widget.mapController.camera.zoom,
+        zoomTween?.evaluate(animation) ?? widget.mapCamera.zoom,
       );
     };
   }

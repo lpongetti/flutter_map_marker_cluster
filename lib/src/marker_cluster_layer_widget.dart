@@ -12,8 +12,11 @@ class MarkerClusterLayerWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mapController = MapController.of(context);
+    final mapCamera = MapCamera.of(context);
+
     return MarkerClusterLayer(
       mapController: mapController,
+      mapCamera: mapCamera,
       options: options,
     );
   }
