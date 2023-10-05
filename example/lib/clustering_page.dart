@@ -234,8 +234,9 @@ class _ClusteringPageState extends State<ClusteringPage> {
                 builder: (context, markers) {
                   return Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blue),
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.blue,
+                    ),
                     child: Center(
                       child: Text(
                         markers.length.toString(),
