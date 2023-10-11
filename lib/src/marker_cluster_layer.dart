@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_manager.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_widget.dart';
@@ -125,7 +125,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   void _initializeClusterManager() {
     _clusterManager = ClusterManager.initialize(
-      anchorPos: widget.options.anchorPos,
+      alignment: widget.options.alignment,
       mapCalculator: _mapCalculator,
       predefinedSize: widget.options.size,
       computeSize: widget.options.computeSize,
@@ -170,9 +170,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ? null
           : Rotate(
               angle: -widget.mapCamera.rotationRad,
-              origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
-              alignment:
-                  marker.rotateAlignment ?? widget.options.rotateAlignment,
+              origin: widget.options.rotateOrigin,
+              alignment: widget.options.rotateAlignment,
             ),
       key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(

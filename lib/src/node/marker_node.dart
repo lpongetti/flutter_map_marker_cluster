@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/widgets.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:latlong2/latlong.dart';
 
@@ -14,7 +14,7 @@ class MarkerNode extends MarkerOrClusterNode implements Marker {
   Key? get key => marker.key;
 
   @override
-  WidgetBuilder get builder => marker.builder;
+  Widget get child => marker.child;
 
   @override
   double get height => marker.height;
@@ -29,33 +29,20 @@ class MarkerNode extends MarkerOrClusterNode implements Marker {
   bool? get rotate => marker.rotate;
 
   @override
-  AlignmentGeometry? get rotateAlignment => marker.rotateAlignment;
-
-  @override
-  Offset? get rotateOrigin => marker.rotateOrigin;
-
-  @override
-  Anchor? get anchor => marker.anchor;
+  Alignment? get alignment => marker.alignment;
 
   @override
   Bounds<double> pixelBounds(MapCamera map) {
     final pixelPoint = map.project(point);
 
-    final ankr = anchor ??
-        Anchor.fromPos(
-          AnchorPos.defaultAnchorPos,
-          width,
-          height,
-        );
+    final left = 0.5 * width * ((alignment ?? Alignment.center).x + 1);
+    final top = 0.5 * height * ((alignment ?? Alignment.center).y + 1);
+    final right = width - left;
+    final bottom = height - top;
 
-    final rightPortion = width - ankr.left;
-    final leftPortion = ankr.left;
-    final bottomPortion = height - ankr.top;
-    final topPortion = ankr.top;
-
-    final ne = Point(pixelPoint.x - rightPortion, pixelPoint.y + topPortion);
-    final sw = Point(pixelPoint.x + leftPortion, pixelPoint.y - bottomPortion);
-
-    return Bounds(ne, sw);
+    return Bounds(
+      Point(pixelPoint.x + left, pixelPoint.y - bottom),
+      Point(pixelPoint.x - right, pixelPoint.y + top),
+    );
   }
 }

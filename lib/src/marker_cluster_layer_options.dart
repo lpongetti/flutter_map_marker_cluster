@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 
@@ -127,7 +126,7 @@ class MarkerClusterLayerOptions {
   final Size Function(List<Marker>)? computeSize;
 
   /// Cluster anchor
-  final AnchorPos? anchorPos;
+  final Alignment? alignment;
 
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
@@ -195,7 +194,7 @@ class MarkerClusterLayerOptions {
     this.markers = const [],
     this.size = const Size(30, 30),
     this.computeSize,
-    this.anchorPos,
+    this.alignment,
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
     this.animationsOptions = const AnimationsOptions(),

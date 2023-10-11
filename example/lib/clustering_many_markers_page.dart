@@ -45,7 +45,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             height: 30,
             width: 30,
             point: latLng,
-            builder: (ctx) => const Icon(Icons.pin_drop),
+            child: const Icon(Icons.pin_drop),
           ),
         );
       }
@@ -61,9 +61,9 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
       drawer: buildDrawer(context, ClusteringManyMarkersPage.route),
       body: FlutterMap(
         options: MapOptions(
-          center: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
+          initialCenter: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
               (maxLatLng.longitude + minLatLng.longitude) / 2),
-          zoom: 6,
+          initialZoom: 6,
           maxZoom: 15,
         ),
         children: <Widget>[
@@ -75,7 +75,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             options: MarkerClusterLayerOptions(
               maxClusterRadius: 45,
               size: const Size(40, 40),
-              anchorPos: AnchorPos.align(AnchorAlign.center),
+              alignment: Alignment.center,
               fitBoundsOptions: const FitBoundsOptions(
                 padding: EdgeInsets.all(50),
                 maxZoom: 15,

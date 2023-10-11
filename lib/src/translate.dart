@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
@@ -40,13 +38,8 @@ abstract class Translate {
     LatLng? customPoint,
   }) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    final anchor = marker.anchor ??
-        Anchor.fromPos(
-          AnchorPos.defaultAnchorPos,
-          marker.width,
-          marker.height,
-        );
-    return util.removeAnchor(pos, marker.width, marker.height, anchor);
+    return util.removeAlignment(
+        pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
   }
 
   static Point<double> _getClusterPixel(
@@ -58,17 +51,12 @@ abstract class Translate {
         .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
-    final anchor = Anchor.fromPos(
-      clusterNode.anchorPos ?? AnchorPos.defaultAnchorPos,
-      calculatedSize.width,
-      calculatedSize.height,
-    );
 
-    return util.removeAnchor(
+    return util.removeAlignment(
       pos,
       calculatedSize.width,
       calculatedSize.height,
-      anchor,
+      clusterNode.alignment ?? Alignment.center,
     );
   }
 }
@@ -134,16 +122,11 @@ class AnimatedTranslate extends Translate {
           marker,
           customPoint: cluster.bounds.center,
         ),
-        newPosition = util.removeAnchor(
+        newPosition = util.removeAlignment(
           point,
           marker.width,
           marker.height,
-          marker.anchor ??
-              Anchor.fromPos(
-                AnchorPos.defaultAnchorPos,
-                marker.width,
-                marker.height,
-              ),
+          marker.alignment ?? Alignment.center,
         ) {
     _tween = Tween<Point<double>>(
       begin: Point(position.x, position.y),
