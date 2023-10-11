@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -126,21 +127,23 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   }
 
   @override
-  Bounds<double> pixelBounds(FlutterMapState map) {
+  Bounds<double> pixelBounds(MapCamera map) {
     final width = size().width;
     final height = size().height;
     final anchor = Anchor.fromPos(
-        anchorPos ?? AnchorPos.align(AnchorAlign.center), width, height);
+      anchorPos ?? AnchorPos.defaultAnchorPos,
+      width,
+      height,
+    );
 
     final rightPortion = width - anchor.left;
     final leftPortion = anchor.left;
     final bottomPortion = height - anchor.top;
     final topPortion = anchor.top;
 
-    final ne =
-        map.project(bounds.northEast) + CustomPoint(rightPortion, -topPortion);
-    final sw = map.project(bounds.southWest) +
-        CustomPoint(-leftPortion, bottomPortion);
+    final ne = map.project(bounds.northEast) + Point(rightPortion, -topPortion);
+    final sw =
+        map.project(bounds.southWest) + Point(-leftPortion, bottomPortion);
 
     return Bounds(ne, sw);
   }

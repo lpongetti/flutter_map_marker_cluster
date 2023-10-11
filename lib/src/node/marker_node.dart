@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/widgets.dart';
 import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
@@ -33,24 +35,26 @@ class MarkerNode extends MarkerOrClusterNode implements Marker {
   Offset? get rotateOrigin => marker.rotateOrigin;
 
   @override
-  AnchorPos? get anchorPos => marker.anchorPos;
+  Anchor? get anchor => marker.anchor;
 
   @override
-  Bounds<double> pixelBounds(FlutterMapState map) {
+  Bounds<double> pixelBounds(MapCamera map) {
     final pixelPoint = map.project(point);
 
-    final anchor = Anchor.fromPos(
-        anchorPos ?? AnchorPos.align(AnchorAlign.center), width, height);
+    final ankr = anchor ??
+        Anchor.fromPos(
+          AnchorPos.defaultAnchorPos,
+          width,
+          height,
+        );
 
-    final rightPortion = width - anchor.left;
-    final leftPortion = anchor.left;
-    final bottomPortion = height - anchor.top;
-    final topPortion = anchor.top;
+    final rightPortion = width - ankr.left;
+    final leftPortion = ankr.left;
+    final bottomPortion = height - ankr.top;
+    final topPortion = ankr.top;
 
-    final ne =
-        CustomPoint(pixelPoint.x - rightPortion, pixelPoint.y + topPortion);
-    final sw =
-        CustomPoint(pixelPoint.x + leftPortion, pixelPoint.y - bottomPortion);
+    final ne = Point(pixelPoint.x - rightPortion, pixelPoint.y + topPortion);
+    final sw = Point(pixelPoint.x + leftPortion, pixelPoint.y - bottomPortion);
 
     return Bounds(ne, sw);
   }

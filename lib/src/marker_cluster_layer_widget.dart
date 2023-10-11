@@ -11,7 +11,13 @@ class MarkerClusterLayerWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mapState = FlutterMapState.maybeOf(context)!;
-    return MarkerClusterLayer(options, mapState);
+    final mapController = MapController.of(context);
+    final mapCamera = MapCamera.of(context);
+
+    return MarkerClusterLayer(
+      mapController: mapController,
+      mapCamera: mapCamera,
+      options: options,
+    );
   }
 }
