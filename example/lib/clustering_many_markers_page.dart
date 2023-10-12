@@ -76,10 +76,8 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
               maxClusterRadius: 45,
               size: const Size(40, 40),
               alignment: Alignment.center,
-              fitBoundsOptions: const FitBoundsOptions(
-                padding: EdgeInsets.all(50),
-                maxZoom: 15,
-              ),
+              padding: const EdgeInsets.all(50),
+              maxZoom: 15,
               markers: markers,
               builder: (context, markers) {
                 return Container(
