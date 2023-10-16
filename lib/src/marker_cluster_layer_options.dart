@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 
@@ -127,13 +126,10 @@ class MarkerClusterLayerOptions {
   final Size Function(List<Marker>)? computeSize;
 
   /// Cluster anchor
-  final AnchorPos? anchorPos;
+  final Alignment? alignment;
 
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
-
-  /// Options for fit bounds
-  final FitBoundsOptions fitBoundsOptions;
 
   /// Zoom buonds with animation on click cluster
   final bool zoomToBoundsOnClick;
@@ -187,6 +183,15 @@ class MarkerClusterLayerOptions {
   /// Popup's options that show when tapping markers or via the PopupController.
   final PopupOptions? popupOptions;
 
+  final EdgeInsets padding;
+  final double maxZoom;
+  final bool inside;
+
+  /// By default calculations will return fractional zoom levels.
+  /// If this parameter is set to [true] fractional zoom levels will be round
+  /// to the next suitable integer.
+  final bool forceIntegerZoomLevel;
+
   MarkerClusterLayerOptions({
     required this.builder,
     this.rotate,
@@ -195,11 +200,14 @@ class MarkerClusterLayerOptions {
     this.markers = const [],
     this.size = const Size(30, 30),
     this.computeSize,
-    this.anchorPos,
+    this.alignment,
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
     this.animationsOptions = const AnimationsOptions(),
-    this.fitBoundsOptions = const FitBoundsOptions(padding: EdgeInsets.all(12)),
+    this.padding = EdgeInsets.zero,
+    this.maxZoom = 17.0,
+    this.inside = false,
+    this.forceIntegerZoomLevel = false,
     this.zoomToBoundsOnClick = true,
     this.centerMarkerOnClick = true,
     this.spiderfyCircleRadius = 40,

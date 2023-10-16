@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_manager.dart';
 import 'package:flutter_map_marker_cluster/src/cluster_widget.dart';
@@ -125,7 +125,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   void _initializeClusterManager() {
     _clusterManager = ClusterManager.initialize(
-      anchorPos: widget.options.anchorPos,
+      alignment: widget.options.alignment,
       mapCalculator: _mapCalculator,
       predefinedSize: widget.options.size,
       computeSize: widget.options.computeSize,
@@ -170,9 +170,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ? null
           : Rotate(
               angle: -widget.mapCamera.rotationRad,
-              origin: marker.rotateOrigin ?? widget.options.rotateOrigin,
-              alignment:
-                  marker.rotateAlignment ?? widget.options.rotateAlignment,
+              origin: widget.options.rotateOrigin,
+              alignment: widget.options.rotateAlignment,
             ),
       key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(
@@ -565,20 +564,32 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
 
       final center = widget.mapCamera.center;
-      var dest = widget.mapController.centerZoomFitBounds(
-        cluster.bounds,
-        options: widget.options.fitBoundsOptions,
-      );
+      // CenterZoom dest = widget.mapController.centerZoomFitBounds(
+      //   cluster.bounds,
+      //   options: widget.options.fitBoundsOptions,
+      // );
+      final opt = widget.options;
+      MapCamera dest = CameraFit.bounds(
+        bounds: cluster.bounds,
+        padding: opt.padding,
+        maxZoom: opt.maxZoom,
+        forceIntegerZoomLevel: opt.forceIntegerZoomLevel,
+      ).fit(widget.mapCamera);
 
       // check if children can un-cluster
       final cannotDivide = cluster.markers.every((marker) =>
               marker.parent!.zoom == _maxZoom &&
               marker.parent == cluster.markers.first.parent) ||
-          (dest.zoom == _currentZoom &&
-              _currentZoom == widget.options.fitBoundsOptions.maxZoom);
+          (dest.zoom == _currentZoom && _currentZoom == opt.maxZoom);
 
       if (cannotDivide) {
-        dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+        //dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+        dest = MapCamera(
+            crs: dest.crs,
+            center: dest.center,
+            zoom: _currentZoom.toDouble(),
+            rotation: dest.rotation,
+            nonRotatedSize: dest.nonRotatedSize);
 
         if (_clusterManager.spiderfyCluster != null) {
           if (_clusterManager.spiderfyCluster == cluster) {
