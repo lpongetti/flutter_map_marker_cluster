@@ -564,20 +564,32 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
 
       final center = widget.mapCamera.center;
-      var dest = widget.mapController.centerZoomFitBounds(
-        cluster.bounds,
-        options: widget.options.fitBoundsOptions,
-      );
+      // CenterZoom dest = widget.mapController.centerZoomFitBounds(
+      //   cluster.bounds,
+      //   options: widget.options.fitBoundsOptions,
+      // );
+      final opt = widget.options;
+      MapCamera dest = CameraFit.bounds(
+        bounds: cluster.bounds,
+        padding: opt.padding,
+        maxZoom: opt.maxZoom,
+        forceIntegerZoomLevel: opt.forceIntegerZoomLevel,
+      ).fit(widget.mapCamera);
 
       // check if children can un-cluster
       final cannotDivide = cluster.markers.every((marker) =>
               marker.parent!.zoom == _maxZoom &&
               marker.parent == cluster.markers.first.parent) ||
-          (dest.zoom == _currentZoom &&
-              _currentZoom == widget.options.fitBoundsOptions.maxZoom);
+          (dest.zoom == _currentZoom && _currentZoom == opt.maxZoom);
 
       if (cannotDivide) {
-        dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+        //dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
+        dest = MapCamera(
+            crs: dest.crs,
+            center: dest.center,
+            zoom: _currentZoom.toDouble(),
+            rotation: dest.rotation,
+            nonRotatedSize: dest.nonRotatedSize);
 
         if (_clusterManager.spiderfyCluster != null) {
           if (_clusterManager.spiderfyCluster == cluster) {

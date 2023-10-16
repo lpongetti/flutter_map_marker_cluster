@@ -188,8 +188,8 @@ class _ClusteringPageState extends State<ClusteringPage> {
         popupController: _popupController,
         child: FlutterMap(
           options: MapOptions(
-            center: points[0],
-            zoom: 5,
+            initialCenter: points[0],
+            initialZoom: 5,
             maxZoom: 15,
             onTap: (_, __) => _popupController
                 .hideAllPopups(), // Hide popup when the map is tapped.
@@ -208,10 +208,8 @@ class _ClusteringPageState extends State<ClusteringPage> {
                 rotate: true,
                 size: const Size(40, 40),
                 alignment: Alignment.center,
-                fitBoundsOptions: const FitBoundsOptions(
-                  padding: EdgeInsets.all(50),
-                  maxZoom: 15,
-                ),
+                padding: const EdgeInsets.all(50),
+                maxZoom: 15,
                 markers: markers,
                 polygonOptions: const PolygonOptions(
                     borderColor: Colors.blueAccent,
@@ -226,7 +224,7 @@ class _ClusteringPageState extends State<ClusteringPage> {
                           color: Colors.white,
                           child: GestureDetector(
                             onTap: () => debugPrint('Popup tap!'),
-                            child: Text(
+                            child: const Text(
                               'Container popup for marker',
                             ),
                           ),
