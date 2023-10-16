@@ -1,5 +1,6 @@
 ## [1.3.0] - 10/11/2023
 
+- Merge pull request #188 from altotunchitoo:flutter_map-6
 - Merge pull request #184 from shrijanRegmi/master
 
 ## [1.2.0] - 07/09/2023
