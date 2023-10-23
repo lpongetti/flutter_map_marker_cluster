@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 class ClusteringPage extends StatefulWidget {
   static const String route = 'clusteringPage';
 
-  const ClusteringPage({Key? key}) : super(key: key);
+  const ClusteringPage({super.key});
 
   @override
   State<ClusteringPage> createState() => _ClusteringPageState();
