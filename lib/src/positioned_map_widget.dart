@@ -29,8 +29,7 @@ class PositionedMapWidget extends MapWidget {
           ? child
           : Transform.rotate(
               angle: rotate!.angle,
-              origin: rotate!.origin,
-              alignment: rotate!.alignment,
+              alignment: (rotate!.alignment ?? Alignment.center) * -1,
               child: child,
             ),
     );

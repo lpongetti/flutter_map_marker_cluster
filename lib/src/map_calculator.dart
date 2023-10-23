@@ -9,9 +9,7 @@ class MapCalculator {
   MapCalculator(this.mapState);
 
   Point<num> getPixelFromPoint(LatLng point) {
-    final pos = mapState.project(point);
-    return pos * mapState.getZoomScale(mapState.zoom, mapState.zoom) -
-        mapState.pixelOrigin.toDoublePoint();
+    return mapState.project(point).subtract(mapState.pixelOrigin);
   }
 
   Point project(LatLng latLng, {double? zoom}) =>

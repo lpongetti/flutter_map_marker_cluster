@@ -170,8 +170,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ? null
           : Rotate(
               angle: -widget.mapCamera.rotationRad,
-              origin: widget.options.rotateOrigin,
-              alignment: widget.options.rotateAlignment,
+              alignment: marker.alignment,
             ),
       key: marker.key ?? ObjectKey(marker.marker),
       child: MarkerWidget(
