@@ -26,8 +26,8 @@ class MarkerClusterLayer extends StatefulWidget {
     required this.mapController,
     required this.mapCamera,
     required this.options,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   @override
   State<MarkerClusterLayer> createState() => _MarkerClusterLayerState();
