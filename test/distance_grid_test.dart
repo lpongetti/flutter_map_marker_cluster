@@ -14,7 +14,7 @@ void main() {
           child: FlutterLogo(),
         );
 
-    grid.addObject(obj, const Point(0, 0));
+    grid.addObject(obj, const Point<double>(0, 0));
     expect(grid.removeObject(obj), true);
   });
 
@@ -25,7 +25,7 @@ void main() {
           child: FlutterLogo(),
         );
 
-    grid.addObject(obj, const Point(0, 0));
+    grid.addObject(obj, const Point<double>(0, 0));
 
     grid.eachObject((o) {
       expect(o, obj);
@@ -52,7 +52,7 @@ void main() {
           child: FlutterLogo(),
         );
 
-    grid.addObject(obj, const Point(0, 0));
+    grid.addObject(obj, const Point<double>(0, 0));
 
     expect(grid.getNearObject(const Point(50.0, 50.0)), obj);
     expect(grid.getNearObject(const Point(100.0, 0.0)), obj);

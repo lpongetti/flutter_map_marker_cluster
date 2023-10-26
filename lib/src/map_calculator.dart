@@ -8,11 +8,11 @@ class MapCalculator {
 
   MapCalculator(this.mapState);
 
-  Point<num> getPixelFromPoint(LatLng point) {
-    return mapState.project(point).subtract(mapState.pixelOrigin);
+  Point<double> getPixelFromPoint(LatLng point) {
+    return mapState.project(point).subtract(mapState.pixelOrigin).toDoublePoint();
   }
 
-  Point project(LatLng latLng, {double? zoom}) =>
+  Point<double> project(LatLng latLng, {double? zoom}) =>
       mapState.project(latLng, zoom);
 
   LatLng unproject(Point point, {double? zoom}) =>
