@@ -150,8 +150,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    return Stack(
-      children: _buildLayers(),
+    return MobileLayerTransformer(
+      child: Stack(
+        children: _buildLayers(),
+      ),
     );
   }
 
