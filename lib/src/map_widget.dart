@@ -6,7 +6,7 @@ import 'package:flutter_map_marker_cluster/src/rotate.dart';
 import 'package:flutter_map_marker_cluster/src/translate.dart';
 
 abstract class MapWidget extends StatelessWidget {
-  const MapWidget.withKey({Key? key}) : super(key: key);
+  const MapWidget.withKey({super.key});
 
   factory MapWidget.static({
     required Widget child,
