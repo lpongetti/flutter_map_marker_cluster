@@ -301,6 +301,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         size: markerNode.parent!.size(),
         animationController: _zoomController,
         translate: StaticTranslate(_mapCalculator, markerNode.parent!),
+        rotate: widget.options.rotate != true
+            ? null
+            : Rotate(
+                angle: -widget.mapCamera.rotationRad,
+                alignment: widget.options.alignment,
+              ),
         fade: Fade.fadeOut,
         child: ClusterWidget(
           cluster: markerNode.parent!,
@@ -326,6 +332,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           key: ObjectKey(clusterNode),
           size: clusterNode.size(),
           translate: StaticTranslate(_mapCalculator, clusterNode),
+          rotate: widget.options.rotate != true
+              ? null
+              : Rotate(
+                  angle: -widget.mapCamera.rotationRad,
+                  alignment: widget.options.alignment,
+                ),
           child: ClusterWidget(
             cluster: clusterNode,
             builder: widget.options.builder,
@@ -345,6 +357,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         animationController: _zoomController,
         translate: StaticTranslate(_mapCalculator, clusterNode),
         fade: Fade.fadeIn,
+        rotate: widget.options.rotate != true
+            ? null
+            : Rotate(
+                angle: -widget.mapCamera.rotationRad,
+                alignment: widget.options.alignment,
+              ),
         child: ClusterWidget(
           cluster: clusterNode,
           builder: widget.options.builder,
@@ -382,6 +400,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
               from: child,
               to: clusterNode,
             ),
+            rotate: widget.options.rotate != true
+                ? null
+                : Rotate(
+                    angle: -widget.mapCamera.rotationRad,
+                    alignment: widget.options.alignment,
+                  ),
             fade: Fade.fadeOut,
             child: ClusterWidget(
               cluster: child,
@@ -410,6 +434,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         from: clusterNode,
         to: clusterNode.parent!,
       ),
+      rotate: widget.options.rotate != true
+          ? null
+          : Rotate(
+              angle: -widget.mapCamera.rotationRad,
+              alignment: widget.options.alignment,
+            ),
       fade: Fade.fadeIn,
       child: ClusterWidget(
         cluster: clusterNode,
@@ -422,6 +452,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       size: clusterNode.parent!.size(),
       animationController: _zoomController,
       translate: StaticTranslate(_mapCalculator, clusterNode.parent!),
+      rotate: widget.options.rotate != true
+          ? null
+          : Rotate(
+              angle: -widget.mapCamera.rotationRad,
+              alignment: widget.options.alignment,
+            ),
       fade: Fade.fadeOut,
       child: ClusterWidget(
         cluster: clusterNode.parent!,
@@ -441,6 +477,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         size: cluster.size(),
         animationController: _spiderfyController,
         translate: StaticTranslate(_mapCalculator, cluster),
+        rotate: widget.options.rotate != true
+            ? null
+            : Rotate(
+                angle: -widget.mapCamera.rotationRad,
+                alignment: widget.options.alignment,
+              ),
         fade: Fade.almostFadeOut,
         child: ClusterWidget(
           cluster: cluster,

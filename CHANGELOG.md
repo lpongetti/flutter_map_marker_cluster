@@ -1,4 +1,11 @@
-## [1.3.0] - 10/11/2023
+## [1.3.1] - 27/10/2023
+
+- Fix cluster rotation
+- Merge pull request #194 from shrijanRegmi/master
+- Merge pull request #192 from marselisborgit/master
+- Merge pull request #182 from starshipcoder/dev-rebuild-issue
+
+## [1.3.0] - 11/10/2023
 
 - Merge pull request #188 from altotunchitoo:flutter_map-6
 - Merge pull request #184 from shrijanRegmi/master
