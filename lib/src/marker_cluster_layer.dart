@@ -534,9 +534,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _zoomController
         ..reset()
         ..forward().then(
-          (_) => setState(() {
-            _hidePolygon();
-          }),
+          (_) {
+            if (mounted) {
+              setState(() {
+                _hidePolygon();
+              });
+            }
+          },
         );
     }
 
