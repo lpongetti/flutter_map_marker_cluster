@@ -83,18 +83,25 @@ class DistanceGrid<T> {
     T? closest;
 
     // Checks rows and columns with index +/- 1.
-    for (int i = y - 1; i <= y + 1; i++) {
-      for (int j = x - 1; j <= x + 1; j++) {
-        final cell = _grid[GridKey(i, j)];
-        if (cell != null) {
-          for (final entry in cell) {
-            final double dx = px - entry.x;
-            final double dy = py - entry.y;
-            final double distSq = dx * dx + dy * dy;
+    bool foundCenter = false;
+    for (final (dist: dist, row: row, col: col) in _neighbors) {
+      if (foundCenter && dist > 1) {
+        break;
+      }
 
-            if (distSq <= closestDistSq) {
-              closestDistSq = distSq;
-              closest = entry.obj;
+      final cell = _grid[GridKey(y + row, x + col)];
+      if (cell != null) {
+        for (final entry in cell) {
+          final double dx = px - entry.x;
+          final double dy = py - entry.y;
+          final double distSq = dx * dx + dy * dy;
+
+          if (distSq <= closestDistSq) {
+            closestDistSq = distSq;
+            closest = entry.obj;
+
+            if (dist == 0) {
+              foundCenter = true;
             }
           }
         }
@@ -106,3 +113,19 @@ class DistanceGrid<T> {
 
   int _getCoord(double x) => x ~/ cellSize;
 }
+
+// Row/Col offsets for immediate neighbors ordered by distance.
+const _neighbors = <({int dist, int row, int col})>[
+  // Center
+  (dist: 0, row: 0, col: 0),
+  // Immediate neighbors on the main axis.
+  (dist: 1, row: -1, col: 0),
+  (dist: 1, row: 1, col: 0),
+  (dist: 1, row: 0, col: -1),
+  (dist: 1, row: 0, col: 1),
+  // Neighbors on the diagonal.
+  (dist: 2, row: -1, col: -1),
+  (dist: 2, row: 1, col: -1),
+  (dist: 2, row: -1, col: 1),
+  (dist: 2, row: 1, col: 1),
+];
