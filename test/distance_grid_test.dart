@@ -54,9 +54,9 @@ void main() {
 
     grid.addObject(obj, const Point<double>(0, 0));
 
-    expect(grid.getNearObject(const Point(50.0, 50.0)), obj);
-    expect(grid.getNearObject(const Point(100.0, 0.0)), obj);
-    expect(grid.getNearObject(const Point(100.1, 0.0)), null);
+    expect(grid.getNearObject(const Point(50, 50)), obj);
+    expect(grid.getNearObject(const Point(100, 0)), obj);
+    expect(grid.getNearObject(const Point(100.1, 0)), null);
   });
 
   test('getNearObject with cellSize 0', () {
@@ -88,10 +88,10 @@ void main() {
           child: FlutterLogo(),
         );
 
-    grid.addObject(obj1, const Point(50.0, 50.0));
-    grid.addObject(obj2, const Point(0.0, 0.0));
+    grid.addObject(obj1, const Point(50, 50));
+    grid.addObject(obj2, const Point(0, 0));
 
-    expect(grid.getNearObject(const Point(50.0, 50.0)), obj1);
+    expect(grid.getNearObject(const Point(50, 50)), obj1);
     expect(grid.getNearObject(const Point(0, 0)), obj2);
   });
 }

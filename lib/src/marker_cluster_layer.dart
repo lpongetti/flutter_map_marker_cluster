@@ -33,7 +33,8 @@ class MarkerClusterLayer extends StatefulWidget {
   State<MarkerClusterLayer> createState() => _MarkerClusterLayerState();
 }
 
-class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProviderStateMixin {
+class _MarkerClusterLayerState extends State<MarkerClusterLayer>
+    with TickerProviderStateMixin {
   late MapCalculator _mapCalculator;
   late ClusterManager _clusterManager;
   late int _maxZoom;
@@ -62,9 +63,11 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       _centerMarkerController.isAnimating ||
       _spiderfyController.isAnimating;
 
-  bool get _zoomingIn => _zoomController.isAnimating && _currentZoom > _previousZoom;
+  bool get _zoomingIn =>
+      _zoomController.isAnimating && _currentZoom > _previousZoom;
 
-  bool get _zoomingOut => _zoomController.isAnimating && _currentZoom < _previousZoom;
+  bool get _zoomingOut =>
+      _zoomController.isAnimating && _currentZoom < _previousZoom;
 
   @override
   void initState() {
@@ -191,12 +194,18 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
   /// Function that is called when the marker is hover (if popup building on hover is selected).
   /// if enter == true then it's onHoverEnter, if enter == false it's onHoverExit
   void _onMarkerHover(MarkerNode marker, bool enter) {
-    if (_zoomController.isAnimating || _centerMarkerController.isAnimating || _fitBoundController.isAnimating) return;
+    if (_zoomController.isAnimating ||
+        _centerMarkerController.isAnimating ||
+        _fitBoundController.isAnimating) return;
 
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
       enter
-          ? Future.delayed(Duration(milliseconds: popupOptions.timeToShowPopupOnHover >= 0 ? popupOptions.timeToShowPopupOnHover : 0), () {
+          ? Future.delayed(
+              Duration(
+                  milliseconds: popupOptions.timeToShowPopupOnHover >= 0
+                      ? popupOptions.timeToShowPopupOnHover
+                      : 0), () {
               popupOptions.markerTapBehavior.apply(
                 PopupSpec.wrap(marker.marker),
                 PopupState.maybeOf(context, listen: false)!,
@@ -207,7 +216,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     }
 
     if (widget.options.onMarkerTap != null) {
-      enter ? widget.options.onMarkerHoverEnter?.call(marker.marker) : widget.options.onMarkerHoverExit?.call(marker.marker);
+      enter
+          ? widget.options.onMarkerHoverEnter?.call(marker.marker)
+          : widget.options.onMarkerHoverExit?.call(marker.marker);
     }
   }
 
@@ -225,12 +236,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
             .map((markerNode) => markerNode.marker)
             .toList();
 
-        if (widget.options.popupOptions != null && markersGettingClustered != null) {
+        if (widget.options.popupOptions != null &&
+            markersGettingClustered != null) {
           widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
             markersGettingClustered,
           );
         }
-        if (widget.options.onMarkersClustered != null && markersGettingClustered != null) {
+        if (widget.options.onMarkersClustered != null &&
+            markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
         }
 
@@ -246,7 +259,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
             .toList();
 
         if (markersGettingClustered != null) {
-          widget.options.popupOptions?.popupController.hidePopupsOnlyFor(markersGettingClustered);
+          widget.options.popupOptions?.popupController
+              .hidePopupsOnlyFor(markersGettingClustered);
           widget.options.onMarkersClustered?.call(markersGettingClustered);
         }
 
@@ -301,7 +315,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
                 angle: -widget.mapCamera.rotationRad,
                 alignment: widget.options.alignment,
               ),
-        fade: Fade.fadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
+        fade:
+            Fade.fadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
         child: ClusterWidget(
           cluster: markerNode.parent!,
           builder: widget.options.builder,
@@ -311,10 +326,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     );
   }
 
-  void _addMarkerClusterLayer(MarkerClusterNode clusterNode, List<Widget> layers) {
+  void _addMarkerClusterLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
     if (_zoomingOut && clusterNode.children.length > 1) {
       _addClusterClosingLayer(clusterNode, layers);
-    } else if (_zoomingIn && clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
+    } else if (_zoomingIn &&
+        clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
       _addClusterOpeningLayer(clusterNode, layers);
     } else if (_isSpiderfyCluster(clusterNode)) {
       layers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
@@ -340,7 +357,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     }
   }
 
-  void _addClusterClosingLayer(MarkerClusterNode clusterNode, List<Widget> layers) {
+  void _addClusterClosingLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
     // cluster
     layers.add(
       MapWidget(
@@ -372,7 +390,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
           _buildMarker(
             marker: child,
             controller: _zoomController,
-            fade: Fade.fadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
+            fade: Fade.fadeOut(
+                curve: widget.options.animationsOptions.fadeOutCurve),
             translate: AnimatedTranslate.fromMyPosToNewPos(
               mapCalculator: _mapCalculator,
               from: child,
@@ -399,7 +418,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
                     angle: -widget.mapCamera.rotationRad,
                     alignment: widget.options.alignment,
                   ),
-            fade: Fade.fadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
+            fade: Fade.fadeOut(
+                curve: widget.options.animationsOptions.fadeOutCurve),
             child: ClusterWidget(
               cluster: child,
               builder: widget.options.builder,
@@ -416,7 +436,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     widget.options.onMarkersClustered?.call(markersGettingClustered);
   }
 
-  void _addClusterOpeningLayer(MarkerClusterNode clusterNode, List<Widget> layers) {
+  void _addClusterOpeningLayer(
+      MarkerClusterNode clusterNode, List<Widget> layers) {
     // cluster
     layers.add(MapWidget(
       size: clusterNode.size(),
@@ -476,7 +497,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
                 angle: -widget.mapCamera.rotationRad,
                 alignment: widget.options.alignment,
               ),
-        fade: Fade.almostFadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
+        fade: Fade.almostFadeOut(
+            curve: widget.options.animationsOptions.fadeOutCurve),
         child: ClusterWidget(
           cluster: cluster,
           builder: widget.options.builder,
@@ -496,7 +518,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
         _buildMarker(
           marker: marker,
           controller: _spiderfyController,
-          fade: Fade.fadeIn(curve: widget.options.animationsOptions.fadeInCurve),
+          fade:
+              Fade.fadeIn(curve: widget.options.animationsOptions.fadeInCurve),
           translate: AnimatedTranslate.spiderfy(
             mapCalculator: _mapCalculator,
             cluster: cluster,
@@ -550,7 +573,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       0.5,
     );
 
-    _clusterManager.recursivelyFromTopClusterLevel(_currentZoom, widget.options.disableClusteringAtZoom, recursionBounds, (MarkerOrClusterNode layer) {
+    _clusterManager.recursivelyFromTopClusterLevel(
+        _currentZoom, widget.options.disableClusteringAtZoom, recursionBounds,
+        (MarkerOrClusterNode layer) {
       // This is the performance critical hot path recursed on every map event!
 
       // Cull markers/clusters that are not on screen.
@@ -572,7 +597,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
       layers.add(PopupLayer(
-        popupDisplayOptions: PopupDisplayOptions(builder: popupOptions.popupBuilder, animation: popupOptions.popupAnimation, snap: popupOptions.popupSnap),
+        popupDisplayOptions: PopupDisplayOptions(
+            builder: popupOptions.popupBuilder,
+            animation: popupOptions.popupAnimation,
+            snap: popupOptions.popupSnap),
       ));
     }
 
@@ -614,12 +642,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       ).fit(widget.mapCamera);
 
       // check if children can un-cluster
-      final cannotDivide = cluster.markers.every((marker) => marker.parent!.zoom == _maxZoom && marker.parent == cluster.markers.first.parent) ||
+      final cannotDivide = cluster.markers.every((marker) =>
+              marker.parent!.zoom == _maxZoom &&
+              marker.parent == cluster.markers.first.parent) ||
           (dest.zoom == _currentZoom && _currentZoom == opt.maxZoom);
 
       if (cannotDivide) {
         //dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
-        dest = MapCamera(crs: dest.crs, center: dest.center, zoom: _currentZoom.toDouble(), rotation: dest.rotation, nonRotatedSize: dest.nonRotatedSize);
+        dest = MapCamera(
+            crs: dest.crs,
+            center: dest.center,
+            zoom: _currentZoom.toDouble(),
+            rotation: dest.rotation,
+            nonRotatedSize: dest.nonRotatedSize);
 
         if (spiderfyCluster != null) {
           if (spiderfyCluster == cluster) {
@@ -635,13 +670,19 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
         _showPolygon(cluster.markers.map((m) => m.point).toList());
       }
 
-      final latTween = Tween<double>(begin: center.latitude, end: dest.center.latitude);
-      final lonTween = Tween<double>(begin: center.longitude, end: dest.center.longitude);
-      final zoomTween = Tween<double>(begin: widget.mapCamera.zoom, end: dest.zoom);
+      final latTween =
+          Tween<double>(begin: center.latitude, end: dest.center.latitude);
+      final lonTween =
+          Tween<double>(begin: center.longitude, end: dest.center.longitude);
+      final zoomTween =
+          Tween<double>(begin: widget.mapCamera.zoom, end: dest.zoom);
 
-      final animation = CurvedAnimation(parent: _fitBoundController, curve: widget.options.animationsOptions.fitBoundCurves);
+      final animation = CurvedAnimation(
+          parent: _fitBoundController,
+          curve: widget.options.animationsOptions.fitBoundCurves);
 
-      final listener = _centerMarkerListener(animation, latTween, lonTween, zoomTween: zoomTween);
+      final listener = _centerMarkerListener(animation, latTween, lonTween,
+          zoomTween: zoomTween);
 
       _fitBoundController.addListener(listener);
 
@@ -675,8 +716,10 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       if (!widget.options.centerMarkerOnClick) return;
 
       final center = widget.mapCamera.center;
-      final latTween = Tween<double>(begin: center.latitude, end: marker.point.latitude);
-      final lonTween = Tween<double>(begin: center.longitude, end: marker.point.longitude);
+      final latTween =
+          Tween<double>(begin: center.latitude, end: marker.point.latitude);
+      final lonTween =
+          Tween<double>(begin: center.longitude, end: marker.point.longitude);
 
       final Animation<double> animation = CurvedAnimation(
         parent: _centerMarkerController,
@@ -757,8 +800,10 @@ LatLngBounds _extendBounds(LatLngBounds bounds, double stickonFactor) {
   // Clamp rather than wrap around. This function is used in the context of
   // drawing things onto a map. Since the map renderer does't wrap maps itself,
   // we also shouldn't wrap around the bounding boxes.
-  final point1 = LatLng((bounds.south - height).clamp(-90, 90), (bounds.west - width).clamp(-180, 180));
-  final point2 = LatLng((bounds.north + height).clamp(-90, 90), (bounds.east + width).clamp(-180, 180));
+  final point1 = LatLng((bounds.south - height).clamp(-90, 90),
+      (bounds.west - width).clamp(-180, 180));
+  final point2 = LatLng((bounds.north + height).clamp(-90, 90),
+      (bounds.east + width).clamp(-180, 180));
 
   return LatLngBounds(point1, point2);
 }

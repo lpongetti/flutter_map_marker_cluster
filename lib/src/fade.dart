@@ -17,5 +17,6 @@ class Fade {
   final Curve _curve;
   final Tween<double> _tween;
 
-  Animation<double> animation(AnimationController controller) => _tween.chain(CurveTween(curve: _curve)).animate(controller);
+  Animation<double> animation(AnimationController controller) =>
+      _tween.chain(CurveTween(curve: _curve)).animate(controller);
 }

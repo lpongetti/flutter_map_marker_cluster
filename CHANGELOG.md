@@ -1,3 +1,8 @@
+## [1.3.2] - 08/11/2023
+
+- Merge pull request #197 from tratteo/master
+- Merge pull request #196 from ignatz/master
+
 ## [1.3.1] - 27/10/2023
 
 - Fix cluster rotation

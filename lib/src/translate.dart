@@ -38,7 +38,8 @@ abstract class Translate {
     LatLng? customPoint,
   }) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    return util.removeAlignment(pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
+    return util.removeAlignment(
+        pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
   }
 
   static Point<double> _getClusterPixel(
@@ -46,7 +47,8 @@ abstract class Translate {
     MarkerClusterNode clusterNode, {
     LatLng? customPoint,
   }) {
-    final pos = mapCalculator.getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
+    final pos = mapCalculator
+        .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
 
@@ -63,10 +65,13 @@ class StaticTranslate extends Translate {
   @override
   final Point<double> position;
 
-  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node) : position = Translate._getNodePixel(mapCalculator, node);
+  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node)
+      : position = Translate._getNodePixel(mapCalculator, node);
 
   @override
-  Animation<Point<double>>? animation(AnimationController animationController) => null;
+  Animation<Point<double>>? animation(
+          AnimationController animationController) =>
+      null;
 }
 
 class AnimatedTranslate extends Translate {
@@ -133,5 +138,6 @@ class AnimatedTranslate extends Translate {
   }
 
   @override
-  Animation<Point<double>> animation(AnimationController animationController) => _tween.chain(CurveTween(curve: curve)).animate(animationController);
+  Animation<Point<double>> animation(AnimationController animationController) =>
+      _tween.chain(CurveTween(curve: curve)).animate(animationController);
 }
