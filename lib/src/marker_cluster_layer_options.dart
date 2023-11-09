@@ -20,6 +20,11 @@ class PolygonOptions {
 }
 
 class AnimationsOptions {
+  final Curve fadeInCurve;
+  final Curve fadeOutCurve;
+  final Curve clusterExpandCurve;
+  final Curve clusterCollapseCurve;
+  final Curve sipderifyCurve;
   final Duration zoom;
   final Duration fitBound;
   final Curve fitBoundCurves;
@@ -30,6 +35,11 @@ class AnimationsOptions {
   const AnimationsOptions({
     this.zoom = const Duration(milliseconds: 500),
     this.fitBound = const Duration(milliseconds: 500),
+    this.fadeInCurve = Curves.easeInCubic,
+    this.fadeOutCurve = Curves.easeInCubic,
+    this.clusterExpandCurve = Curves.easeInCubic,
+    this.clusterCollapseCurve = Curves.easeInCubic,
+    this.sipderifyCurve = Curves.fastOutSlowIn,
     this.centerMarker = const Duration(milliseconds: 500),
     this.spiderfy = const Duration(milliseconds: 500),
     this.fitBoundCurves = Curves.fastOutSlowIn,
@@ -80,13 +90,11 @@ class PopupOptions {
     MarkerTapBehavior? markerTapBehavior,
     this.buildPopupOnHover = false,
     this.timeToShowPopupOnHover = 300,
-  })  : markerTapBehavior =
-            markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
+  })  : markerTapBehavior = markerTapBehavior ?? MarkerTapBehavior.togglePopupAndHideRest(),
         popupController = popupController ?? PopupController();
 }
 
-typedef ClusterWidgetBuilder = Widget Function(
-    BuildContext context, List<Marker> markers);
+typedef ClusterWidgetBuilder = Widget Function(BuildContext context, List<Marker> markers);
 
 class MarkerClusterLayerOptions {
   /// Cluster builder
