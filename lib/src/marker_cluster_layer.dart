@@ -45,11 +45,22 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
   late AnimationController _fitBoundController;
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
+
   PolygonLayer? _polygon;
+  MarkerClusterNode? spiderfyCluster;
 
   _MarkerClusterLayerState();
 
-  bool get _animating => _zoomController.isAnimating || _fitBoundController.isAnimating || _centerMarkerController.isAnimating || _spiderfyController.isAnimating;
+  bool _isSpiderfyCluster(MarkerClusterNode cluster) {
+    return spiderfyCluster != null &&
+        spiderfyCluster!.bounds.center == cluster.bounds.center;
+  }
+
+  bool get _animating =>
+      _zoomController.isAnimating ||
+      _fitBoundController.isAnimating ||
+      _centerMarkerController.isAnimating ||
+      _spiderfyController.isAnimating;
 
   bool get _zoomingIn => _zoomController.isAnimating && _currentZoom > _previousZoom;
 
@@ -202,7 +213,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
 
   void _spiderfy(MarkerClusterNode cluster) {
     setState(() {
-      _clusterManager.spiderfyCluster = cluster;
+      spiderfyCluster = cluster;
     });
     _spiderfyController.forward();
   }
@@ -210,7 +221,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
   Future<void> _unspiderfy() async {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers.map((markerNode) => markerNode.marker).toList();
+        final markersGettingClustered = spiderfyCluster?.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
 
         if (widget.options.popupOptions != null && markersGettingClustered != null) {
           widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
@@ -223,12 +236,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
 
         await _spiderfyController.reverse().then(
               (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
+                spiderfyCluster = null;
               }),
             );
         break;
       case AnimationStatus.forward:
-        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers.map((markerNode) => markerNode.marker).toList();
+        final markersGettingClustered = spiderfyCluster?.markers
+            .map((markerNode) => markerNode.marker)
+            .toList();
 
         if (markersGettingClustered != null) {
           widget.options.popupOptions?.popupController.hidePopupsOnlyFor(markersGettingClustered);
@@ -238,7 +253,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
         _spiderfyController.stop();
         await _spiderfyController.reverse().then(
               (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
+                spiderfyCluster = null;
               }),
             );
         break;
@@ -301,7 +316,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       _addClusterClosingLayer(clusterNode, layers);
     } else if (_zoomingIn && clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
       _addClusterOpeningLayer(clusterNode, layers);
-    } else if (_clusterManager.isSpiderfyCluster(clusterNode)) {
+    } else if (_isSpiderfyCluster(clusterNode)) {
       layers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
     } else {
       layers.add(
@@ -513,9 +528,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       _zoomController
         ..reset()
         ..forward().then(
-          (_) => setState(() {
-            _hidePolygon();
-          }),
+          (_) {
+            if (mounted) {
+              setState(() {
+                _hidePolygon();
+              });
+            }
+          },
         );
     }
 
@@ -568,8 +587,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
 
       if (!widget.options.zoomToBoundsOnClick) {
         if (widget.options.spiderfyCluster) {
-          if (_clusterManager.spiderfyCluster != null) {
-            if (_clusterManager.spiderfyCluster == cluster) {
+          if (spiderfyCluster != null) {
+            if (spiderfyCluster == cluster) {
               _unspiderfy();
               return;
             } else {
@@ -602,8 +621,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
         //dest = CenterZoom(center: dest.center, zoom: _currentZoom.toDouble());
         dest = MapCamera(crs: dest.crs, center: dest.center, zoom: _currentZoom.toDouble(), rotation: dest.rotation, nonRotatedSize: dest.nonRotatedSize);
 
-        if (_clusterManager.spiderfyCluster != null) {
-          if (_clusterManager.spiderfyCluster == cluster) {
+        if (spiderfyCluster != null) {
+          if (spiderfyCluster == cluster) {
             _unspiderfy();
             return;
           } else {

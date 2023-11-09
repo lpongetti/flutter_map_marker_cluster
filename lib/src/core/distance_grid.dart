@@ -1,108 +1,131 @@
+import 'dart:collection';
 import 'dart:math';
 
+class CellEntry<T> {
+  final T obj;
+  final double x;
+  final double y;
+
+  const CellEntry(this.x, this.y, this.obj);
+}
+
+class GridKey {
+  final int row;
+  final int col;
+
+  const GridKey(this.row, this.col);
+
+  @override
+  bool operator ==(Object other) =>
+      other is GridKey && other.row == row && other.col == col;
+
+  @override
+  int get hashCode => (col << 26) ^ row;
+}
+
 class DistanceGrid<T> {
-  final num cellSize;
+  final int cellSize;
+  final double _sqCellSize;
 
-  final num _sqCellSize;
-  final Map<num, Map<num, List<T>>> _grid = {};
-  final Map<T, Point> _objectPoint = {};
+  final _grid = HashMap<GridKey, List<CellEntry<T>>>();
+  final _objectPoint = HashMap<T, GridKey>();
 
-  DistanceGrid(this.cellSize) : _sqCellSize = cellSize * cellSize;
+  DistanceGrid(int cellSize)
+      : cellSize = cellSize > 0 ? cellSize : 1,
+        _sqCellSize = (cellSize * cellSize).toDouble();
 
-  void addObject(T obj, Point point) {
-    final x = _getCoord(point.x), y = _getCoord(point.y);
-    final row = _grid[y] ??= {};
-    final cell = row[x] ??= [];
-
-    _objectPoint[obj] = point;
-
-    cell.add(obj);
+  void clear() {
+    _grid.clear();
+    _objectPoint.clear();
   }
 
-  void updateObject(T obj, Point point) {
+  void addObject(T obj, Point<double> point) {
+    final key = GridKey(_getCoord(point.y), _getCoord(point.x));
+    final cell = _grid[key] ??= [];
+
+    _objectPoint[obj] = key;
+    cell.add(CellEntry<T>(point.x, point.y, obj));
+  }
+
+  void updateObject(T obj, Point<double> point) {
     removeObject(obj);
     addObject(obj, point);
   }
 
   //Returns true if the object was found
   bool removeObject(T obj) {
-    final point = _objectPoint[obj];
-    if (point == null) return false;
+    final key = _objectPoint.remove(obj);
+    if (key == null) return false;
 
-    final x = _getCoord(point.x), y = _getCoord(point.y);
-    final row = _grid[y] ??= {};
-    final cell = row[x] ??= [];
-
-    _objectPoint.remove(obj);
-
-    final len = cell.length;
-    for (var i = 0; i < len; i++) {
-      if (cell[i] == obj) {
-        cell.removeAt(i);
-
-        if (len == 1) {
-          row.remove(x);
-
-          if (_grid[y]!.isEmpty) {
-            _grid.remove(y);
-          }
-        }
-
-        return true;
-      }
+    // Object existed in the _objectPoint map, thus must exist in the grid.
+    final cell = _grid[key]!;
+    cell.removeWhere((e) => e.obj == obj);
+    if (cell.isEmpty) {
+      _grid.remove(key);
     }
-    return false;
+    return true;
   }
 
   void eachObject(Function(T) fn) {
-    for (final i in _grid.keys) {
-      final row = _grid[i]!;
-
-      for (final j in row.keys) {
-        final cell = row[j]!;
-
-        for (var k = 0; k < cell.length; k++) {
-          fn(cell[k]);
-        }
+    for (final cell in _grid.values) {
+      for (final entry in cell) {
+        fn(entry.obj);
       }
     }
   }
 
-  T? getNearObject(Point point) {
-    final x = _getCoord(point.x), y = _getCoord(point.y);
-    var closestDistSq = _sqCellSize;
+  T? getNearObject(Point<double> point) {
+    final px = point.x;
+    final py = point.y;
+
+    final x = _getCoord(px), y = _getCoord(py);
+    double closestDistSq = _sqCellSize;
     T? closest;
 
-    for (var i = y - 1; i <= y + 1; i++) {
-      final row = _grid[i];
-      if (row != null) {
-        for (var j = x - 1; j <= x + 1; j++) {
-          final cell = row[j];
-          if (cell != null) {
-            for (var k = 0; k < cell.length; k++) {
-              final obj = cell[k];
-              final dist = _sqDist(_objectPoint[obj]!, point);
+    // Checks rows and columns with index +/- 1.
+    bool foundCenter = false;
+    for (final (dist: dist, row: row, col: col) in _neighbors) {
+      if (foundCenter && dist > 1) {
+        break;
+      }
 
-              if (dist < closestDistSq ||
-                  dist <= closestDistSq && closest == null) {
-                closestDistSq = dist;
-                closest = obj;
-              }
+      final cell = _grid[GridKey(y + row, x + col)];
+      if (cell != null) {
+        for (final entry in cell) {
+          final double dx = px - entry.x;
+          final double dy = py - entry.y;
+          final double distSq = dx * dx + dy * dy;
+
+          if (distSq <= closestDistSq) {
+            closestDistSq = distSq;
+            closest = entry.obj;
+
+            if (dist == 0) {
+              foundCenter = true;
             }
           }
         }
       }
     }
+
     return closest;
   }
 
-  num _getCoord(num x) {
-    final coord = x / cellSize;
-    return coord.isFinite ? coord.floor() : x;
-  }
-
-  num _sqDist(Point p1, Point p2) {
-    final dx = p2.x - p1.x, dy = p2.y - p1.y;
-    return dx * dx + dy * dy;
-  }
+  int _getCoord(double x) => x ~/ cellSize;
 }
+
+// Row/Col offsets for immediate neighbors ordered by distance.
+const _neighbors = <({int dist, int row, int col})>[
+  // Center
+  (dist: 0, row: 0, col: 0),
+  // Immediate neighbors on the main axis.
+  (dist: 1, row: -1, col: 0),
+  (dist: 1, row: 1, col: 0),
+  (dist: 1, row: 0, col: -1),
+  (dist: 1, row: 0, col: 1),
+  // Neighbors on the diagonal.
+  (dist: 2, row: -1, col: -1),
+  (dist: 2, row: 1, col: -1),
+  (dist: 2, row: -1, col: 1),
+  (dist: 2, row: 1, col: 1),
+];
