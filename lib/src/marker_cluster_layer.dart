@@ -46,9 +46,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   late AnimationController _fitBoundController;
   late AnimationController _centerMarkerController;
   late AnimationController _spiderfyController;
+
   PolygonLayer? _polygon;
+  MarkerClusterNode? spiderfyCluster;
 
   _MarkerClusterLayerState();
+
+  bool _isSpiderfyCluster(MarkerClusterNode cluster) {
+    return spiderfyCluster != null &&
+        spiderfyCluster!.bounds.center == cluster.bounds.center;
+  }
 
   bool get _animating =>
       _zoomController.isAnimating ||
@@ -217,7 +224,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   void _spiderfy(MarkerClusterNode cluster) {
     setState(() {
-      _clusterManager.spiderfyCluster = cluster;
+      spiderfyCluster = cluster;
     });
     _spiderfyController.forward();
   }
@@ -225,7 +232,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   Future<void> _unspiderfy() async {
     switch (_spiderfyController.status) {
       case AnimationStatus.completed:
-        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
+        final markersGettingClustered = spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -242,12 +249,12 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
         await _spiderfyController.reverse().then(
               (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
+                spiderfyCluster = null;
               }),
             );
         break;
       case AnimationStatus.forward:
-        final markersGettingClustered = _clusterManager.spiderfyCluster?.markers
+        final markersGettingClustered = spiderfyCluster?.markers
             .map((markerNode) => markerNode.marker)
             .toList();
 
@@ -260,7 +267,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _spiderfyController.stop();
         await _spiderfyController.reverse().then(
               (_) => setState(() {
-                _clusterManager.spiderfyCluster = null;
+                spiderfyCluster = null;
               }),
             );
         break;
@@ -324,7 +331,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     } else if (_zoomingIn &&
         clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
       _addClusterOpeningLayer(clusterNode, layers);
-    } else if (_clusterManager.isSpiderfyCluster(clusterNode)) {
+    } else if (_isSpiderfyCluster(clusterNode)) {
       layers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
     } else {
       layers.add(
@@ -534,9 +541,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _zoomController
         ..reset()
         ..forward().then(
-          (_) => setState(() {
-            _hidePolygon();
-          }),
+          (_) {
+            if (mounted) {
+              setState(() {
+                _hidePolygon();
+              });
+            }
+          },
         );
     }
 
@@ -594,8 +605,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
       if (!widget.options.zoomToBoundsOnClick) {
         if (widget.options.spiderfyCluster) {
-          if (_clusterManager.spiderfyCluster != null) {
-            if (_clusterManager.spiderfyCluster == cluster) {
+          if (spiderfyCluster != null) {
+            if (spiderfyCluster == cluster) {
               _unspiderfy();
               return;
             } else {
@@ -635,8 +646,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             rotation: dest.rotation,
             nonRotatedSize: dest.nonRotatedSize);
 
-        if (_clusterManager.spiderfyCluster != null) {
-          if (_clusterManager.spiderfyCluster == cluster) {
+        if (spiderfyCluster != null) {
+          if (spiderfyCluster == cluster) {
             _unspiderfy();
             return;
           } else {
