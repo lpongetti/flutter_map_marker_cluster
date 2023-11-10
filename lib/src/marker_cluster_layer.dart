@@ -326,15 +326,15 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     );
   }
 
-  void _addMarkerClusterLayer(
-      MarkerClusterNode clusterNode, List<Widget> layers) {
+  void _addMarkerClusterLayer(MarkerClusterNode clusterNode,
+      List<Widget> layers, List<Widget> spiderfyLayers) {
     if (_zoomingOut && clusterNode.children.length > 1) {
       _addClusterClosingLayer(clusterNode, layers);
     } else if (_zoomingIn &&
         clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
       _addClusterOpeningLayer(clusterNode, layers);
     } else if (_isSpiderfyCluster(clusterNode)) {
-      layers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
+      spiderfyLayers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
     } else {
       layers.add(
         MapWidget.static(
@@ -541,6 +541,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
     final zoom = widget.mapCamera.zoom.ceil();
     final layers = <Widget>[];
+    final spiderfyLayers = <Widget>[];
 
     if (_polygon != null) layers.add(_polygon!);
 
@@ -588,11 +589,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       if (layer is MarkerNode) {
         _addMarkerLayer(layer, layers);
       } else if (layer is MarkerClusterNode) {
-        _addMarkerClusterLayer(layer, layers);
+        _addMarkerClusterLayer(layer, layers, spiderfyLayers);
       } else {
         throw 'Unexpected layer type: ${layer.runtimeType}';
       }
     });
+
+    // ensures the spiderfy layers markers are on top of other markers and clusters
+    layers.addAll(spiderfyLayers);
 
     final popupOptions = widget.options.popupOptions;
     if (popupOptions != null) {
