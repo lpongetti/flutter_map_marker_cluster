@@ -677,6 +677,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       final zoomTween =
           Tween<double>(begin: widget.mapCamera.zoom, end: dest.zoom);
 
+      final isAlreadyFit = latTween.begin == latTween.end &&
+          lonTween.begin == lonTween.end &&
+          zoomTween.begin == zoomTween.end;
+
+      if (isAlreadyFit) {
+        if (cannotDivide && widget.options.spiderfyCluster) {
+          _spiderfy(cluster);
+        }
+        return;
+      }
+
       final animation = CurvedAnimation(
           parent: _fitBoundController,
           curve: widget.options.animationsOptions.fitBoundCurves);
