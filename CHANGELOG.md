@@ -1,3 +1,8 @@
+## [1.3.3] - 13/11/2023
+
+- Merge pull request #198 from mdanics/master
+- Merge pull request #199 from mdanics/spiderfy_ontop
+
 ## [1.3.2] - 08/11/2023
 
 - Merge pull request #197 from tratteo/master
