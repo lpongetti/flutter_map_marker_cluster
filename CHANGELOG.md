@@ -1,3 +1,7 @@
+## [1.3.4] - 05/12/2023
+
+- Merge pull request #201 from tratteo/master
+
 ## [1.3.3] - 13/11/2023
 
 - Merge pull request #198 from mdanics/master
