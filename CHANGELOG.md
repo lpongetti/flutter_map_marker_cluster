@@ -1,3 +1,9 @@
+## [1.3.5] - 10/03/2024
+
+- Merge pull request #209 from ReinisSprogis/master
+- Merge pull request #208 from pgebert/master
+- Merge pull request #203 from eshfield/patch-1
+
 ## [1.3.4] - 05/12/2023
 
 - Merge pull request #201 from tratteo/master

@@ -169,7 +169,6 @@ class MarkerClusterLayerOptions {
   /// Function to call when a cluster Marker is tapped
   final void Function(MarkerClusterNode)? onClusterTap;
 
-  
   ///If set to [true] the marker will have only gesture behavior that is provided by the marker child.
   ///Can be used in cases where the marker child is a widget that already has gesture behavior and [GestureDetector] from the [MarkerClusterLayer] is interfering with it.
   ///If set to [true] [onMarkerTap] [onMarkerHoverEnter] [onMarkerHoverExit] [centerMarkerOnClick] will not work.
