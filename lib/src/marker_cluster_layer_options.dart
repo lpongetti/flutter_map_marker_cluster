@@ -157,6 +157,9 @@ class MarkerClusterLayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker)? onMarkerTap;
 
+  /// Function to call when a Marker is double tapped
+  final void Function(Marker)? onMarkerDoubleTap;
+
   /// Function to call when a Marker starts to be hovered
   final void Function(Marker)? onMarkerHoverEnter;
 
@@ -212,6 +215,7 @@ class MarkerClusterLayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkerDoubleTap,
     this.onMarkerHoverEnter,
     this.onMarkerHoverExit,
     this.onClusterTap,
