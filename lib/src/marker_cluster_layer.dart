@@ -761,7 +761,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     return () {
       if (_animating) return;
 
-      widget.options.onMarkerTap?.call(marker.marker);
+      widget.options.onMarkerDoubleTap?.call(marker.marker);
     };
   }
 
