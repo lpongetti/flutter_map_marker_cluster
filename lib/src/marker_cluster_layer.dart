@@ -201,6 +201,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         marker: marker,
         markerChildBehavior: widget.options.markerChildBehavior,
         onTap: _onMarkerTap(marker),
+        onDoubleTap: _onMarkerDoubleTap(marker),
         onHover: (bool value) => _onMarkerHover(marker, value),
         buildOnHover: widget.options.popupOptions?.buildPopupOnHover ?? false,
       ),
@@ -753,6 +754,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
       });
+    };
+  }
+
+  VoidCallback _onMarkerDoubleTap(MarkerNode marker) {
+    return () {
+      if (_animating) return;
+
+      widget.options.onMarkerDoubleTap?.call(marker.marker);
     };
   }
 

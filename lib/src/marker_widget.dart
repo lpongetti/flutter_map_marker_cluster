@@ -4,6 +4,7 @@ import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 class MarkerWidget extends StatelessWidget {
   final MarkerNode marker;
   final VoidCallback onTap;
+  final VoidCallback onDoubleTap;
   final Function(bool)? onHover;
   final bool buildOnHover;
   final bool markerChildBehavior;
@@ -11,6 +12,7 @@ class MarkerWidget extends StatelessWidget {
   MarkerWidget({
     required this.marker,
     required this.onTap,
+    required this.onDoubleTap,
     required this.markerChildBehavior,
     this.onHover,
     this.buildOnHover = false,
@@ -23,6 +25,7 @@ class MarkerWidget extends StatelessWidget {
         : GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: onTap,
+            onDoubleTap: onDoubleTap,
             child: buildOnHover && onHover != null
                 ? MouseRegion(
                     onEnter: (_) => onHover!(true),
