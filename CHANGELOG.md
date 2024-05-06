@@ -1,3 +1,7 @@
+## [1.3.6] - 06/05/2024
+
+- Merge pull request #212 from Railway-Engineering-Solutions/master
+
 ## [1.3.5] - 10/03/2024
 
 - Merge pull request #209 from ReinisSprogis/master
