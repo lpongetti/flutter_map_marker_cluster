@@ -13,10 +13,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_map: ">=7.0.0 <8.0.0"
-  flutter_map_marker_popup:
-    git:
-      ref: master
-      url: https://github.com/pento/flutter_map_marker_popup/
+  flutter_map_marker_popup: ^7.0.0
   latlong2: ^0.9.0
 
 dev_dependencies:
