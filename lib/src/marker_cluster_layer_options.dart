@@ -9,13 +9,13 @@ class PolygonOptions {
   final Color color;
   final double borderStrokeWidth;
   final Color borderColor;
-  final bool isDotted;
+  final StrokePattern pattern;
 
   const PolygonOptions({
     this.color = const Color(0xFF00FF00),
     this.borderStrokeWidth = 0.0,
     this.borderColor = const Color(0xFFFFFF00),
-    this.isDotted = false,
+    this.pattern = const StrokePattern.solid(),
   });
 }
 
