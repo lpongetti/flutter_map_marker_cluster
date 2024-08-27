@@ -788,7 +788,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             borderStrokeWidth: widget.options.polygonOptions.borderStrokeWidth,
             color: widget.options.polygonOptions.color,
             borderColor: widget.options.polygonOptions.borderColor,
-            isDotted: widget.options.polygonOptions.isDotted,
           ),
         ]);
       });
