@@ -757,7 +757,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     };
   }
 
-  VoidCallback _onMarkerDoubleTap(MarkerNode marker) {
+  VoidCallback? _onMarkerDoubleTap(MarkerNode marker) {
+    if (widget.options.onMarkerDoubleTap == null) return null;
+
     return () {
       if (_animating) return;
 
