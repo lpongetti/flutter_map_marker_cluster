@@ -1,3 +1,8 @@
+## [1.4.0] - 19/09/2024
+
+- Merge pull request #220 from lemiha/master
+- Merge pull request #217 from ChargeHorizons/master
+
 ## [1.3.6] - 06/05/2024
 
 - Merge pull request #212 from Railway-Engineering-Solutions/master
