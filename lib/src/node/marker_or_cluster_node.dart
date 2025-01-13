@@ -1,4 +1,4 @@
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 
 /// Just a base class which MarkerNode and MarkerClusterNode both extend which
@@ -9,5 +9,5 @@ abstract class MarkerOrClusterNode {
 
   MarkerOrClusterNode({required this.parent});
 
-  Bounds<double> pixelBounds(FlutterMapState map);
+  Bounds<double> pixelBounds(MapCamera map);
 }

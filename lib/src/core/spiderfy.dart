@@ -1,7 +1,5 @@
 import 'dart:math';
 
-import 'package:flutter_map/flutter_map.dart';
-
 class Spiderfy {
   static const pi2 = pi * 2;
   static const spiralFootSeparation =
@@ -39,7 +37,7 @@ class Spiderfy {
     return List<Point>.generate(count, (index) {
       final angle = circleStartAngle + index * angleStep;
 
-      return CustomPoint<double>(
+      return Point<double>(
           center.x + radius * cos(angle), center.y + radius * sin(angle));
     });
   }

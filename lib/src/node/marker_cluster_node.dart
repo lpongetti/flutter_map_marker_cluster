@@ -1,7 +1,7 @@
-import 'dart:ui';
+import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_node.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_or_cluster_node.dart';
 import 'package:latlong2/latlong.dart';
@@ -50,7 +50,7 @@ class _Derived {
 
 class MarkerClusterNode extends MarkerOrClusterNode {
   final int zoom;
-  final AnchorPos? anchorPos;
+  final Alignment? alignment;
   final Size predefinedSize;
   final Size Function(List<Marker>)? computeSize;
   final children = <MarkerOrClusterNode>[];
@@ -59,7 +59,7 @@ class MarkerClusterNode extends MarkerOrClusterNode {
 
   MarkerClusterNode({
     required this.zoom,
-    required this.anchorPos,
+    required this.alignment,
     required this.predefinedSize,
     this.computeSize,
   }) : super(parent: null) {
@@ -126,21 +126,17 @@ class MarkerClusterNode extends MarkerOrClusterNode {
   }
 
   @override
-  Bounds<double> pixelBounds(FlutterMapState map) {
+  Bounds<double> pixelBounds(MapCamera map) {
     final width = size().width;
     final height = size().height;
-    final anchor = Anchor.fromPos(
-        anchorPos ?? AnchorPos.align(AnchorAlign.center), width, height);
 
-    final rightPortion = width - anchor.left;
-    final leftPortion = anchor.left;
-    final bottomPortion = height - anchor.top;
-    final topPortion = anchor.top;
+    final left = 0.5 * width * ((alignment ?? Alignment.center).x + 1);
+    final top = 0.5 * height * ((alignment ?? Alignment.center).y + 1);
+    final right = width - left;
+    final bottom = height - top;
 
-    final ne =
-        map.project(bounds.northEast) + CustomPoint(rightPortion, -topPortion);
-    final sw = map.project(bounds.southWest) +
-        CustomPoint(-leftPortion, bottomPortion);
+    final ne = map.project(bounds.northEast) + Point(right, -top);
+    final sw = map.project(bounds.southWest) + Point(-left, bottom);
 
     return Bounds(ne, sw);
   }

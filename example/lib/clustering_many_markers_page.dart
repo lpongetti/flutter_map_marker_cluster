@@ -9,7 +9,7 @@ import 'package:latlong2/latlong.dart';
 class ClusteringManyMarkersPage extends StatefulWidget {
   static const String route = 'clusteringManyMarkersPage';
 
-  const ClusteringManyMarkersPage({Key? key}) : super(key: key);
+  const ClusteringManyMarkersPage({super.key});
 
   @override
   State<ClusteringManyMarkersPage> createState() =>
@@ -45,7 +45,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             height: 30,
             width: 30,
             point: latLng,
-            builder: (ctx) => const Icon(Icons.pin_drop),
+            child: const Icon(Icons.pin_drop),
           ),
         );
       }
@@ -61,9 +61,9 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
       drawer: buildDrawer(context, ClusteringManyMarkersPage.route),
       body: FlutterMap(
         options: MapOptions(
-          center: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
+          initialCenter: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
               (maxLatLng.longitude + minLatLng.longitude) / 2),
-          zoom: 6,
+          initialZoom: 6,
           maxZoom: 15,
         ),
         children: <Widget>[
@@ -75,11 +75,9 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
             options: MarkerClusterLayerOptions(
               maxClusterRadius: 45,
               size: const Size(40, 40),
-              anchorPos: AnchorPos.align(AnchorAlign.center),
-              fitBoundsOptions: const FitBoundsOptions(
-                padding: EdgeInsets.all(50),
-                maxZoom: 15,
-              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(50),
+              maxZoom: 15,
               markers: markers,
               builder: (context, markers) {
                 return Container(

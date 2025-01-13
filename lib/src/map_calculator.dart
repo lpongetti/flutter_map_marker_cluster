@@ -1,20 +1,20 @@
-import 'package:flutter_map/plugin_api.dart';
+import 'dart:math';
+
+import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 class MapCalculator {
-  final FlutterMapState mapState;
+  final MapCamera mapState;
 
   MapCalculator(this.mapState);
 
-  CustomPoint<num> getPixelFromPoint(LatLng point) {
-    final pos = mapState.project(point);
-    return pos * mapState.getZoomScale(mapState.zoom, mapState.zoom) -
-        mapState.pixelOrigin;
+  Point<double> getPixelFromPoint(LatLng point) {
+    return mapState.project(point) - mapState.pixelOrigin.toDoublePoint();
   }
 
-  CustomPoint project(LatLng latLng, {double? zoom}) =>
+  Point<double> project(LatLng latLng, {double? zoom}) =>
       mapState.project(latLng, zoom);
 
-  LatLng unproject(CustomPoint point, {double? zoom}) =>
+  LatLng unproject(Point point, {double? zoom}) =>
       mapState.unproject(point, zoom);
 }

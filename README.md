@@ -39,18 +39,15 @@ dependencies:
         ),
         children: <Widget>[
           TileLayer(
-            urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-            subdomains: const ['a', 'b', 'c'],
+            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           ),
           MarkerClusterLayerWidget(
             options: MarkerClusterLayerOptions(
               maxClusterRadius: 45,
               size: const Size(40, 40),
-              anchor: AnchorPos.align(AnchorAlign.center),
-              fitBoundsOptions: const FitBoundsOptions(
-                padding: EdgeInsets.all(50),
-                maxZoom: 15,
-              ),
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(50),
+              maxZoom: 15,        
               markers: markers,
               builder: (context, markers) {
                 return Container(

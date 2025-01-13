@@ -7,7 +7,7 @@ import 'package:latlong2/latlong.dart';
 class ClusteringPage extends StatefulWidget {
   static const String route = 'clusteringPage';
 
-  const ClusteringPage({Key? key}) : super(key: key);
+  const ClusteringPage({super.key});
 
   @override
   State<ClusteringPage> createState() => _ClusteringPageState();
@@ -28,130 +28,130 @@ class _ClusteringPageState extends State<ClusteringPage> {
     pointIndex = 0;
     markers = [
       Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+        alignment: Alignment.center,
         height: 30,
         width: 30,
         point: points[pointIndex],
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        child: const Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(53.3498, -6.2603),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(53.3488, -6.2613),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(53.3488, -6.2613),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(48.8566, 2.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
-      Marker(
-        anchorPos: AnchorPos.align(AnchorAlign.center),
+      const Marker(
+        alignment: Alignment.center,
         height: 30,
         width: 30,
-        point: const LatLng(49.8566, 3.3522),
-        builder: (ctx) => const Icon(Icons.pin_drop),
+        point: LatLng(49.8566, 3.3522),
+        child: Icon(Icons.pin_drop),
       ),
     ];
 
@@ -174,10 +174,10 @@ class _ClusteringPageState extends State<ClusteringPage> {
           setState(() {
             markers[0] = Marker(
               point: points[pointIndex],
-              anchorPos: AnchorPos.align(AnchorAlign.center),
+              alignment: Alignment.center,
               height: 30,
               width: 30,
-              builder: (ctx) => const Icon(Icons.pin_drop),
+              child: const Icon(Icons.pin_drop),
             );
             markers = List.from(markers);
           });
@@ -188,8 +188,8 @@ class _ClusteringPageState extends State<ClusteringPage> {
         popupController: _popupController,
         child: FlutterMap(
           options: MapOptions(
-            center: points[0],
-            zoom: 5,
+            initialCenter: points[0],
+            initialZoom: 5,
             maxZoom: 15,
             onTap: (_, __) => _popupController
                 .hideAllPopups(), // Hide popup when the map is tapped.
@@ -207,11 +207,9 @@ class _ClusteringPageState extends State<ClusteringPage> {
                 maxClusterRadius: 120,
                 rotate: true,
                 size: const Size(40, 40),
-                anchorPos: AnchorPos.align(AnchorAlign.center),
-                fitBoundsOptions: const FitBoundsOptions(
-                  padding: EdgeInsets.all(50),
-                  maxZoom: 15,
-                ),
+                alignment: Alignment.center,
+                padding: const EdgeInsets.all(50),
+                maxZoom: 15,
                 markers: markers,
                 polygonOptions: const PolygonOptions(
                     borderColor: Colors.blueAccent,
@@ -226,16 +224,17 @@ class _ClusteringPageState extends State<ClusteringPage> {
                           color: Colors.white,
                           child: GestureDetector(
                             onTap: () => debugPrint('Popup tap!'),
-                            child: Text(
-                              'Container popup for marker at ${marker.point}',
+                            child: const Text(
+                              'Container popup for marker',
                             ),
                           ),
                         )),
                 builder: (context, markers) {
                   return Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: Colors.blue),
+                      borderRadius: BorderRadius.circular(20),
+                      color: Colors.blue,
+                    ),
                     child: Center(
                       child: Text(
                         markers.length.toString(),

@@ -15,8 +15,8 @@ class PositionedMapWidget extends MapWidget {
     required this.size,
     required this.position,
     this.rotate,
-    Key? key,
-  }) : super.withKey(key: key);
+    super.key,
+  }) : super.withKey();
 
   @override
   Widget build(BuildContext context) {
@@ -29,8 +29,7 @@ class PositionedMapWidget extends MapWidget {
           ? child
           : Transform.rotate(
               angle: rotate!.angle,
-              origin: rotate!.origin,
-              alignment: rotate!.alignment,
+              alignment: (rotate!.alignment ?? Alignment.center) * -1,
               child: child,
             ),
     );

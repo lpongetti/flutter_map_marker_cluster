@@ -22,11 +22,11 @@ class AnimatedMapWidget extends MapWidget {
     required Translate translate,
     this.rotate,
     Fade? fade,
-    Key? key,
+    super.key,
   })  : _translateAnimation = translate.animation(animationController),
         _position = translate is StaticTranslate ? translate.position : null,
         _fadeAnimation = fade?.animation(animationController),
-        super.withKey(key: key);
+        super.withKey();
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +37,7 @@ class AnimatedMapWidget extends MapWidget {
             ? child
             : Transform.rotate(
                 angle: rotate!.angle,
-                origin: rotate!.origin,
-                alignment: rotate!.alignment,
+                alignment: (rotate!.alignment ?? Alignment.center) * -1,
                 child: child,
               );
 

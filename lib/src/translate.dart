@@ -1,8 +1,6 @@
 import 'dart:math';
 
-import 'package:flutter/animation.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter_map/plugin_api.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
@@ -40,12 +38,8 @@ abstract class Translate {
     LatLng? customPoint,
   }) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    final anchor = Anchor.fromPos(
-      marker.anchorPos ?? AnchorPos.align(AnchorAlign.center),
-      marker.width,
-      marker.height,
-    );
-    return util.removeAnchor(pos, marker.width, marker.height, anchor);
+    return util.removeAlignment(
+        pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
   }
 
   static Point<double> _getClusterPixel(
@@ -57,17 +51,12 @@ abstract class Translate {
         .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
-    final anchor = Anchor.fromPos(
-      clusterNode.anchorPos ?? AnchorPos.align(AnchorAlign.center),
-      calculatedSize.width,
-      calculatedSize.height,
-    );
 
-    return util.removeAnchor(
+    return util.removeAlignment(
       pos,
       calculatedSize.width,
       calculatedSize.height,
-      anchor,
+      clusterNode.alignment ?? Alignment.center,
     );
   }
 }
@@ -90,11 +79,12 @@ class AnimatedTranslate extends Translate {
   final Point<double> position;
   final Point<double> newPosition;
   late final Tween<Point<double>> _tween;
-
+  final Curve curve;
   AnimatedTranslate.fromMyPosToNewPos({
     required MapCalculator mapCalculator,
     required MarkerOrClusterNode from,
     required MarkerClusterNode to,
+    required this.curve,
   })  : position = Translate._getNodePixel(mapCalculator, from),
         newPosition = Translate._getNodePixel(
           mapCalculator,
@@ -111,6 +101,7 @@ class AnimatedTranslate extends Translate {
     required MapCalculator mapCalculator,
     required MarkerOrClusterNode from,
     required MarkerClusterNode to,
+    required this.curve,
   })  : position = Translate._getNodePixel(mapCalculator, from),
         newPosition = Translate._getNodePixel(
           mapCalculator,
@@ -128,20 +119,17 @@ class AnimatedTranslate extends Translate {
     required MarkerClusterNode cluster,
     required MarkerNode marker,
     required Point point,
+    required this.curve,
   })  : position = Translate._getMarkerPixel(
           mapCalculator,
           marker,
           customPoint: cluster.bounds.center,
         ),
-        newPosition = util.removeAnchor(
+        newPosition = util.removeAlignment(
           point,
           marker.width,
           marker.height,
-          Anchor.fromPos(
-            marker.anchorPos ?? AnchorPos.align(AnchorAlign.center),
-            marker.width,
-            marker.height,
-          ),
+          marker.alignment ?? Alignment.center,
         ) {
     _tween = Tween<Point<double>>(
       begin: Point(position.x, position.y),
@@ -151,5 +139,5 @@ class AnimatedTranslate extends Translate {
 
   @override
   Animation<Point<double>> animation(AnimationController animationController) =>
-      _tween.animate(animationController);
+      _tween.chain(CurveTween(curve: curve)).animate(animationController);
 }

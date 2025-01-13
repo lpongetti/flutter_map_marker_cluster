@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map/plugin_api.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:flutter_map_marker_popup/extension_api.dart';
 
@@ -10,17 +9,22 @@ class PolygonOptions {
   final Color color;
   final double borderStrokeWidth;
   final Color borderColor;
-  final bool isDotted;
+  final StrokePattern pattern;
 
   const PolygonOptions({
     this.color = const Color(0xFF00FF00),
     this.borderStrokeWidth = 0.0,
     this.borderColor = const Color(0xFFFFFF00),
-    this.isDotted = false,
+    this.pattern = const StrokePattern.solid(),
   });
 }
 
 class AnimationsOptions {
+  final Curve fadeInCurve;
+  final Curve fadeOutCurve;
+  final Curve clusterExpandCurve;
+  final Curve clusterCollapseCurve;
+  final Curve sipderifyCurve;
   final Duration zoom;
   final Duration fitBound;
   final Curve fitBoundCurves;
@@ -31,6 +35,11 @@ class AnimationsOptions {
   const AnimationsOptions({
     this.zoom = const Duration(milliseconds: 500),
     this.fitBound = const Duration(milliseconds: 500),
+    this.fadeInCurve = Curves.easeInCubic,
+    this.fadeOutCurve = Curves.easeInCubic,
+    this.clusterExpandCurve = Curves.easeInCubic,
+    this.clusterCollapseCurve = Curves.easeInCubic,
+    this.sipderifyCurve = Curves.fastOutSlowIn,
     this.centerMarker = const Duration(milliseconds: 500),
     this.spiderfy = const Duration(milliseconds: 500),
     this.fitBoundCurves = Curves.fastOutSlowIn,
@@ -99,27 +108,6 @@ class MarkerClusterLayerOptions {
   /// If true markers will be counter rotated to the map rotation
   final bool? rotate;
 
-  /// The origin of the coordinate system (relative to the upper left corner of
-  /// this render object) in which to apply the matrix.
-  ///
-  /// Setting an origin is equivalent to conjugating the transform matrix by a
-  /// translation. This property is provided just for convenience.
-  final Offset? rotateOrigin;
-
-  /// The alignment of the origin, relative to the size of the box.
-  ///
-  /// This is equivalent to setting an origin based on the size of the box.
-  /// If it is specified at the same time as the [rotateOrigin], both are applied.
-  ///
-  /// An [AlignmentDirectional.centerStart] value is the same as an [Alignment]
-  /// whose [Alignment.x] value is `-1.0` if [Directionality.of] returns
-  /// [TextDirection.ltr], and `1.0` if [Directionality.of] returns
-  /// [TextDirection.rtl].	 Similarly [AlignmentDirectional.centerEnd] is the
-  /// same as an [Alignment] whose [Alignment.x] value is `1.0` if
-  /// [Directionality.of] returns	 [TextDirection.ltr], and `-1.0` if
-  /// [Directionality.of] returns [TextDirection.rtl].
-  final AlignmentGeometry? rotateAlignment;
-
   /// Cluster size
   final Size size;
 
@@ -127,13 +115,10 @@ class MarkerClusterLayerOptions {
   final Size Function(List<Marker>)? computeSize;
 
   /// Cluster anchor
-  final AnchorPos? anchorPos;
+  final Alignment? alignment;
 
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
-
-  /// Options for fit bounds
-  final FitBoundsOptions fitBoundsOptions;
 
   /// Zoom buonds with animation on click cluster
   final bool zoomToBoundsOnClick;
@@ -172,6 +157,9 @@ class MarkerClusterLayerOptions {
   /// Function to call when a Marker is tapped
   final void Function(Marker)? onMarkerTap;
 
+  /// Function to call when a Marker is double tapped
+  final void Function(Marker)? onMarkerDoubleTap;
+
   /// Function to call when a Marker starts to be hovered
   final void Function(Marker)? onMarkerHoverEnter;
 
@@ -184,22 +172,39 @@ class MarkerClusterLayerOptions {
   /// Function to call when a cluster Marker is tapped
   final void Function(MarkerClusterNode)? onClusterTap;
 
+  ///If set to [true] the marker will have only gesture behavior that is provided by the marker child.
+  ///Can be used in cases where the marker child is a widget that already has gesture behavior and [GestureDetector] from the [MarkerClusterLayer] is interfering with it.
+  ///If set to [true] [onMarkerTap] [onMarkerHoverEnter] [onMarkerHoverExit] [centerMarkerOnClick] will not work.
+  ///
+  ///Defaults to [false].
+  final bool markerChildBehavior;
+
   /// Popup's options that show when tapping markers or via the PopupController.
   final PopupOptions? popupOptions;
+
+  final EdgeInsets padding;
+  final double maxZoom;
+  final bool inside;
+
+  /// By default calculations will return fractional zoom levels.
+  /// If this parameter is set to [true] fractional zoom levels will be round
+  /// to the next suitable integer.
+  final bool forceIntegerZoomLevel;
 
   MarkerClusterLayerOptions({
     required this.builder,
     this.rotate,
-    this.rotateOrigin,
-    this.rotateAlignment,
     this.markers = const [],
     this.size = const Size(30, 30),
     this.computeSize,
-    this.anchorPos,
+    this.alignment,
     this.maxClusterRadius = 80,
     this.disableClusteringAtZoom = 20,
     this.animationsOptions = const AnimationsOptions(),
-    this.fitBoundsOptions = const FitBoundsOptions(padding: EdgeInsets.all(12)),
+    this.padding = EdgeInsets.zero,
+    this.maxZoom = 17.0,
+    this.inside = false,
+    this.forceIntegerZoomLevel = false,
     this.zoomToBoundsOnClick = true,
     this.centerMarkerOnClick = true,
     this.spiderfyCircleRadius = 40,
@@ -210,10 +215,12 @@ class MarkerClusterLayerOptions {
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
+    this.onMarkerDoubleTap,
     this.onMarkerHoverEnter,
     this.onMarkerHoverExit,
     this.onClusterTap,
     this.onMarkersClustered,
     this.popupOptions,
+    this.markerChildBehavior = false,
   });
 }

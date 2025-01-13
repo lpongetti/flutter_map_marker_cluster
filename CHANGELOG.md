@@ -1,3 +1,44 @@
+## [1.4.0] - 19/09/2024
+
+- Merge pull request #220 from lemiha/master
+- Merge pull request #217 from ChargeHorizons/master
+
+## [1.3.6] - 06/05/2024
+
+- Merge pull request #212 from Railway-Engineering-Solutions/master
+
+## [1.3.5] - 10/03/2024
+
+- Merge pull request #209 from ReinisSprogis/master
+- Merge pull request #208 from pgebert/master
+- Merge pull request #203 from eshfield/patch-1
+
+## [1.3.4] - 05/12/2023
+
+- Merge pull request #201 from tratteo/master
+
+## [1.3.3] - 13/11/2023
+
+- Merge pull request #198 from mdanics/master
+- Merge pull request #199 from mdanics/spiderfy_ontop
+
+## [1.3.2] - 08/11/2023
+
+- Merge pull request #197 from tratteo/master
+- Merge pull request #196 from ignatz/master
+
+## [1.3.1] - 27/10/2023
+
+- Fix cluster rotation
+- Merge pull request #194 from shrijanRegmi/master
+- Merge pull request #192 from marselisborgit/master
+- Merge pull request #182 from starshipcoder/dev-rebuild-issue
+
+## [1.3.0] - 11/10/2023
+
+- Merge pull request #188 from altotunchitoo:flutter_map-6
+- Merge pull request #184 from shrijanRegmi/master
+
 ## [1.2.0] - 07/09/2023
 
 - Merge pull request #175 from enricostrijks/master
