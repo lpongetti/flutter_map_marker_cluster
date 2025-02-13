@@ -33,17 +33,20 @@ class MarkerNode extends MarkerOrClusterNode implements Marker {
   Alignment? get alignment => marker.alignment;
 
   @override
-  Bounds<double> pixelBounds(MapCamera map) {
-    final pixelPoint = map.project(point);
+  Offset pixelBounds(MapCamera map) {
+    final pixelPoint = map.projectAtZoom(point);
 
     final left = 0.5 * width * ((alignment ?? Alignment.center).x + 1);
     final top = 0.5 * height * ((alignment ?? Alignment.center).y + 1);
     final right = width - left;
     final bottom = height - top;
 
-    return Bounds(
-      Point(pixelPoint.x + left, pixelPoint.y - bottom),
-      Point(pixelPoint.x - right, pixelPoint.y + top),
-    );
+    final topLeft = Offset(pixelPoint.dx + left, pixelPoint.dy - bottom);
+    final bottomRight = Offset(pixelPoint.dx - right, pixelPoint.dy + top);
+
+    final dx = bottomRight.dx - topLeft.dx;
+    final dy = bottomRight.dy - topLeft.dy;
+
+    return Offset(dx, dy);
   }
 }

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/src/node/marker_cluster_node.dart';
 
@@ -9,5 +11,5 @@ abstract class MarkerOrClusterNode {
 
   MarkerOrClusterNode({required this.parent});
 
-  Bounds<double> pixelBounds(MapCamera map);
+  Offset pixelBounds(MapCamera map);
 }
