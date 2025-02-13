@@ -18,8 +18,7 @@ class MyApp extends StatelessWidget {
       home: const ClusteringPage(),
       routes: <String, WidgetBuilder>{
         ClusteringPage.route: (context) => const ClusteringPage(),
-        ClusteringManyMarkersPage.route: (context) =>
-            const ClusteringManyMarkersPage(),
+        ClusteringManyMarkersPage.route: (context) => const ClusteringManyMarkersPage(),
       },
     );
   }

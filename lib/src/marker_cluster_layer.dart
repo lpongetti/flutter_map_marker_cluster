@@ -75,7 +75,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
     _addLayers();
 
     _zoomController.forward();
-
     super.initState();
   }
 
@@ -563,7 +562,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer> with TickerProv
       // This is the performance critical hot path recursed on every map event!
 
       // Cull markers/clusters that are not on screen.
-      if (!widget.mapCamera.pixelBounds.contains(
+      if (widget.mapCamera.pixelBounds.contains(
         layer.pixelBounds(widget.mapCamera),
       )) {
         return;

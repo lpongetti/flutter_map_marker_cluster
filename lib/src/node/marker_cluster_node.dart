@@ -129,8 +129,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
     final right = width - left;
     final bottom = height - top;
 
-    final ne = map.projectAtZoom(bounds.northEast) + Offset(right, -top);
-    final sw = map.projectAtZoom(bounds.southWest) + Offset(-left, bottom);
+    final ne = map.projectAtZoom(bounds.northEast) + Offset(right, bottom);
+    final sw = map.projectAtZoom(bounds.southWest) + Offset(left, top);
 
     return Offset(ne.dx - sw.dx, ne.dy - sw.dy);
   }
