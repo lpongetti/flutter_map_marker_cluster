@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map_marker_cluster/src/core/util.dart' as util;
 import 'package:flutter_map_marker_cluster/src/map_calculator.dart';
@@ -38,7 +36,8 @@ abstract class Translate {
     LatLng? customPoint,
   }) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    return util.removeAlignment(pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
+    return util.removeAlignment(
+        pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
   }
 
   static Offset _getClusterPixel(
@@ -46,7 +45,8 @@ abstract class Translate {
     MarkerClusterNode clusterNode, {
     LatLng? customPoint,
   }) {
-    final pos = mapCalculator.getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
+    final pos = mapCalculator
+        .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
 
@@ -63,7 +63,8 @@ class StaticTranslate extends Translate {
   @override
   final Offset position;
 
-  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node) : position = Translate._getNodePixel(mapCalculator, node);
+  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node)
+      : position = Translate._getNodePixel(mapCalculator, node);
 
   @override
   Animation<Offset>? animation(AnimationController animationController) => null;
@@ -133,5 +134,6 @@ class AnimatedTranslate extends Translate {
   }
 
   @override
-  Animation<Offset> animation(AnimationController animationController) => _tween.chain(CurveTween(curve: curve)).animate(animationController);
+  Animation<Offset> animation(AnimationController animationController) =>
+      _tween.chain(CurveTween(curve: curve)).animate(animationController);
 }

@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'dart:ui';
 
 import 'package:flutter_map/flutter_map.dart';
@@ -11,10 +10,13 @@ class MapCalculator {
 
   Offset getPixelFromPoint(LatLng point) {
     final Offset pxPoint = mapState.projectAtZoom(point);
-    return Offset(pxPoint.dx - mapState.pixelOrigin.dx, pxPoint.dy - mapState.pixelOrigin.dy);
+    return Offset(pxPoint.dx - mapState.pixelOrigin.dx,
+        pxPoint.dy - mapState.pixelOrigin.dy);
   }
 
-  Offset project(LatLng latLng, {double? zoom}) => mapState.projectAtZoom(latLng, zoom);
+  Offset project(LatLng latLng, {double? zoom}) =>
+      mapState.projectAtZoom(latLng, zoom);
 
-  LatLng unproject(Offset point, {double? zoom}) => mapState.unprojectAtZoom(point, zoom);
+  LatLng unproject(Offset point, {double? zoom}) =>
+      mapState.unprojectAtZoom(point, zoom);
 }

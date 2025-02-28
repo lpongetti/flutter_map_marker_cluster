@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:math';
 import 'dart:ui';
 
 class CellEntry<T> {
@@ -17,7 +16,8 @@ class GridKey {
   const GridKey(this.row, this.col);
 
   @override
-  bool operator ==(Object other) => other is GridKey && other.row == row && other.col == col;
+  bool operator ==(Object other) =>
+      other is GridKey && other.row == row && other.col == col;
 
   @override
   int get hashCode => (col << 26) ^ row;
