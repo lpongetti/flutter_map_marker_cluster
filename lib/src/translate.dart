@@ -12,11 +12,11 @@ import 'package:latlong2/latlong.dart';
 abstract class Translate {
   const Translate();
 
-  Animation<Point<double>>? animation(AnimationController animationController);
+  Animation<Offset>? animation(AnimationController animationController);
 
-  Point<double> get position;
+  Offset get position;
 
-  static Point<double> _getNodePixel(
+  static Offset _getNodePixel(
     MapCalculator mapCalculator,
     MarkerOrClusterNode node, {
     LatLng? customPoint,
@@ -32,23 +32,21 @@ abstract class Translate {
     }
   }
 
-  static Point<double> _getMarkerPixel(
+  static Offset _getMarkerPixel(
     MapCalculator mapCalculator,
     MarkerNode marker, {
     LatLng? customPoint,
   }) {
     final pos = mapCalculator.getPixelFromPoint(customPoint ?? marker.point);
-    return util.removeAlignment(
-        pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
+    return util.removeAlignment(pos, marker.width, marker.height, marker.alignment ?? Alignment.center);
   }
 
-  static Point<double> _getClusterPixel(
+  static Offset _getClusterPixel(
     MapCalculator mapCalculator,
     MarkerClusterNode clusterNode, {
     LatLng? customPoint,
   }) {
-    final pos = mapCalculator
-        .getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
+    final pos = mapCalculator.getPixelFromPoint(customPoint ?? clusterNode.bounds.center);
 
     final calculatedSize = clusterNode.size();
 
@@ -63,22 +61,19 @@ abstract class Translate {
 
 class StaticTranslate extends Translate {
   @override
-  final Point<double> position;
+  final Offset position;
 
-  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node)
-      : position = Translate._getNodePixel(mapCalculator, node);
+  StaticTranslate(MapCalculator mapCalculator, MarkerOrClusterNode node) : position = Translate._getNodePixel(mapCalculator, node);
 
   @override
-  Animation<Point<double>>? animation(
-          AnimationController animationController) =>
-      null;
+  Animation<Offset>? animation(AnimationController animationController) => null;
 }
 
 class AnimatedTranslate extends Translate {
   @override
-  final Point<double> position;
-  final Point<double> newPosition;
-  late final Tween<Point<double>> _tween;
+  final Offset position;
+  final Offset newPosition;
+  late final Tween<Offset> _tween;
   final Curve curve;
   AnimatedTranslate.fromMyPosToNewPos({
     required MapCalculator mapCalculator,
@@ -91,9 +86,9 @@ class AnimatedTranslate extends Translate {
           from,
           customPoint: to.bounds.center,
         ) {
-    _tween = Tween<Point<double>>(
-      begin: Point(position.x, position.y),
-      end: Point(newPosition.x, newPosition.y),
+    _tween = Tween<Offset>(
+      begin: Offset(position.dx, position.dy),
+      end: Offset(newPosition.dx, newPosition.dy),
     );
   }
 
@@ -108,9 +103,9 @@ class AnimatedTranslate extends Translate {
           from,
           customPoint: to.bounds.center,
         ) {
-    _tween = Tween<Point<double>>(
-      begin: Point(newPosition.x, newPosition.y),
-      end: Point(position.x, position.y),
+    _tween = Tween<Offset>(
+      begin: Offset(newPosition.dx, newPosition.dy),
+      end: Offset(position.dx, position.dy),
     );
   }
 
@@ -118,7 +113,7 @@ class AnimatedTranslate extends Translate {
     required MapCalculator mapCalculator,
     required MarkerClusterNode cluster,
     required MarkerNode marker,
-    required Point point,
+    required Offset point,
     required this.curve,
   })  : position = Translate._getMarkerPixel(
           mapCalculator,
@@ -131,13 +126,12 @@ class AnimatedTranslate extends Translate {
           marker.height,
           marker.alignment ?? Alignment.center,
         ) {
-    _tween = Tween<Point<double>>(
-      begin: Point(position.x, position.y),
-      end: Point(newPosition.x, newPosition.y),
+    _tween = Tween<Offset>(
+      begin: Offset(position.dx, position.dy),
+      end: Offset(newPosition.dx, newPosition.dy),
     );
   }
 
   @override
-  Animation<Point<double>> animation(AnimationController animationController) =>
-      _tween.chain(CurveTween(curve: curve)).animate(animationController);
+  Animation<Offset> animation(AnimationController animationController) => _tween.chain(CurveTween(curve: curve)).animate(animationController);
 }

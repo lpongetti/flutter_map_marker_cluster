@@ -10,9 +10,9 @@ class AnimatedMapWidget extends MapWidget {
   final Widget child;
   final Size size;
   final AnimationController animationController;
-  final Animation<Point<double>>? _translateAnimation;
+  final Animation<Offset>? _translateAnimation;
   final Rotate? rotate;
-  final Point<double>? _position;
+  final Offset? _position;
   final Animation<double>? _fadeAnimation;
 
   AnimatedMapWidget({
@@ -44,8 +44,8 @@ class AnimatedMapWidget extends MapWidget {
         return Positioned(
           width: size.width,
           height: size.height,
-          left: _position?.x ?? _translateAnimation!.value.x,
-          top: _position?.y ?? _translateAnimation!.value.y,
+          left: _position?.dx ?? _translateAnimation!.value.dx,
+          top: _position?.dy ?? _translateAnimation!.value.dy,
           child: _fadeAnimation == null
               ? childWithRotation!
               : Opacity(

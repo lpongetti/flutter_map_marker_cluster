@@ -12,8 +12,7 @@ class ClusteringManyMarkersPage extends StatefulWidget {
   const ClusteringManyMarkersPage({super.key});
 
   @override
-  State<ClusteringManyMarkersPage> createState() =>
-      _ClusteringManyMarkersPageState();
+  State<ClusteringManyMarkersPage> createState() => _ClusteringManyMarkersPageState();
 }
 
 class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
@@ -61,8 +60,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
       drawer: buildDrawer(context, ClusteringManyMarkersPage.route),
       body: FlutterMap(
         options: MapOptions(
-          initialCenter: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2,
-              (maxLatLng.longitude + minLatLng.longitude) / 2),
+          initialCenter: LatLng((maxLatLng.latitude + minLatLng.latitude) / 2, (maxLatLng.longitude + minLatLng.longitude) / 2),
           initialZoom: 6,
           maxZoom: 15,
         ),
@@ -81,9 +79,7 @@ class _ClusteringManyMarkersPageState extends State<ClusteringManyMarkersPage> {
               markers: markers,
               builder: (context, markers) {
                 return Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color: Colors.blue),
+                  decoration: BoxDecoration(borderRadius: BorderRadius.circular(20), color: Colors.blue),
                   child: Center(
                     child: Text(
                       markers.length.toString(),
