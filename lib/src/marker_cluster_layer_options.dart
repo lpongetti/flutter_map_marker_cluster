@@ -118,7 +118,7 @@ class MarkerClusterLayerOptions {
   /// A cluster will cover at most this many pixels from its center
   final int maxClusterRadius;
 
-  /// Zoom buonds with animation on click cluster
+  /// Zoom bounds with animation on click cluster
   final bool zoomToBoundsOnClick;
 
   /// animations options
