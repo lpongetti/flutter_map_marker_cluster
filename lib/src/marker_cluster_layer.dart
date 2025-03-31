@@ -210,7 +210,9 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   void _onMarkerHover(MarkerNode marker, bool enter) {
     if (_zoomController.isAnimating ||
         _centerMarkerController.isAnimating ||
-        _fitBoundController.isAnimating) return;
+        _fitBoundController.isAnimating) {
+      return;
+    }
 
     if (widget.options.popupOptions != null) {
       final popupOptions = widget.options.popupOptions!;
