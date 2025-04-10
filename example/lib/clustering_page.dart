@@ -14,7 +14,6 @@ class ClusteringPage extends StatefulWidget {
 }
 
 class _ClusteringPageState extends State<ClusteringPage> {
-  final PopupController _popupController = PopupController();
 
   late List<Marker> markers;
   late int pointIndex;
@@ -184,15 +183,11 @@ class _ClusteringPageState extends State<ClusteringPage> {
         },
         child: const Icon(Icons.refresh),
       ),
-      body: PopupScope(
-        popupController: _popupController,
-        child: FlutterMap(
+      body: FlutterMap(
           options: MapOptions(
             initialCenter: points[0],
             initialZoom: 5,
             maxZoom: 15,
-            onTap: (_, __) => _popupController
-                .hideAllPopups(), // Hide popup when the map is tapped.
           ),
           children: <Widget>[
             TileLayer(
@@ -215,20 +210,6 @@ class _ClusteringPageState extends State<ClusteringPage> {
                     borderColor: Colors.blueAccent,
                     color: Colors.black12,
                     borderStrokeWidth: 3),
-                popupOptions: PopupOptions(
-                    popupSnap: PopupSnap.markerTop,
-                    popupController: _popupController,
-                    popupBuilder: (_, marker) => Container(
-                          width: 200,
-                          height: 100,
-                          color: Colors.white,
-                          child: GestureDetector(
-                            onTap: () => debugPrint('Popup tap!'),
-                            child: const Text(
-                              'Container popup for marker',
-                            ),
-                          ),
-                        )),
                 builder: (context, markers) {
                   return Container(
                     decoration: BoxDecoration(
@@ -247,7 +228,6 @@ class _ClusteringPageState extends State<ClusteringPage> {
             ),
           ],
         ),
-      ),
     );
   }
 }

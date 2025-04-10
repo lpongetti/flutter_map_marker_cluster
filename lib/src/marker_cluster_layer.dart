@@ -154,7 +154,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
-    final popupOptions = widget.options.popupOptions;
     return Stack(
       children: [
         // Keep the layers in a MobileTransformStack
@@ -164,14 +163,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ),
         ),
         // Move the PopupLayer outside the MobileLayerTransformer since it has its own
-        if (popupOptions != null)
-          PopupLayer(
-            popupDisplayOptions: PopupDisplayOptions(
-              builder: popupOptions.popupBuilder,
-              animation: popupOptions.popupAnimation,
-              snap: popupOptions.popupSnap,
-            ),
-          )
       ],
     );
   }
@@ -200,7 +191,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         onTap: _onMarkerTap(marker),
         onDoubleTap: _onMarkerDoubleTap(marker),
         onHover: (bool value) => _onMarkerHover(marker, value),
-        buildOnHover: widget.options.popupOptions?.buildPopupOnHover ?? false,
+        buildOnHover: false,
       ),
     );
   }
@@ -212,23 +203,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         _centerMarkerController.isAnimating ||
         _fitBoundController.isAnimating) {
       return;
-    }
-
-    if (widget.options.popupOptions != null) {
-      final popupOptions = widget.options.popupOptions!;
-      enter
-          ? Future.delayed(
-              Duration(
-                  milliseconds: popupOptions.timeToShowPopupOnHover >= 0
-                      ? popupOptions.timeToShowPopupOnHover
-                      : 0), () {
-              popupOptions.markerTapBehavior.apply(
-                PopupSpec.wrap(marker.marker),
-                PopupState.maybeOf(context, listen: false)!,
-                popupOptions.popupController,
-              );
-            })
-          : popupOptions.popupController.hideAllPopups();
     }
 
     if (widget.options.onMarkerTap != null) {
@@ -252,12 +226,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             .map((markerNode) => markerNode.marker)
             .toList();
 
-        if (widget.options.popupOptions != null &&
-            markersGettingClustered != null) {
-          widget.options.popupOptions!.popupController.hidePopupsOnlyFor(
-            markersGettingClustered,
-          );
-        }
         if (widget.options.onMarkersClustered != null &&
             markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
@@ -275,8 +243,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             .toList();
 
         if (markersGettingClustered != null) {
-          widget.options.popupOptions?.popupController
-              .hidePopupsOnlyFor(markersGettingClustered);
           widget.options.onMarkersClustered?.call(markersGettingClustered);
         }
 
@@ -446,9 +412,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       }
     }
 
-    widget.options.popupOptions?.popupController.hidePopupsOnlyFor(
-      markersGettingClustered,
-    );
     widget.options.onMarkersClustered?.call(markersGettingClustered);
   }
 
@@ -721,15 +684,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   VoidCallback _onMarkerTap(MarkerNode marker) {
     return () {
       if (_animating) return;
-
-      if (widget.options.popupOptions != null) {
-        final popupOptions = widget.options.popupOptions!;
-        popupOptions.markerTapBehavior.apply(
-          PopupSpec.wrap(marker.marker),
-          PopupState.maybeOf(context, listen: false)!,
-          popupOptions.popupController,
-        );
-      }
 
       widget.options.onMarkerTap?.call(marker.marker);
 
