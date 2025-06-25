@@ -8,6 +8,8 @@ class MarkerWidget extends StatelessWidget {
   final Function(bool)? onHover;
   final bool buildOnHover;
   final bool markerChildBehavior;
+  final double opacity;
+  final bool absorbing;
 
   MarkerWidget({
     required this.marker,
@@ -16,11 +18,13 @@ class MarkerWidget extends StatelessWidget {
     required this.markerChildBehavior,
     this.onHover,
     this.buildOnHover = false,
+    this.opacity = 1.0,
+    this.absorbing = false,
   }) : super(key: marker.key ?? ObjectKey(marker.marker));
 
   @override
   Widget build(BuildContext context) {
-    return markerChildBehavior
+    Widget content = markerChildBehavior
         ? marker.child
         : GestureDetector(
             behavior: HitTestBehavior.opaque,
@@ -34,5 +38,15 @@ class MarkerWidget extends StatelessWidget {
                   )
                 : marker.child,
           );
+    if (opacity < 1.0 || absorbing) {
+      content = AbsorbPointer(
+        absorbing: absorbing,
+        child: Opacity(
+          opacity: opacity,
+          child: content,
+        ),
+      );
+    }
+    return content;
   }
 }

@@ -128,6 +128,8 @@ class MarkerClusterLayerOptions {
   ///Defaults to [false].
   final bool markerChildBehavior;
 
+  final bool autoCenterAndExpand;
+
   final EdgeInsets padding;
   final double maxZoom;
   final bool inside;
@@ -142,6 +144,7 @@ class MarkerClusterLayerOptions {
     this.rotate,
     this.markers = const [],
     this.size = const Size(30, 30),
+    this.autoCenterAndExpand = true,
     this.computeSize,
     this.alignment,
     this.maxClusterRadius = 80,

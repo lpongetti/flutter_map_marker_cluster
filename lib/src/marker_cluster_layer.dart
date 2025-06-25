@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
@@ -19,20 +20,27 @@ class MarkerClusterLayer extends StatefulWidget {
   final MarkerClusterLayerOptions options;
   final MapController mapController;
   final MapCamera mapCamera;
+  final ClusterController? clusterController;
 
   const MarkerClusterLayer({
     required this.mapController,
     required this.mapCamera,
     required this.options,
+    this.clusterController,
     super.key,
   });
 
   @override
-  State<MarkerClusterLayer> createState() => _MarkerClusterLayerState();
+  State<MarkerClusterLayer> createState() => MarkerClusterLayerState();
 }
 
-class _MarkerClusterLayerState extends State<MarkerClusterLayer>
+class MarkerClusterLayerState extends State<MarkerClusterLayer>
     with TickerProviderStateMixin {
+  // Constants for opacity and animation values
+  static const double _fadedOpacity = 0.3;
+  static const double _stickyBoundsFactor = 0.5;
+  static const Duration _opacityAnimationDuration = Duration(milliseconds: 300);
+
   late MapCalculator _mapCalculator;
   late ClusterManager _clusterManager;
   late int _maxZoom;
@@ -48,7 +56,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   PolygonLayer? _polygon;
   MarkerClusterNode? spiderfyCluster;
 
-  _MarkerClusterLayerState();
+  MarkerClusterLayerState();
 
   bool _isSpiderfyCluster(MarkerClusterNode cluster) {
     return spiderfyCluster != null &&
@@ -69,19 +77,17 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void initState() {
+    super.initState();
     _mapCalculator = MapCalculator(widget.mapCamera);
-
     _currentZoom = _previousZoom = widget.mapCamera.zoom.ceil();
     _previousZoomDouble = widget.mapCamera.zoom;
     _minZoom = widget.mapCamera.minZoom?.ceil() ?? 1;
     _maxZoom = widget.mapCamera.maxZoom?.floor() ?? 20;
-    _previousZoomDouble = widget.mapCamera.zoom;
     _initializeAnimationControllers();
     _initializeClusterManager();
     _addLayers();
-
     _zoomController.forward();
-    super.initState();
+    widget.clusterController?.$updateState(this);
   }
 
   void _initializeAnimationControllers() {
@@ -99,7 +105,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       vsync: this,
       duration: widget.options.animationsOptions.centerMarker,
     );
-
     _spiderfyController = AnimationController(
       vsync: this,
       duration: widget.options.animationsOptions.spiderfy,
@@ -117,6 +122,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   void didUpdateWidget(MarkerClusterLayer oldWidget) {
+    widget.clusterController?.$updateState(this);
     if (oldWidget.options.markers != widget.options.markers) {
       _initializeClusterManager();
       _addLayers();
@@ -125,6 +131,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       _mapCalculator = MapCalculator(widget.mapCamera);
     }
     super.didUpdateWidget(oldWidget);
+  }
+
+  void openCluster(MarkerClusterNode cluster) {
+    _spiderfy(cluster);
+  }
+
+  Future<void> closeCluster() {
+    return _unspiderfy();
   }
 
   void _initializeClusterManager() {
@@ -154,9 +168,31 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   @override
   Widget build(BuildContext context) {
+    final manager = widget.clusterController?.manager;
+    if (manager == null) {
+      // fallback to normal behavior if no manager
+      return _buildLayerContent();
+    }
+    return ValueListenableBuilder<ClusterController?>(
+      valueListenable: manager.activeController,
+      builder: (context, active, child) {
+        final isActive = (active == null || active == widget.clusterController);
+        return IgnorePointer(
+          ignoring: !isActive,
+          child: AnimatedOpacity(
+            opacity: isActive ? 1.0 : _fadedOpacity,
+            duration: _opacityAnimationDuration,
+            child: child,
+          ),
+        );
+      },
+      child: _buildLayerContent(),
+    );
+  }
+
+  Widget _buildLayerContent() {
     return Stack(
       children: [
-        // Keep the layers in a MobileTransformStack
         MobileLayerTransformer(
           child: Stack(
             children: _buildMobileTransformStack(),
@@ -172,6 +208,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     required AnimationController controller,
     required Translate translate,
     Fade? fade,
+    double opacity = 1.0,
+    bool absorbing = false,
   }) {
     return MapWidget(
       size: Size(marker.width, marker.height),
@@ -192,6 +230,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         onDoubleTap: _onMarkerDoubleTap(marker),
         onHover: (bool value) => _onMarkerHover(marker, value),
         buildOnHover: false,
+        opacity: opacity,
+        absorbing: absorbing,
       ),
     );
   }
@@ -217,6 +257,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       spiderfyCluster = cluster;
     });
     _spiderfyController.forward();
+    widget.clusterController?.onClusterExpand();
   }
 
   Future<void> _unspiderfy() async {
@@ -230,12 +271,16 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
             markersGettingClustered != null) {
           widget.options.onMarkersClustered!(markersGettingClustered);
         }
-
+        widget.clusterController?.onClusterContract();
         await _spiderfyController.reverse().then(
-              (_) => setState(() {
+          (_) {
+            if (mounted) {
+              setState(() {
                 spiderfyCluster = null;
-              }),
-            );
+              });
+            }
+          },
+        );
         break;
       case AnimationStatus.forward:
         final markersGettingClustered = spiderfyCluster?.markers
@@ -245,22 +290,30 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
         if (markersGettingClustered != null) {
           widget.options.onMarkersClustered?.call(markersGettingClustered);
         }
-
-        _spiderfyController.stop();
-        await _spiderfyController.reverse().then(
-              (_) => setState(() {
-                spiderfyCluster = null;
-              }),
-            );
-        break;
+        if (!widget.options.autoCenterAndExpand) {
+          _spiderfyController.stop();
+          await _spiderfyController.reverse().then(
+                (_) => setState(() {
+                  spiderfyCluster = null;
+                }),
+              );
+          break;
+        }
       default:
         break;
     }
   }
 
   void _addMarkerLayer(MarkerNode markerNode, List<Widget> layers) {
-    if (_zoomingIn && markerNode.parent!.zoom == _previousZoom) {
-      _addZoomingInMarkerLayer(markerNode, layers);
+    // Intra-layer fade/ignore: if a cluster is open, fade/ignore all except the spiderfied cluster and its markers
+    if (spiderfyCluster != null && (markerNode.parent != spiderfyCluster)) {
+      layers.add(_buildMarker(
+        marker: markerNode,
+        controller: _zoomController,
+        translate: StaticTranslate(_mapCalculator, markerNode),
+        opacity: _fadedOpacity,
+        absorbing: true,
+      ));
     } else {
       layers.add(_buildMarker(
         marker: markerNode,
@@ -270,53 +323,41 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     }
   }
 
-  void _addZoomingInMarkerLayer(MarkerNode markerNode, List<Widget> layers) {
-    layers.add(
-      _buildMarker(
-        marker: markerNode,
-        controller: _zoomController,
-        fade: Fade.fadeIn(curve: widget.options.animationsOptions.fadeInCurve),
-        translate: AnimatedTranslate.fromNewPosToMyPos(
-          mapCalculator: _mapCalculator,
-          from: markerNode,
-          to: markerNode.parent!,
-          curve: widget.options.animationsOptions.clusterExpandCurve,
-        ),
-      ),
-    );
-
-    // parent
-    layers.add(
-      MapWidget(
-        size: markerNode.parent!.size(),
-        animationController: _zoomController,
-        translate: StaticTranslate(_mapCalculator, markerNode.parent!),
-        rotate: widget.options.rotate != true
-            ? null
-            : Rotate(
-                angle: -widget.mapCamera.rotationRad,
-                alignment: widget.options.alignment,
-              ),
-        fade:
-            Fade.fadeOut(curve: widget.options.animationsOptions.fadeOutCurve),
-        child: ClusterWidget(
-          cluster: markerNode.parent!,
-          builder: widget.options.builder,
-          onTap: _onClusterTap(markerNode.parent!),
-        ),
-      ),
-    );
-  }
-
   void _addMarkerClusterLayer(MarkerClusterNode clusterNode,
       List<Widget> layers, List<Widget> spiderfyLayers) {
+    if (_isSpiderfyCluster(clusterNode)) {
+      spiderfyLayers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
+      return;
+    }
+    // Intra-layer fade/ignore: if a cluster is open, fade/ignore all except the spiderfied cluster
+    if (spiderfyCluster != null) {
+      layers.add(
+        MapWidget.static(
+          key: ObjectKey(clusterNode),
+          size: clusterNode.size(),
+          translate: StaticTranslate(_mapCalculator, clusterNode),
+          rotate: widget.options.rotate != true
+              ? null
+              : Rotate(
+                  angle: -widget.mapCamera.rotationRad,
+                  alignment: widget.options.alignment,
+                ),
+          child: ClusterWidget(
+            cluster: clusterNode,
+            builder: widget.options.builder,
+            onTap: _onClusterTap(clusterNode),
+            opacity: _fadedOpacity,
+            absorbing: true,
+          ),
+        ),
+      );
+      return;
+    }
     if (_zoomingOut && clusterNode.children.length > 1) {
       _addClusterClosingLayer(clusterNode, layers);
     } else if (_zoomingIn &&
         clusterNode.parent!.bounds.center != clusterNode.bounds.center) {
       _addClusterOpeningLayer(clusterNode, layers);
-    } else if (_isSpiderfyCluster(clusterNode)) {
-      spiderfyLayers.addAll(_buildSpiderfyCluster(clusterNode, _currentZoom));
     } else {
       layers.add(
         MapWidget.static(
@@ -550,7 +591,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     // marker.
     final recursionBounds = _extendBounds(
       widget.mapCamera.visibleBounds,
-      0.5,
+      _stickyBoundsFactor,
     );
 
     _clusterManager.recursivelyFromTopClusterLevel(
@@ -559,9 +600,14 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       // This is the performance critical hot path recursed on every map event!
 
       // Cull markers/clusters that are not on screen.
-      if (widget.mapCamera.pixelBounds.contains(
-        layer.pixelBounds(widget.mapCamera),
-      )) {
+      try {
+        if (widget.mapCamera.pixelBounds.contains(
+          layer.pixelBounds(widget.mapCamera),
+        )) {
+          return;
+        }
+      } catch (e) {
+        // Skip this layer if bounds calculation fails
         return;
       }
 
@@ -584,7 +630,6 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       if (_animating) return;
 
       widget.options.onClusterTap?.call(cluster);
-
       if (!widget.options.zoomToBoundsOnClick) {
         if (widget.options.spiderfyCluster) {
           if (spiderfyCluster != null) {
@@ -684,9 +729,8 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
   VoidCallback _onMarkerTap(MarkerNode marker) {
     return () {
       if (_animating) return;
-
+      // widget.clusterController.onMarkerTap?.call(marker.marker);
       widget.options.onMarkerTap?.call(marker.marker);
-
       if (!widget.options.centerMarkerOnClick) return;
 
       final center = widget.mapCamera.center;
@@ -762,6 +806,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
     if (widget.options.spiderfyShapePositions != null) {
       return widget.options.spiderfyShapePositions!(count, center);
     }
+
     if (count >= widget.options.circleSpiralSwitchover) {
       return Spiderfy.spiral(
         widget.options.spiderfySpiralDistanceMultiplier,
