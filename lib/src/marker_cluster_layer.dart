@@ -50,6 +50,13 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
 
   _MarkerClusterLayerState();
 
+  bool _shouldSpiderfy(MarkerClusterNode cluster) {
+    return widget.options.spiderfyCluster &&
+        (widget.options.disableSpiderfyAboveMarkerCount <= 0 ||
+            cluster.markers.length <=
+                widget.options.disableSpiderfyAboveMarkerCount);
+  }
+
   bool _isSpiderfyCluster(MarkerClusterNode cluster) {
     return spiderfyCluster != null &&
         spiderfyCluster!.bounds.center == cluster.bounds.center;
@@ -623,7 +630,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
       widget.options.onClusterTap?.call(cluster);
 
       if (!widget.options.zoomToBoundsOnClick) {
-        if (widget.options.spiderfyCluster) {
+        if (_shouldSpiderfy(cluster)) {
           if (spiderfyCluster != null) {
             if (spiderfyCluster == cluster) {
               _unspiderfy();
@@ -691,7 +698,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           zoomTween.begin == zoomTween.end;
 
       if (isAlreadyFit) {
-        if (cannotDivide && widget.options.spiderfyCluster) {
+        if (cannotDivide && _shouldSpiderfy(cluster)) {
           _spiderfy(cluster);
         }
         return;
@@ -711,7 +718,7 @@ class _MarkerClusterLayerState extends State<MarkerClusterLayer>
           ..removeListener(listener)
           ..reset();
 
-        if (cannotDivide && widget.options.spiderfyCluster) {
+        if (cannotDivide && _shouldSpiderfy(cluster)) {
           _spiderfy(cluster);
         }
       });

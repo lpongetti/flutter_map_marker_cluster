@@ -130,6 +130,10 @@ class MarkerClusterLayerOptions {
   /// If false remove spiderfy effect on tap
   final bool spiderfyCluster;
 
+  /// If set, spiderfy will be disabled above this marker count
+  /// 0 -> No limit
+  final int disableSpiderfyAboveMarkerCount;
+
   /// Increase to increase the distance away that circle spiderfied markers appear from the center
   final int spiderfyCircleRadius;
 
@@ -210,6 +214,7 @@ class MarkerClusterLayerOptions {
     this.circleSpiralSwitchover = 9,
     this.spiderfyShapePositions,
     this.spiderfyCluster = true,
+    this.disableSpiderfyAboveMarkerCount = 0,
     this.polygonOptions = const PolygonOptions(),
     this.showPolygon = true,
     this.onMarkerTap,
