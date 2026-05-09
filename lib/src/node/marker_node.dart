@@ -36,8 +36,8 @@ class MarkerNode extends MarkerOrClusterNode implements Marker {
     final alignment = this.alignment ?? Alignment.center;
 
     // Calculate offset from center based on alignment
-    final offsetX = width * alignment.x * 0.5; // -0.5 to 0.5 range
-    final offsetY = height * alignment.y * 0.5; // -0.5 to 0.5 range
+    final offsetX = width * (alignment.x - 1) * 0.5; // -1 to 0 range
+    final offsetY = height * (alignment.y - 1) * 0.5; // -1 to 0 range
 
     final topLeft = Offset(center.dx + offsetX, center.dy + offsetY);
     final bottomRight = Offset(topLeft.dx + width, topLeft.dy + height);

@@ -130,8 +130,8 @@ class MarkerClusterNode extends MarkerOrClusterNode {
     final size = this.size();
 
     // Calculate offset from center based on alignment
-    final offsetX = size.width * alignment.x * 0.5; // -0.5 to 0.5 range
-    final offsetY = size.height * alignment.y * 0.5; // -0.5 to 0.5 range
+    final offsetX = size.width * (alignment.x - 1) * 0.5; // -1 to 0 range
+    final offsetY = size.height * (alignment.y - 1) * 0.5; // -1 to 0 range
 
     // Calculate top-left corner
     final topLeft = Offset(
