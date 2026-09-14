@@ -31,11 +31,15 @@ void main() {
           child: Icon(Icons.location_on),
         );
 
+        final centre = mockCamera.projectAtZoom(marker.point);
+
         final markerNode = MarkerNode(marker);
         final bounds = markerNode.pixelBounds(mockCamera);
 
         // Verify it returns a proper Rect
         expect(bounds, isA<Rect>());
+        expect(bounds.left, equals(centre.dx - 20));
+        expect(bounds.top, equals(centre.dy - 20));
         expect(bounds.width, equals(40.0));
         expect(bounds.height, equals(40.0));
       });
@@ -49,10 +53,14 @@ void main() {
           child: Icon(Icons.location_on),
         );
 
+        final centre = mockCamera.projectAtZoom(marker.point);
+
         final markerNode = MarkerNode(marker);
         final bounds = markerNode.pixelBounds(mockCamera);
 
         expect(bounds, isA<Rect>());
+        expect(bounds.left, equals(centre.dx - 40));
+        expect(bounds.top, equals(centre.dy - 40));
         expect(bounds.width, equals(40.0));
         expect(bounds.height, equals(40.0));
       });
@@ -66,10 +74,14 @@ void main() {
           child: Icon(Icons.location_on),
         );
 
+        final centre = mockCamera.projectAtZoom(marker.point);
+
         final markerNode = MarkerNode(marker);
         final bounds = markerNode.pixelBounds(mockCamera);
 
         expect(bounds, isA<Rect>());
+        expect(bounds.left, equals(centre.dx));
+        expect(bounds.top, equals(centre.dy));
         expect(bounds.width, equals(40.0));
         expect(bounds.height, equals(40.0));
       });
